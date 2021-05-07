@@ -23,17 +23,16 @@ public class BTTN {
 	 * @param filepath
 	 */
 	private static void setup(String filepath) {
-		System.out.println("What do you need to setup?\nEnter the opotion number below!");
-		System.out.println("1. Add/Remove Channel");
-		System.out.println("2. Add/Remove Authentication Keys");
-		System.out.print("Option Number: ");
+		System.out.println(Bundle.getString("setupQ"));
+		System.out.println(Bundle.getString("modChan"));
+		System.out.println(Bundle.getString("modKeys"));
+		System.out.print(Bundle.getString("option"));
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int option = -1;
 		try {
 			option = Integer.parseInt(reader.readLine());
 		} catch (NumberFormatException | IOException e) {
-			System.err.println("Channel.java - invalid number provided or trouble reading the number provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidNum"));
 		}
 		switch(option) {
 		case 1:
@@ -43,8 +42,7 @@ public class BTTN {
 			Channel.setupChannels(filepath);
 			break;
 		default:
-			System.err.println("Invalid option inputted!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidOpt"));
 		}
 	}
 
@@ -54,8 +52,7 @@ public class BTTN {
 	 */
 	public static void main(String[] args) {
 		if(args.length < 1 || args.length > 2) {
-			System.err.println("Invalid arguments, make sure you are only providing the full path to your JSON config file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("argsError"));
 		} else if(args.length == 1){
 			HashMap<String, Boolean> oldStatus = new HashMap<String, Boolean>();
 			HashMap<String, Boolean> currStatus = new HashMap<String, Boolean>();
@@ -72,23 +69,24 @@ public class BTTN {
 					nowLive.add(channel);
 				}
 			}
+			Helper.updateStatusFile(currStatus, args[0]);
 			if(!nowLive.isEmpty()) {
 				Collections.sort(nowLive);
 				Notifications.sendLiveNotification(nowLive, auth);
 			} else {
-				System.out.println("BTTN Checked all channels, no updates!");
+				Logger.logInfo(Bundle.getString("noUpdates"));
 			}
-			Helper.updateStatusFile(currStatus, args[0]);
-		} else if(args[1].contains("setup")) {
+		} else if(args[1].contains(Bundle.getString("setup"))) {
 			setup(args[0]);
 		} else {
-			System.err.println("Invalid Argument provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("argsError"));
 		}
 		/* TODO
 		 * Improve notifications with stream name and game???
 		 * Add comments and javadoc
-		 * Logging
+		 * Fix daily delete of log file
+		 * Fix error when exporting???
+		 * Check for bugs before 1.0 release, especially in file modifying
 		 */
 	}
 }

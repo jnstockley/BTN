@@ -45,8 +45,7 @@ public class Helper {
 		HashMap<String, String> auth = new HashMap<String, String>();
 		File file = new File(filepath);
 		if(file.length() == 0) {
-			System.err.println("Helper.java - " + filepath + " is an empty file! Please add channels and authentication keys!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("emptyFile", filepath));
 		}
 		JSONObject authJSON = getSection(filepath, "auth");
 		if(authJSON.containsKey("twitch")) {
@@ -55,12 +54,10 @@ public class Helper {
 				auth.put("twitch-client-id", twitch.get("clientID").toString());
 				auth.put("twitch-authorization", "Bearer " + twitch.get("authorization").toString());
 			} else {
-				System.err.println("Missing Twitch clientID and/or authorization key(s)!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("noTwitchKey"));
 			}
 		} else {
-			System.err.println("Missing Twitch section of JSON auth file");
-			System.exit(1);
+			Logger.logError(Bundle.getString("noTwitch", filepath));
 		}
 		if(authJSON.containsKey("spontit")) {
 			JSONObject spontit = (JSONObject) authJSON.get("spontit");
@@ -68,12 +65,10 @@ public class Helper {
 				auth.put("spontit-user-id", spontit.get("userID").toString());
 				auth.put("spontit-authorization", spontit.get("authorization").toString());
 			} else {
-				System.err.println("Missing Spontit userID and/or authorization key(s)!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("noSpontitKey"));
 			}
 		} else {
-			System.err.println("Missing Spontit section of JSON auth file");
-			System.exit(1);
+			Logger.logError(Bundle.getString("noSpontit", filepath));
 		}
 		return auth;
 	}
@@ -95,14 +90,13 @@ public class Helper {
 			response = HTTP.get("https://api.twitch.tv/helix/search/channels?query=" + channel, twitchAuth);
 			if(Integer.parseInt(response.get("statusCode"))!=200) {
 				Notifications.sendErrorNotification(response, auth);
-				System.exit(1);
+				Logger.logError(Bundle.getString("twitchStatus", response.toString()));
 			} else {
 				JSONObject json = null;
 				try {
 					json = (JSONObject) parser.parse(response.get("data"));
 				} catch (ParseException e1) {
-					System.err.println("Helper.java - not valid JSON provided!");
-					System.exit(1);
+					Logger.logError(Bundle.getString("badJSONForm"));
 				}
 				Object[] jsonArr = ((JSONArray) json.get("data")).toArray();
 				List<String> data = new ArrayList<String>();
@@ -114,8 +108,7 @@ public class Helper {
 					try {
 						channelJson = (JSONObject)parser.parse(channelData);
 					} catch (ParseException e) {
-						System.err.println("Helper.java - not valid JSON provided!");
-						System.exit(1);
+						Logger.logError(Bundle.getString("badJSONForm"));
 					}
 					if(channelJson.get("display_name").equals(channel) && channelJson.get("is_live").toString().equals("true")) {
 						currStatus.put(channel, true);
@@ -141,8 +134,7 @@ public class Helper {
 		try {
 			json = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e1) {
-			System.err.println("Helper.java - " + filepath + " either not found or not valid JSON file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		JSONObject channelJSON = new JSONObject(currStatus);
 		json.remove("channels");
@@ -154,11 +146,10 @@ public class Helper {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			System.err.println("Helper.java - " + filepath + " error writing file to disk!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badWrite", filepath));
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param filepath
@@ -176,13 +167,12 @@ public class Helper {
 					delay = Integer.parseInt(json.get("updateDelay").toString());
 				}
 			} catch (IOException | ParseException e) {
-				System.err.println("Helper.java - " + filepath + " either not found or not valid JSON file!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("badWrite", filepath));
 			}
 		}
 		return delay;
 	}
-	
+
 	/**
 	 * 
 	 * @param filepath
@@ -195,8 +185,7 @@ public class Helper {
 		try {
 			jsonSection = (JSONObject) ((JSONObject) parser.parse(new FileReader(filepath))).get(section);
 		} catch (IOException | ParseException e) {
-			System.err.println("Helper.java - " + filepath + " either not found or not valid JSON file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badWrite", filepath));
 		}
 		return jsonSection;
 	}

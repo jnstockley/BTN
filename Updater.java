@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class Updater {
 
 	//
-	private final static double version = 0.9;
+	private final static double version = 0.10;
 	
 	/**
 	 * 
@@ -29,14 +29,12 @@ public class Updater {
 		HashMap<String, String> response = HTTP.get("https://raw.githubusercontent.com/jnstockley/BTTN/main/version");
 		if(response.get("statusCode").equals("200")) {
 			double serverVersion = Double.parseDouble(response.get("data"));
-			if(serverVersion > version) {
-				timeToSendAlert(30, serverVersion, auth);
-				System.out.println("Update avaiable please update!");
-				System.exit(0);
+			if((serverVersion > version) && timeToSendAlert(30)) {
+				Notifications.sendUpdateNotification(serverVersion, auth);
+				Logger.logInfo(Bundle.getString("updateAvailable"));
 			}
 		} else {
-			System.err.println("Updater.java - error checking for new version!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("errCheck"));
 		}
 	}
 	
@@ -46,16 +44,16 @@ public class Updater {
 	 * @param serverVersion
 	 * @param auth
 	 */
-	public static void timeToSendAlert(int delay, double serverVersion, HashMap<String, String> auth) {
+	private static boolean timeToSendAlert(int delay) {
 		Date checkTime = new Date(getDateTime() + TimeUnit.MINUTES.toMillis(delay));
 		Date curDate = new Date();
 		System.out.println(checkTime);
 		System.out.println(curDate);
 		if(checkTime.compareTo(curDate) < 0) {
-			Notifications.sendUpdateNotification(serverVersion, auth);
 			writeDateTime(curDate.getTime());
+			return true;
 		} else {
-			System.out.println("Update but notif would not be sent");
+			return false;
 		}
 	}
 	
@@ -72,8 +70,7 @@ public class Updater {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			System.err.println("Updater.java - Error writing to time file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("timeWriteErr"));
 		}
 	}
 	
@@ -89,8 +86,7 @@ public class Updater {
 			br.close();
 			return time;
 		} catch (IOException | NumberFormatException e) {
-			System.err.println("Updater.java - Error reading time file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("timeReadErr"));
 			return -1;
 		} 
 	}

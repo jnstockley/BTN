@@ -26,21 +26,19 @@ public class Auth {
 	 */
 	@SuppressWarnings("unchecked")
 	private static void twitchAddAuth(String filepath, BufferedReader reader, boolean update) {
-		System.out.print("Enter your Twitch.tv Client ID: ");
+		System.out.print(Bundle.getString("twitchClient"));
 		String clientID = null;
 		try {
 			clientID = reader.readLine();
 		} catch (IOException e) {
-			System.err.println("Auth.java - invalid trouble reading the client id provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badClient"));
 		}
-		System.out.print("Enter your Twitch.tv Authorization Key: ");
+		System.out.print(Bundle.getString("twitchAuth"));
 		String authorization = null;
 		try {
 			authorization = reader.readLine();
 		} catch (IOException e) {
-			System.err.println("Auth.java - invalid trouble reading the authorization key provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badAuth"));
 		}
 		JSONObject twitchAuthJSON = new JSONObject();
 		twitchAuthJSON.put("clientID", clientID);
@@ -52,14 +50,12 @@ public class Auth {
 			try {
 				json = (JSONObject) parser.parse(new FileReader(filepath));
 			} catch (IOException | ParseException e) {
-				System.err.println("Auth.java - " + filepath + " either not found or not valid JSON file!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("badJSON", filepath));
 			}
 		}
 		if(json.containsKey("auth")) {
 			if(((JSONObject)json.get("auth")).containsKey("twitch")){
-				System.err.println("Auth.java - Twitch API keys are already exist in this file!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("twitchKeys"));
 			}
 			JSONObject authJson = (JSONObject)json.get("auth");
 			authJson.put("twitch", twitchAuthJSON);
@@ -76,15 +72,12 @@ public class Auth {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			System.err.println("Auth.java - " + filepath + " error writing file to disk!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badWrite", filepath));
 		}
 		if(update) {
-			System.out.println("Updated Twitch API Keys!");
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("updateTwitch"));
 		} else {
-			System.out.println("Added Twitch API Keys!");
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("addTwitch"));
 		}
 	}
 
@@ -95,21 +88,19 @@ public class Auth {
 	 */
 	@SuppressWarnings("unchecked")
 	private static void spontitAddAuth(String filepath, BufferedReader reader, boolean update) {
-		System.out.print("Enter your Spontit Authorization Key: ");
+		System.out.print(Bundle.getString("spontitAuth"));
 		String authorization = null;
 		try {
 			authorization = reader.readLine();
 		} catch (IOException e) {
-			System.err.println("Auth.java - invalid trouble reading the authorization key provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badAuth"));
 		}
-		System.out.print("Enter yourr Spontit User ID: ");
+		System.out.print(Bundle.getString("spontitUser"));
 		String userID = null;
 		try {
 			userID = reader.readLine();
 		} catch (IOException e) {
-			System.err.println("Auth.java - invalid trouble reading the user id provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badUser"));
 		}
 		JSONObject spontitAuthJSON = new JSONObject();
 		spontitAuthJSON.put("userID", userID);
@@ -121,14 +112,12 @@ public class Auth {
 			try {
 				json = (JSONObject) parser.parse(new FileReader(filepath));
 			} catch (IOException | ParseException e) {
-				System.err.println("Auth.java - " + filepath + " either not found or not valid JSON file!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("badJSON", filepath));
 			}
 		}
 		if(json.containsKey("auth")) {
 			if(((JSONObject)json.get("auth")).containsKey("spontit")){
-				System.err.println("Auth.java - Spontit API keys are already exist in this file!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("spontitKeys"));
 			}
 			JSONObject authJson = (JSONObject)json.get("auth");
 			authJson.put("spontit", spontitAuthJSON);
@@ -145,15 +134,12 @@ public class Auth {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			System.err.println("Auth.java - " + filepath + " error writing file to disk!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badWrite", filepath));
 		}
 		if(update) {
-			System.out.println("Updated Spontit API Keys!");
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("updateSpontit"));
 		} else {
-			System.out.println("Added Spontit API Keys!");
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("addSpontit"));
 		}
 	}
 
@@ -167,14 +153,12 @@ public class Auth {
 		JSONObject json = new JSONObject();
 		File file = new File(filepath);
 		if(file.length() ==0) {
-			System.err.println("Auth.java - " + filepath + " empty file please add Authentications before trying to remove them!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("emptyAuth", filepath));
 		}
 		try {
 			json = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e) {
-			System.err.println("Auth.java - " + filepath + " either not found or not valid JSON file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		if(json.containsKey("auth") && ((JSONObject)json.get("auth")).containsKey("twitch")){
 			((JSONObject)json.get("auth")).remove("twitch");
@@ -185,16 +169,13 @@ public class Auth {
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				System.err.println("Auth.java - " + filepath + " error writing file to disk!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("badWrite", filepath));
 			}
 			if(!update) {
-				System.out.println("Removed Twitch API Keys. Please make sure to add new ones before running the program!");
-				System.exit(0);
+				Logger.logWarn(Bundle.getString("removeTwitch"));
 			}
 		}else {
-			System.err.println("Auth.java - No Twitch.tv API keys found in " + filepath + ". Please add API keys before trying to remove them!");
-			System.exit(1);
+			Logger.logWarn(Bundle.getString("noTwitch", filepath));
 		}
 	}
 
@@ -208,14 +189,12 @@ public class Auth {
 		JSONObject json = new JSONObject();
 		File file = new File(filepath);
 		if(file.length() ==0) {
-			System.err.println("Auth.java - " + filepath + " empty file please add Authentications before trying to remove them!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("emptyAuth", filepath));
 		}
 		try {
 			json = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e) {
-			System.err.println("Auth.java - " + filepath + " either not found or not valid JSON file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		if(json.containsKey("auth") && ((JSONObject)json.get("auth")).containsKey("spontit")){
 			((JSONObject)json.get("auth")).remove("spontit");
@@ -226,16 +205,13 @@ public class Auth {
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				System.err.println("Auth.java - " + filepath + " error writing file to disk!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("badWrite", filepath));
 			}
 			if(!update) {
-				System.out.println("Removed Spontit API Keys. Please make sure to add new ones before running the program!");
-				System.exit(0);
+				Logger.logInfo(Bundle.getString("removeSpontit"));
 			}
 		}else {
-			System.err.println("Auth.java - No Spontit API keys found in " + filepath + ". Please add API keys before trying to remove them!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("noSpontit", filepath));
 		}
 	}
 
@@ -245,16 +221,15 @@ public class Auth {
 	 * @return
 	 */
 	private static int authSelection(BufferedReader reader) {
-		System.out.println("Do you want to add/remove Twitch API Keys or Spontit API Keys");
-		System.out.println("1. Twitch");
-		System.out.println("2. Spontit");
-		System.out.print("Option: ");
+		System.out.println(Bundle.getString("authType"));
+		System.out.println(Bundle.getString("twitch"));
+		System.out.println(Bundle.getString("spontit"));
+		System.out.print(Bundle.getString("option"));
 		int option = -1;
 		try {
 			option = Integer.parseInt(reader.readLine());
 		} catch (NumberFormatException | IOException e) {
-			System.err.println("Auth.java - invalid number provided or trouble reading the number provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidOpt"));
 		}
 		return option;
 	}
@@ -264,22 +239,20 @@ public class Auth {
 	 * @param filepath
 	 */
 	protected static void setupAuth(String filepath) {
-		System.out.println("Please select an option below:");
-		System.out.println("1. Add an Authentication");
-		System.out.println("2. Remove an Authentication");
-		System.out.println("3. Update an Authentication");
-		System.out.print("Option: ");
+		System.out.println(Bundle.getString("selOpt"));
+		System.out.println(Bundle.getString("addAuth"));
+		System.out.println(Bundle.getString("removeAuth"));
+		System.out.println(Bundle.getString("updateAuth"));
+		System.out.print(Bundle.getString("option"));
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int option = -1;
 		try {
 			option = Integer.parseInt(reader.readLine());
 		} catch (NumberFormatException | IOException e) {
-			System.err.println("Auth.java - invalid number provided or trouble reading the number provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidOpt"));
 		}
 		if(option > 3 || option < 1) {
-			System.out.println("Not a valid option inputted!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidOpt"));
 		}
 		int service = authSelection(reader);
 		switch(option) {
@@ -294,8 +267,7 @@ public class Auth {
 			}
 			break;
 		default:
-			System.err.println("Not a valid option inputted! 1");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidOpt"));
 		case 2:
 			switch(service) {
 			case 1:
@@ -305,8 +277,7 @@ public class Auth {
 				spontitRemoveAuth(filepath, reader, false);
 				break;
 			default:
-				System.err.println("Not a valid option inputted! 2");
-				System.exit(1);
+				Logger.logError(Bundle.getString("invalidOpt"));
 			}
 			break;
 		case 3:
@@ -320,8 +291,7 @@ public class Auth {
 				spontitAddAuth(filepath, reader, true);
 				break;
 			default:
-				System.err.println("Not a valid option inputted! 3");
-				System.exit(1);
+				Logger.logError(Bundle.getString("invalidOpt"));
 			}
 			break;
 		}

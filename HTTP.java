@@ -19,7 +19,7 @@ import java.util.Set;
 public class HTTP {
 
 	/**
-	 * 
+	 *
 	 * @param url
 	 * @return
 	 */
@@ -28,8 +28,7 @@ public class HTTP {
 		try {
 			obj = new URL(url);
 		} catch (MalformedURLException e) {
-			System.err.println("HTTP.java - " + url + " is not a valid URL!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badURL", url));
 		}
 		HttpURLConnection httpURLConnection = null;
 		int responseCode = -1;
@@ -38,8 +37,7 @@ public class HTTP {
 			httpURLConnection.setRequestMethod("GET");
 			responseCode = httpURLConnection.getResponseCode();
 		} catch (IOException e) {
-			System.err.println("HTTP.java - error opening HTTP request!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("errOpen"));
 		}
 		HashMap<String, String> response = new HashMap<String, String>();
 		response.put("statusCode", Integer.toString(responseCode));
@@ -48,8 +46,6 @@ public class HTTP {
 			try {
 				in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
 			}
 			String inputLine;
 			StringBuffer strResponse = new StringBuffer();
@@ -59,8 +55,7 @@ public class HTTP {
 				}
 				in.close();
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("errRead"));
 			}
 			response.put("data", strResponse.toString());
 		}
@@ -78,8 +73,7 @@ public class HTTP {
 		try {
 			obj = new URL(url);
 		} catch (MalformedURLException e) {
-			System.err.println("HTTP.java - " + url + " is not a valid URL!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badURL", url));
 		}
 		HttpURLConnection httpURLConnection = null;
 		int responseCode = -1;
@@ -92,8 +86,7 @@ public class HTTP {
 			}
 			responseCode = httpURLConnection.getResponseCode();
 		} catch (IOException e) {
-			System.err.println("HTTP.java - error opening HTTP request!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("errOpen"));
 		}
 		HashMap<String, String> response = new HashMap<String, String>();
 		response.put("statusCode", Integer.toString(responseCode));
@@ -102,8 +95,7 @@ public class HTTP {
 			try {
 				in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("errRead"));
 			}
 			String inputLine;
 			StringBuffer strResponse = new StringBuffer();
@@ -113,8 +105,7 @@ public class HTTP {
 				}
 				in.close();
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("errRead"));
 			} 
 			response.put("data", strResponse.toString());
 		}
@@ -132,8 +123,7 @@ public class HTTP {
 		try {
 			obj = new URL(url);
 		} catch (MalformedURLException e) {
-			System.err.println("HTTP.java - " + url + " is not a valid URL!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badURL", url));
 		}
 		HttpURLConnection httpURLConnection = null;
 		try {
@@ -141,8 +131,7 @@ public class HTTP {
 			httpURLConnection.setRequestMethod("POST");
 			httpURLConnection.setDoOutput(true);
 		} catch (IOException e) {
-			System.err.println("HTTP.java - error opening HTTP request!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("errOpen"));
 		}
 		OutputStream os = null;
 		int responseCode = -1;
@@ -154,8 +143,7 @@ public class HTTP {
 			os.close();
 			responseCode = httpURLConnection.getResponseCode();
 		} catch (IOException e) {
-			System.err.println("HTTP.java - error adding data to HTTP request!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badData"));
 		}
 		HashMap<String, String> response = new HashMap<String, String>();
 		response.put("statusCode", Integer.toString(responseCode));
@@ -164,8 +152,7 @@ public class HTTP {
 			try {
 				in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("errRead"));
 			}
 			String inputLine;
 			StringBuffer strResponse = new StringBuffer();
@@ -175,8 +162,7 @@ public class HTTP {
 				}
 				in.close();
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("errRead"));
 			} 
 			response.put("data", response.toString());
 		}
@@ -195,8 +181,7 @@ public class HTTP {
 		try {
 			obj = new URL(url);
 		} catch (MalformedURLException e) {
-			System.err.println("HTTP.java - " + url + " is not a valid URL!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badURL", url));
 		}
 		HttpURLConnection httpURLConnection = null;
 		try {
@@ -204,8 +189,7 @@ public class HTTP {
 			httpURLConnection.setRequestMethod("POST");
 			httpURLConnection.setDoOutput(true);
 		} catch (IOException e) {
-			System.err.println("HTTP.java - error opening HTTP request!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("errOpen"));
 		}
 		Set<String> headerKeys = headers.keySet();
 		for(String header: headerKeys) {
@@ -222,8 +206,7 @@ public class HTTP {
 			responseCode = httpURLConnection.getResponseCode();
 
 		}catch (IOException e) {
-			System.err.println("HTTP.java - error adding data to HTTP request!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badData"));
 		}
 		HashMap<String, String> response = new HashMap<String, String>();
 		response.put("statusCode", Integer.toString(responseCode));
@@ -232,8 +215,7 @@ public class HTTP {
 			try {
 				in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("errRead"));
 			}
 			String inputLine;
 			StringBuffer strResponse = new StringBuffer();
@@ -243,8 +225,7 @@ public class HTTP {
 				}
 				in.close();
 			} catch (IOException e) {
-				System.err.println("HTTP.java - error reading response from HTTP request!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("errRead"));
 			} 
 			response.put("data", response.toString());
 		}

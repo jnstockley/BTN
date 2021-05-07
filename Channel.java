@@ -35,17 +35,15 @@ public class Channel {
 		try {
 			channels = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e) {
-			System.err.println("Channel.java - " + filepath + " either not found or not valid JSON file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		int oldSize = channels.size();
-		System.out.print("Enter a channel to get notifications for, seperate each channel by a comma: ");
+		System.out.print(Bundle.getString("getChan"));
 		List<String> newChannels = null;
 		try {
 			newChannels = Arrays.asList(reader.readLine().split("\\s*,\\s*"));
 		} catch (IOException e) {
-			System.err.println("Channel.java - invalid channels list provided, make sure you are seperating every channel by a ','!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badChan"));
 		}
 		for(String channel: newChannels) {
 			if(!channels.containsKey(channel)) {
@@ -60,13 +58,11 @@ public class Channel {
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				System.err.println("Channel.java - " + filepath + " error writing file to disk!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("badWrite", filepath));
 			}
 			System.exit(0);
 		} else {
-			System.out.println("No new channels added, file remains the same!");
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("noChanAdd"));
 		}
 	}
 
@@ -82,11 +78,10 @@ public class Channel {
 		try {
 			channels = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e) {
-			System.err.println("Channel.java - " + filepath + " either not found or not valid JSON file!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		int oldSize = channels.size();
-		System.out.println("Enter the number(s) of the channels you want to no longer recieve notifications for, sperate each index by a comma:");
+		System.out.println(Bundle.getString("delChan"));
 		int index = 1;
 		Set<String> channelSet = channels.keySet();
 		List<String> channelNames = new ArrayList<String>();
@@ -103,8 +98,7 @@ public class Channel {
 		try {
 			indexs = Arrays.asList((reader.readLine().split("\\s*,\\s*")));
 		} catch (IOException e) {
-			System.err.println("Channel.java - invalid channels list provided, make sure you are seperating every channel by a ','!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("badChan"));
 		}
 		for(String channelIndex: indexs) {
 			channels.remove(channelNames.get(Integer.parseInt(channelIndex)-1));
@@ -117,14 +111,11 @@ public class Channel {
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				System.err.println("Channel.java - " + filepath + " error writing file to disk!");
-				System.exit(1);
+				Logger.logError(Bundle.getString("badWrite"));
 			}
-			
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("goodDel", filepath));
 		} else {
-			System.out.println("No channels selected to be removed, file remains the same!");
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("noChanDel"));
 		}
 	}
 
@@ -133,17 +124,16 @@ public class Channel {
 	 * @param filepath
 	 */
 	protected static void setupChannels(String filepath) {
-		System.out.println("Please select an option: ");
-		System.out.println("1. Add Channel");
-		System.out.println("2. Remove Channel");
-		System.out.print("Option: ");
+		System.out.println(Bundle.getString("selOpt"));
+		System.out.println(Bundle.getString("addChan"));
+		System.out.println(Bundle.getString("delChan"));
+		System.out.print(Bundle.getString("option"));
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int option = 0;
 		try {
 			option = Integer.parseInt(reader.readLine());
 		} catch (NumberFormatException | IOException e) {
-			System.err.println("Channel.java - invalid number provided or trouble reading the number provided!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidNum"));
 		}
 		switch(option) {
 		case 1:
@@ -153,8 +143,7 @@ public class Channel {
 			removeChannels(filepath, reader);
 			break;
 		default:
-			System.err.println("Not a valid option inputted!");
-			System.exit(1);
+			Logger.logError(Bundle.getString("invalidNum"));
 		}
 	}
 }

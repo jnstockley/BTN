@@ -21,16 +21,16 @@ public class Notifications {
 	@SuppressWarnings("unchecked")
 	protected static void sendErrorNotification(HashMap<String, String> response, HashMap<String, String> auth) {
 		JSONObject json = new JSONObject();
-		json.put("pushTitle", "Error Checking Live Status");
-		json.put("content", "Error Code: " + response.get("statusCode"));
+		json.put("pushTitle", Bundle.getString("errorStatus"));
+		json.put("content", Bundle.getString("errCode") + response.get("statusCode"));
 		HashMap<String, String> spontitAuth = new HashMap<String, String>();
 		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
 		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
 		HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), spontitAuth);
 		if(HTTPresponse.get("statusCode").equals("200")) {
-			System.out.println("Error Notif Sent!");
+			Logger.logWarn(Bundle.getString("errSent"));
 		} else {
-			System.out.println("Error Notif not Sent!");
+			Logger.logError(Bundle.getString("errNotSent"));
 		}
 	}
 
@@ -51,20 +51,20 @@ public class Notifications {
 		}
 		streamer += nowLive.get(nowLive.size()-1);
 		if(nowLive.size() == 1) {
-			streamer += " is live!";
+			streamer += Bundle.getString("isLive");
 			json.put("pushTitle", streamer);
 			json.put("link", "https://twitch.tv/" + nowLive.get(0));
-			json.put("content", "Check them out on twitch.tv/" + nowLive.get(0) + "!");
+			json.put("content", Bundle.getString("checkThemLink") + nowLive.get(0) + "!");
 		} else {
-			streamer += " are live!";
+			streamer += Bundle.getString("areLive");
 			json.put("pushTitle", streamer);
-			json.put("content", "Check them out on Twitch!");
+			json.put("content", Bundle.getString("checkThem"));
 		}
 		HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), spontitAuth);
 		if(HTTPresponse.get("statusCode").equals("200")) {
-			System.out.println("Live Notif Sent!");
+			Logger.logInfo(Bundle.getString("liveSent") + nowLive);
 		} else {
-			System.out.println("Live Notif not Sent!");
+			Logger.logError(Bundle.getString("liveNotSent"));
 		}
 	}
 	
@@ -80,14 +80,14 @@ public class Notifications {
 		HashMap<String, String> spontitAuth = new HashMap<String, String>();
 		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
 		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
-		json.put("pushTitle", "BTTN Update Available!");
-		json.put("content", "Please update to version " + version + "! BTTN is not checking for live channels until BTTN is updated.");
+		json.put("pushTitle", Bundle.getString("BTTNUpdate"));
+		json.put("content", Bundle.getString("updateTo", Double.toString(version)));
 		json.put("link", "https://github.com/jnstockley/BTTN/releases");
 		HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), spontitAuth);
 		if(HTTPresponse.get("statusCode").equals("200")) {
-			System.out.println("Update Notif Sent!");
+			Logger.logInfo(Bundle.getString("updateSent"));
 		} else {
-			System.out.println("Update Notif not Sent!");
+			Logger.logError(Bundle.getString("updateNotSent"));
 		}
 	}
 }
