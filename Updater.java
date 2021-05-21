@@ -1,3 +1,5 @@
+//Updater.java
+package com.github.jnstockley;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -7,28 +9,35 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-//Updater.java
 
 /**
+ * Helps with checking for updates and letting the user know that an update is available
  * 
- * @author Jack Stockely
+ * @author Jack Stockley
  * 
- * @version 0.9-beta
+ * @version 0.11-beta
  *
  */
 public class Updater {
 
-	//
-	private final static double version = 0.10;
+	/**
+	 * Private double representing the current version of the BTTN program
+	 */
+	private final static double version = 0.11;
 	
 	/**
-	 * 
-	 * @param auth
+	 * Makes HTTP request to server to get the latest version number publicly available
+	 * @param auth HashMap with API keys used to send update notification if update is available
+	 * @param delay Integer representing amount of delay between update notifications
 	 */
 	protected static void checkUpdate(HashMap<String, String> auth, int delay) {
+		// HTTP request to see if newer version is available
 		HashMap<String, String> response = HTTP.get("https://raw.githubusercontent.com/jnstockley/BTTN/main/version");
+		// Makes sure HTTP request returned a status code of 200
 		if(response.get("statusCode").equals("200")) {
+			// Checks if server version is newer then current version
 			double serverVersion = Double.parseDouble(response.get("data"));
+			// Sends notification if its been longer then update delay
 			if((serverVersion > version) && timeToSendAlert(30)) {
 				Notifications.sendUpdateNotification(serverVersion, auth);
 				Logger.logInfo(Bundle.getString("updateAvailable"));
@@ -39,16 +48,16 @@ public class Updater {
 	}
 	
 	/**
-	 * 
-	 * @param delay
-	 * @param serverVersion
-	 * @param auth
+	 * Checks the time an update notification was last sent is greater or equal to delay
+	 * @param delay Integer representing amount of delay between update notifications
+	 * @return True if notification should be sent otherwise false
 	 */
 	private static boolean timeToSendAlert(int delay) {
+		// Gets time last sent and adds delay to it
 		Date checkTime = new Date(getDateTime() + TimeUnit.MINUTES.toMillis(delay));
+		// Gets current date
 		Date curDate = new Date();
-		System.out.println(checkTime);
-		System.out.println(curDate);
+		// Checks if last time plus delay is less then current time and updates last sent file
 		if(checkTime.compareTo(curDate) < 0) {
 			writeDateTime(curDate.getTime());
 			return true;
@@ -58,10 +67,11 @@ public class Updater {
 	}
 	
 	/**
-	 * 
-	 * @param time
+	 * Updates a text file with the time the last update notification was sent out
+	 * @param time The time in milliseconds since January 1st 1970 the last update notification was sent
 	 */
 	private static void writeDateTime(long time) {
+		// Writes current time to last sent text file
 		File timeFile = new File("lastSent.txt");
 		FileWriter writer = null;
 		try {
@@ -75,10 +85,12 @@ public class Updater {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Gets the last time an update notification was sent from the last sent text file
+	 * @return The time in milliseconds since January 1st 1970 the last update notification
+	 * was sent or -1 if no file exists
 	 */
 	private static long getDateTime() {
+		// Reads the long integer from the last sent text file and returns it
 		File timeFile = new File("lastSent.txt");
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(timeFile));

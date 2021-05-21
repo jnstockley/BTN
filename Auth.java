@@ -1,4 +1,5 @@
 //Auth.java
+package com.github.jnstockley;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -11,28 +12,33 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
+ * Helps with setting up the JSON config file with API key(s) for the services required
+ * by BTTN.
  * 
  * @author Jack Stockley
  * 
- * @version 0.9-beta
+ * @version 0.11-beta
  *
  */
 public class Auth {
 
 	/**
-	 * 
-	 * @param filepath
-	 * @param reader
+	 * Adds the Twitch Auth Key and Client ID to the JSON config file
+	 * @param filepath The location of the Config file, in JSON  format
+	 * @param reader A BufferedReader which reads user input from the console
+	 * @param update Variable used to determine if function was called from update function
 	 */
 	@SuppressWarnings("unchecked")
 	private static void twitchAddAuth(String filepath, BufferedReader reader, boolean update) {
 		System.out.print(Bundle.getString("twitchClient"));
+		// Get the Twitch client ID from console
 		String clientID = null;
 		try {
 			clientID = reader.readLine();
 		} catch (IOException e) {
 			Logger.logError(Bundle.getString("badClient"));
 		}
+		// Get the Twitch Authentication Key from console
 		System.out.print(Bundle.getString("twitchAuth"));
 		String authorization = null;
 		try {
@@ -40,11 +46,13 @@ public class Auth {
 		} catch (IOException e) {
 			Logger.logError(Bundle.getString("badAuth"));
 		}
+		// Create JSON Object with Twitch keys
 		JSONObject twitchAuthJSON = new JSONObject();
 		twitchAuthJSON.put("clientID", clientID);
 		twitchAuthJSON.put("authorization", authorization);
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
+		// Checks if config file is empty
 		File file = new File(filepath);
 		if(file.length() != 0) {
 			try {
@@ -53,6 +61,7 @@ public class Auth {
 				Logger.logError(Bundle.getString("badJSON", filepath));
 			}
 		}
+		// Checks if config file has auth key in JSON object and builds appropriate JSON object
 		if(json.containsKey("auth")) {
 			if(((JSONObject)json.get("auth")).containsKey("twitch")){
 				Logger.logError(Bundle.getString("twitchKeys"));
@@ -65,6 +74,7 @@ public class Auth {
 			twitch.put("twitch", twitchAuthJSON);
 			json.put("auth", twitch);
 		}
+		// Writes the JSON object to the file
 		FileWriter writer;
 		try {
 			writer = new FileWriter(filepath);
@@ -74,6 +84,7 @@ public class Auth {
 		} catch (IOException e) {
 			Logger.logError(Bundle.getString("badWrite", filepath));
 		}
+		// Checks if functions was called from update function
 		if(update) {
 			Logger.logInfo(Bundle.getString("updateTwitch"));
 		} else {
@@ -82,12 +93,14 @@ public class Auth {
 	}
 
 	/**
-	 * 
-	 * @param filepath
-	 * @param reader
+	 * Adds the Spontit Auth Key and User ID to the JSON config file
+	 * @param filepath The location of the Config file, in JSON  format
+	 * @param reader A BufferedReader which reads user input from the console
+	 * @param update Variable used to determine if function was called from update function
 	 */
 	@SuppressWarnings("unchecked")
 	private static void spontitAddAuth(String filepath, BufferedReader reader, boolean update) {
+		// Gets the Spontit auth key
 		System.out.print(Bundle.getString("spontitAuth"));
 		String authorization = null;
 		try {
@@ -95,6 +108,7 @@ public class Auth {
 		} catch (IOException e) {
 			Logger.logError(Bundle.getString("badAuth"));
 		}
+		// Gets the Spontit User ID
 		System.out.print(Bundle.getString("spontitUser"));
 		String userID = null;
 		try {
@@ -102,11 +116,13 @@ public class Auth {
 		} catch (IOException e) {
 			Logger.logError(Bundle.getString("badUser"));
 		}
+		// Builds the Spontit JSON Object
 		JSONObject spontitAuthJSON = new JSONObject();
 		spontitAuthJSON.put("userID", userID);
 		spontitAuthJSON.put("authorization", authorization);
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
+		// Checks if the config file is empty
 		File file = new File(filepath);
 		if(file.length() !=0) {
 			try {
@@ -115,6 +131,7 @@ public class Auth {
 				Logger.logError(Bundle.getString("badJSON", filepath));
 			}
 		}
+		// Checks if config file has auth key in JSON object and builds appropriate JSON object
 		if(json.containsKey("auth")) {
 			if(((JSONObject)json.get("auth")).containsKey("spontit")){
 				Logger.logError(Bundle.getString("spontitKeys"));
@@ -127,6 +144,7 @@ public class Auth {
 			spontit.put("spontit", spontitAuthJSON);
 			json.put("auth", spontit);
 		}
+		// Writes the JSON object to the config file
 		FileWriter writer;
 		try {
 			writer = new FileWriter(filepath);
@@ -136,6 +154,7 @@ public class Auth {
 		} catch (IOException e) {
 			Logger.logError(Bundle.getString("badWrite", filepath));
 		}
+		// Checks if functions was called from update function 
 		if(update) {
 			Logger.logInfo(Bundle.getString("updateSpontit"));
 		} else {
@@ -144,22 +163,26 @@ public class Auth {
 	}
 
 	/**
-	 * 
-	 * @param filepath
-	 * @param reader
+	 * Removes the Twitch Auth Key and Client ID to the JSON config file
+	 * @param filepath The location of the Config file, in JSON  format
+	 * @param reader A BufferedReader which reads user input from the console
+	 * @param update Variable used to determine if function was called from update function
 	 */
 	private static void twitchRemoveAuth(String filepath, BufferedReader reader, boolean update) {
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
+		// Checks if config file is empty
 		File file = new File(filepath);
 		if(file.length() ==0) {
 			Logger.logError(Bundle.getString("emptyAuth", filepath));
 		}
+		// Reads JSON file
 		try {
 			json = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e) {
 			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
+		// Checks JSON object for required JSON keys and removes the Twitch JSON key
 		if(json.containsKey("auth") && ((JSONObject)json.get("auth")).containsKey("twitch")){
 			((JSONObject)json.get("auth")).remove("twitch");
 			FileWriter writer;
@@ -171,6 +194,7 @@ public class Auth {
 			} catch (IOException e) {
 				Logger.logError(Bundle.getString("badWrite", filepath));
 			}
+			// Checks if functions was called from update function 
 			if(!update) {
 				Logger.logWarn(Bundle.getString("removeTwitch"));
 			}
@@ -180,22 +204,26 @@ public class Auth {
 	}
 
 	/**
-	 * 
-	 * @param filepath
-	 * @param reader
+	 * Removes the Spontit Auth Key and User ID to the JSON config file
+	 * @param filepath The location of the Config file, in JSON  format
+	 * @param reader A BufferedReader which reads user input from the console
+	 * @param update Variable used to determine if function was called from update function
 	 */
 	private static void spontitRemoveAuth(String filepath, BufferedReader reader, boolean update) {
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
+		// Checks if config file is empty
 		File file = new File(filepath);
 		if(file.length() ==0) {
 			Logger.logError(Bundle.getString("emptyAuth", filepath));
 		}
+		//Reads JSON file
 		try {
 			json = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e) {
 			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
+		// Checks JSON object for required JSON keys and removes the Spontit JSON key
 		if(json.containsKey("auth") && ((JSONObject)json.get("auth")).containsKey("spontit")){
 			((JSONObject)json.get("auth")).remove("spontit");
 			FileWriter writer;
@@ -207,6 +235,7 @@ public class Auth {
 			} catch (IOException e) {
 				Logger.logError(Bundle.getString("badWrite", filepath));
 			}
+			// Checks if functions was called from update function 
 			if(!update) {
 				Logger.logInfo(Bundle.getString("removeSpontit"));
 			}
@@ -216,34 +245,42 @@ public class Auth {
 	}
 
 	/**
-	 * 
-	 * @param reader
-	 * @return
+	 * Gets the service the user wants to modify and returns it
+	 * @param reader A BufferedReader which reads user input from the console
+	 * @return An integer representing the service number the user wants to modify
 	 */
 	private static int authSelection(BufferedReader reader) {
+		// Prints the services and asks user which service they want to modify
 		System.out.println(Bundle.getString("authType"));
 		System.out.println(Bundle.getString("twitch"));
 		System.out.println(Bundle.getString("spontit"));
 		System.out.print(Bundle.getString("option"));
+		// Makes sure option number is valid and returns it
 		int option = -1;
 		try {
 			option = Integer.parseInt(reader.readLine());
 		} catch (NumberFormatException | IOException e) {
 			Logger.logError(Bundle.getString("invalidOpt"));
 		}
+		if(option > 2 || option < 1) {
+			Logger.logError(Bundle.getString("invalidOpt"));
+		}
 		return option;
 	}
 
 	/**
-	 * 
-	 * @param filepath
+	 * Main function which helps with selecting the service the user wants to modify
+	 * and runs the corresponding function
+	 * @param filepath The location of the Config file, in JSON  format
 	 */
 	protected static void setupAuth(String filepath) {
+		// Prints the ways the user can modify the config file
 		System.out.println(Bundle.getString("selOpt"));
 		System.out.println(Bundle.getString("addAuth"));
 		System.out.println(Bundle.getString("removeAuth"));
 		System.out.println(Bundle.getString("updateAuth"));
 		System.out.print(Bundle.getString("option"));
+		// Makes sure the option number is valid
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int option = -1;
 		try {
@@ -254,39 +291,49 @@ public class Auth {
 		if(option > 3 || option < 1) {
 			Logger.logError(Bundle.getString("invalidOpt"));
 		}
+		// Gets the service the user wants to modify
 		int service = authSelection(reader);
 		switch(option) {
+		// Add functions
 		case 1:
 			switch(service) {
 			case 1:
+				// Add Twitch
 				twitchAddAuth(filepath, reader, false);
 				break;
 			case 2:
+				// Add Spontit
 				spontitAddAuth(filepath, reader, false);
 				break;
 			}
 			break;
 		default:
 			Logger.logError(Bundle.getString("invalidOpt"));
+			// Remove functions
 		case 2:
 			switch(service) {
 			case 1:
+				// Remove Twitch
 				twitchRemoveAuth(filepath, reader, false);
 				break;
 			case 2:
+				// Remove Spontit
 				spontitRemoveAuth(filepath, reader, false);
 				break;
 			default:
 				Logger.logError(Bundle.getString("invalidOpt"));
 			}
 			break;
+			// Update functions
 		case 3:
 			switch(service) {
 			case 1:
+				// Update Twitch
 				twitchRemoveAuth(filepath, reader, true);
 				twitchAddAuth(filepath, reader, true);
 				break;
 			case 2:
+				// Update Spontit
 				spontitRemoveAuth(filepath, reader, true);
 				spontitAddAuth(filepath, reader, true);
 				break;
