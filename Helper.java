@@ -15,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
+ * Helper class, which focuses on retrieving data required throughout the program
  * 
  * @author Jack Stockley
  * 
