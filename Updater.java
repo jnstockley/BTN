@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Jack Stockley
  * 
- * @version 0.11-beta
+ * @version 0.12-beta
  *
  */
 public class Updater {
@@ -23,8 +23,8 @@ public class Updater {
 	/**
 	 * Private double representing the current version of the BTTN program
 	 */
-	private final static double version = 0.11;
-	
+	private final static double version = 0.12;
+
 	/**
 	 * Makes HTTP request to server to get the latest version number publicly available
 	 * @param auth HashMap with API keys used to send update notification if update is available
@@ -46,7 +46,7 @@ public class Updater {
 			Logger.logError(Bundle.getString("errCheck"));
 		}
 	}
-	
+
 	/**
 	 * Checks the time an update notification was last sent is greater or equal to delay
 	 * @param delay Integer representing amount of delay between update notifications
@@ -65,7 +65,7 @@ public class Updater {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Updates a text file with the time the last update notification was sent out
 	 * @param time The time in milliseconds since January 1st 1970 the last update notification was sent
@@ -83,23 +83,28 @@ public class Updater {
 			Logger.logError(Bundle.getString("timeWriteErr"));
 		}
 	}
-	
+
 	/**
-	 * Gets the last time an update notification was sent from the last sent text file
+	 * Gets the last time an update notification was sent from the last sent text file.
 	 * @return The time in milliseconds since January 1st 1970 the last update notification
-	 * was sent or -1 if no file exists
+	 * was sent or -1 if no file exists or it is empty
 	 */
 	private static long getDateTime() {
 		// Reads the long integer from the last sent text file and returns it
 		File timeFile = new File("lastSent.txt");
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(timeFile));
-			Long time = Long.parseLong(br.readLine());
-			br.close();
-			return time;
-		} catch (IOException | NumberFormatException e) {
-			Logger.logError(Bundle.getString("timeReadErr"));
+		if(timeFile.exists() && timeFile.length() != 0) {
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(timeFile));
+				Long time = Long.parseLong(br.readLine());
+				br.close();
+				return time;
+			} catch (IOException | NumberFormatException e) {
+				e.printStackTrace();
+				Logger.logError(Bundle.getString("timeReadErr"));
+				return -1;
+			} 
+		} else {
 			return -1;
-		} 
+		}
 	}
 }

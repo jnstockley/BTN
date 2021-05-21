@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
  * 
  * @author Jack Stockley
  * 
- * @version 0.11-beta
+ * @version 0.12-beta
  *
  */
 public class Notifications {
@@ -19,7 +19,7 @@ public class Notifications {
 	 * Sends a Spontit Notification alerting user an error when checking the Twitch API
 	 * @param response The response from the Twitch API
 	 * @param auth HashMap with the API keys for Spontit
- 	 */
+	 */
 	@SuppressWarnings("unchecked")
 	protected static void sendErrorNotification(HashMap<String, String> response, HashMap<String, String> auth) {
 		// Creates the JSON required by Spontit to alert user to error
@@ -39,7 +39,7 @@ public class Notifications {
 			Logger.logError(Bundle.getString("errNotSent"));
 		}
 	}
-	
+
 	/**
 	 * Sends a Spontit Notification alerting the user that BTTN has an update available
 	 * @param version Double representing the new version number to update to

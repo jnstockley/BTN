@@ -20,7 +20,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 0.11-beta
+ * @version 0.12-beta
  *
  */
 public class Channel {
@@ -156,7 +156,7 @@ public class Channel {
 		case 1:
 			addChannels(filepath, reader);
 			break;
-		// Remove Channels
+			// Remove Channels
 		case 2:
 			removeChannels(filepath, reader);
 			break;

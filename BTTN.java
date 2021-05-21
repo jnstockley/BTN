@@ -18,7 +18,7 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 0.11-beta
+ * @version 0.12-beta
  * 
  */
 public class BTTN {
@@ -96,10 +96,10 @@ public class BTTN {
 			} else {
 				Logger.logInfo(Bundle.getString("noUpdates"));
 			}
-		// Runs the setup functions
+			// Runs the setup functions
 		} else if(args.length == 2 && args[1].contains(Bundle.getString("setup"))) {
 			setup(args[0]);
-		// Displays an error if the args are invalid
+			// Displays an error if the args are invalid
 		} else {
 			Logger.logError(Bundle.getString("argsError"));
 		}

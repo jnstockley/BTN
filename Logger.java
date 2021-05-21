@@ -13,7 +13,7 @@ import java.util.Date;
  * 
  * @author Jack Stockley
  * 
- * @version 0.11-beta
+ * @version 0.12-beta
  *
  */
 public class Logger {

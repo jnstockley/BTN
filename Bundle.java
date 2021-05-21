@@ -9,11 +9,11 @@ import java.util.ResourceBundle;
  * 
  * @author Jack Stockley
  * 
- * @version 0.11-beta
+ * @version 0.12-beta
  *
  */
 public class Bundle {
-	
+
 	/**
 	 * Gets the locale for the user
 	 */
@@ -22,7 +22,7 @@ public class Bundle {
 	 * Gets the bundle to be used based on the users locale
 	 */
 	private static final ResourceBundle bundle = getBundle("bundle");
-	
+
 	/**
 	 * Helper function to help with getting the resource file when running
 	 * in the real world or in an IDE
@@ -37,7 +37,7 @@ public class Bundle {
 			return ResourceBundle.getBundle(bundle, LOCALE);
 		}
 	}
-	
+
 	/**
 	 * Helper function used to retrieve the bundle key from resource file
 	 * @param key String representation of the key
@@ -46,7 +46,7 @@ public class Bundle {
 	protected static String getString(String key) {
 		return bundle.getString(key);
 	}
-	
+
 	/**
 	 * Helper function used to retrieve the bundle key from the resource file,
 	 * also replaces '%f% with the 'value' passed into
