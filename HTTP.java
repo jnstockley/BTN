@@ -15,7 +15,7 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 0.12-beta
+ * @version 0.13-beta
  *
  */
 public class HTTP {

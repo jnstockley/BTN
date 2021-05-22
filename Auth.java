@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,7 +19,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 0.12-beta
+ * @version 0.13-beta
  *
  */
 public class Auth {
@@ -93,33 +95,52 @@ public class Auth {
 	}
 
 	/**
-	 * Adds the Spontit Auth Key and User ID to the JSON config file
+	 * Adds the Spontit Auth Key(s) and User ID to the JSON config file
+	 * Allows multiple keys and userIDs to overcome Spontit issues with multi-device
+	 * support
 	 * @param filepath The location of the Config file, in JSON  format
 	 * @param reader A BufferedReader which reads user input from the console
 	 * @param update Variable used to determine if function was called from update function
 	 */
 	@SuppressWarnings("unchecked")
 	private static void spontitAddAuth(String filepath, BufferedReader reader, boolean update) {
-		// Gets the Spontit auth key
-		System.out.print(Bundle.getString("spontitAuth"));
-		String authorization = null;
+		// Asks the user how many Spontit API keys they want to add, used to
+		// overcome issue with Spontit and multi-device support
+		System.out.println(Bundle.getString("numUsers"));
+		System.out.print(Bundle.getString("number"));
+		int numKeys = -1;
 		try {
-			authorization = reader.readLine();
-		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badAuth"));
+			numKeys = Integer.parseInt(reader.readLine());
+		} catch (NumberFormatException | IOException e1) {
+			Logger.logError(Bundle.getString("invalidNum"));
 		}
-		// Gets the Spontit User ID
-		System.out.print(Bundle.getString("spontitUser"));
-		String userID = null;
-		try {
-			userID = reader.readLine();
-		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badUser"));
+		List<String> authKeys = new ArrayList<String>();
+		List<String> userIDs = new ArrayList<String>();
+		// Allows user to enter X number of userIDs and API Key(s)
+		for(int i=0; i< numKeys; i++) {
+			// Gets the Spontit auth key
+			System.out.print(Bundle.getString("spontitAuth"));
+			String authorization = null;
+			try {
+				authorization = reader.readLine();
+			} catch (IOException e) {
+				Logger.logError(Bundle.getString("badAuth"));
+			}
+			// Gets the Spontit User ID
+			System.out.print(Bundle.getString("spontitUser"));
+			String userID = null;
+			try {
+				userID = reader.readLine();
+			} catch (IOException e) {
+				Logger.logError(Bundle.getString("badUser"));
+			}
+			authKeys.add(authorization);
+			userIDs.add(userID);
 		}
 		// Builds the Spontit JSON Object
 		JSONObject spontitAuthJSON = new JSONObject();
-		spontitAuthJSON.put("userID", userID);
-		spontitAuthJSON.put("authorization", authorization);
+		spontitAuthJSON.put("userID", userIDs);
+		spontitAuthJSON.put("authorization", authKeys);
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
 		// Checks if the config file is empty

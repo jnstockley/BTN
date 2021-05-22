@@ -1,9 +1,11 @@
 //Helper.java
 package com.github.jnstockley;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +21,15 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 0.12-beta
+ * @version 0.13-beta
  *
  */
 public class Helper {
+
+	/**
+	 * Private variable that describes the latest version of the JSON config file
+	 */
+	private static final double jsonVersion = 0.13;
 
 	/**
 	 * Reads the JSON config file and returns the old live status for each channel
@@ -83,14 +90,14 @@ public class Helper {
 	}
 
 	/**
-	 * Uses the Twitch API to get the current live status of the channels in the JSON config file
+	 * Uses the Twitch API to get the current live status, and game channel is streaming of the channels in the JSON config file
 	 * @param channels Set of all the channels to check
 	 * @param auth HashMap with the API Keys
-	 * @return HashMap with the channel and boolean representing the live status
+	 * @return HashMap with the channel and another HashMap with String representation of live status and game streaming
 	 */
-	protected static HashMap<String, Boolean> getStatus(Set<String> channels, HashMap<String, String> auth) {
+	protected static HashMap<String, HashMap<String, String>> getStatus(Set<String> channels, HashMap<String, String> auth) {
 		// Get the Twitch API keys and converts them to one the Twitch API can easily understand
-		HashMap<String, Boolean> currStatus = new HashMap<String, Boolean>();
+		HashMap<String, HashMap<String, String>> currStatus = new HashMap<String, HashMap<String, String>>();
 		HashMap<String, String> twitchAuth = new HashMap<String, String>();
 		twitchAuth.put("client-id", auth.get("twitch-client-id"));
 		twitchAuth.put("Authorization", auth.get("twitch-authorization"));
@@ -120,6 +127,7 @@ public class Helper {
 				}
 				// Parses JSON data
 				for(String channelData: data) {
+					HashMap<String, String> chanData = new HashMap<String, String>();
 					JSONObject channelJson = null;
 					try {
 						channelJson = (JSONObject)parser.parse(channelData);
@@ -128,11 +136,16 @@ public class Helper {
 					}
 					// Makes sure channels name match and checks if live status is true
 					if(channelJson.get("display_name").equals(channel) && channelJson.get("is_live").toString().equals("true")) {
-						currStatus.put(channel, true);
+						chanData.put("live", "true");
+						chanData.put("game", channelJson.get("game_name").toString());
+						chanData.put("title", channelJson.get("title").toString());
+						currStatus.put(channel, chanData);
 					}
 				}
 				if(!currStatus.containsKey(channel)) {
-					currStatus.put(channel, false);
+					HashMap<String, String> chanData = new HashMap<String, String>();
+					chanData.put("live", "false");
+					currStatus.put(channel, chanData);
 				}	
 			}
 		}
@@ -145,7 +158,12 @@ public class Helper {
 	 * @param filepath Location of JSON config file
 	 */
 	@SuppressWarnings("unchecked")
-	protected static void updateStatusFile(HashMap<String, Boolean> currStatus, String filepath) {
+	protected static void updateStatusFile(HashMap<String, HashMap<String, String>> currStatus, String filepath) {
+		HashMap<String, Boolean> liveStatus = new HashMap<String, Boolean>();
+		Set<String> channels = currStatus.keySet();
+		for(String channel: channels) {
+			liveStatus.put(channel, Boolean.parseBoolean(currStatus.get(channel).get("live")));
+		}
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
 		// Reads data from JSON config file
@@ -155,7 +173,7 @@ public class Helper {
 			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		// Update live status
-		JSONObject channelJSON = new JSONObject(currStatus);
+		JSONObject channelJSON = new JSONObject(liveStatus);
 		json.remove("channels");
 		json.put("channels", channelJSON);
 		// Writes changes to JSON config file
@@ -209,8 +227,126 @@ public class Helper {
 		try {
 			jsonSection = (JSONObject) ((JSONObject) parser.parse(new FileReader(filepath))).get(section);
 		} catch (IOException | ParseException e) {
-			Logger.logError(Bundle.getString("badWrite", filepath));
+			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		return jsonSection;
+	}
+
+	/**
+	 * Helper function witch runs at the start of the main program to make sure the version
+	 * number of the JSON config file is up to date
+	 * @param filepath Location of JSON config file
+	 * @return True if the config file is up to date, otherwise false
+	 */
+	protected static boolean configUpToDate(String filepath) {
+		// Reads the config file
+		JSONObject json = new JSONObject();
+		JSONParser parser = new JSONParser();
+		try {
+			json = (JSONObject) parser.parse(new FileReader(filepath));
+		} catch (IOException | ParseException e) {
+			Logger.logError(Bundle.getString("badJSON", filepath));
+		}
+		// Makes sure JSON config file has version key and is up to date
+		if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == jsonVersion) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Performs upgrade to JSON config file to add new features and fix bugs
+	 * @param filepath Location of the JSON config file
+	 */
+	@SuppressWarnings("unchecked")
+	protected static void configUpgrade(String filepath) {
+		// Reads the config file
+		JSONObject json = new JSONObject();
+		JSONParser parser = new JSONParser();
+		try {
+			json = (JSONObject) parser.parse(new FileReader(filepath));
+		} catch (IOException | ParseException e1) {
+			Logger.logError(Bundle.getString("badJSON", filepath));
+		}
+		// Makes sure the JSON config file has required keys and known version number
+		if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.9) {
+			if(json.containsKey("auth") && ((JSONObject) (json.get("auth"))).containsKey("spontit")) {
+				// Performs conversion from single entry to JSON Array and update version number
+				JSONObject spontit = (JSONObject)((JSONObject)json.get("auth")).get("spontit");
+				String authorization = spontit.get("authorization").toString();
+				String userID = spontit.get("userID").toString();
+				JSONObject newSpontit = new JSONObject();
+				newSpontit.put("authorization", "[" + authorization + "]");
+				newSpontit.put("userID", "[" + userID + "]");
+				((JSONObject)json.get("auth")).put("spontit", newSpontit);
+				json.put("version", 0.13);
+				// Writes changes to file and informs user of upgrade!
+				try {
+					FileWriter writer = new FileWriter(filepath);
+					writer.write(json.toJSONString());
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					Logger.logError(Bundle.getString("badWrite", filepath));
+				}
+				System.out.println(Bundle.getString("updateComplete"));
+			} else {
+				Logger.logError(Bundle.getString("noSpontit"));
+			}
+		} else {
+			Logger.logError(Bundle.getString("noVersion"));
+		}
+	}
+
+	/**
+	 * Helper function which makes sure the miscellaneous JSON keys are in the JSON config file
+	 * and if not adds them to the file
+	 * @param filepath Location of the JSON config file
+	 */
+	@SuppressWarnings("unchecked")
+	protected static void addMisc(String filepath) {
+		// Reads the JSON config file
+		JSONObject json = new JSONObject();
+		JSONParser parser = new JSONParser();
+		try {
+			json = (JSONObject) parser.parse(new FileReader(filepath));
+		} catch (IOException | ParseException e1) {
+			Logger.logError(Bundle.getString("badJSON", filepath));
+		}
+		// Makes sure version key is in and if not adds current JSON version number
+		if(!json.containsKey("version")) {
+			json.put("version", jsonVersion);
+			// Writes changes to JSON file
+			try {
+				FileWriter writer = new FileWriter(filepath);
+				writer.write(json.toJSONString());
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				Logger.logError(Bundle.getString("badWrite", filepath));
+			}
+		}
+		// Makes sure update delay key is in and if not asks user to enter a value
+		if(!json.containsKey("updateDelay")) {
+			System.out.print(Bundle.getString("updateDelay"));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			int delay = -1;
+			try {
+				delay = Integer.parseInt(reader.readLine());
+				json.put("updateDelay", delay);
+				// Writes changes to JSON file
+				try {
+					FileWriter writer = new FileWriter(filepath);
+					writer.write(json.toJSONString());
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					Logger.logError(Bundle.getString("badWrite", filepath));
+				}
+			} catch (NumberFormatException | IOException e) {
+				Logger.logError(Bundle.getString("invalidNum"));
+			}
+		}
 	}
 }

@@ -1,5 +1,6 @@
 //Notifications.java
 package com.github.jnstockley;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import org.json.simple.JSONObject;
  * 
  * @author Jack Stockley
  * 
- * @version 0.12-beta
+ * @version 0.13-beta
  *
  */
 public class Notifications {
@@ -67,40 +68,49 @@ public class Notifications {
 	}
 
 	/**
-	 * Sends a Spontit Notification alerting the user that a Twitch channel has gone live
+	 * Sends Spontit Notification(s) alerting the user that a Twitch channel
+	 * has gone live with the category the streamer is streaming in
 	 * @param nowLive List of channel(s) that are now live
 	 * @param auth HashMap with the API keys for Spontit
 	 */
 	@SuppressWarnings("unchecked")
-	protected static void sendLiveNotification(List<String> nowLive, HashMap<String, String> auth) {
+	protected static void sendLiveNotification(HashMap<String, HashMap<String, String>> nowLive, HashMap<String, String> auth) {
 		// Gets the Spontit API Keys
 		HashMap<String, String> spontitAuth = new HashMap<String, String>();
 		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
 		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
 		// Creates the JSON required by Spontit to alert user to a new live channel
 		JSONObject json = new JSONObject();
-		String streamer = "";
-		for(int i=0; i<nowLive.size()-1; i++) {
-			streamer += nowLive.get(i) + ", ";
-		}
-		streamer += nowLive.get(nowLive.size()-1);
+		String streamer = nowLive.keySet().toString();
+		streamer = streamer.substring(1, streamer.length()-1);
 		if(nowLive.size() == 1) {
-			streamer += " "+ Bundle.getString("isLive");
-			json.put("pushTitle", streamer);
-			json.put("link", "https://twitch.tv/" + nowLive.get(0));
-			json.put("content", Bundle.getString("checkThemLink") + nowLive.get(0) + "!");
+			json.put("pushTitle", streamer + " " + Bundle.getString("isLive"));
+			json.put("link", "https://twitch.tv/" + streamer);
+			json.put("content", nowLive.get(streamer).get("title") + ": " + nowLive.get(streamer).get("game"));
 		} else {
 			streamer += " "+ Bundle.getString("areLive");
 			json.put("pushTitle", streamer);
 			json.put("content", Bundle.getString("checkThem"));
 		}
-		// Makes HTTP post request to send update notification
-		HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), spontitAuth);
-		// Makes sure HTTP status code is 200
-		if(HTTPresponse.get("statusCode").equals("200")) {
-			Logger.logInfo(Bundle.getString("liveSent") + nowLive);
-		} else {
-			Logger.logError(Bundle.getString("liveNotSent"));
-		}
+		// Parsing for multiple Spontit API Keys
+		String userIDsStr = spontitAuth.get("X-UserId");
+		userIDsStr = userIDsStr.substring(1, userIDsStr.length()-1);
+		String authKeysStr = spontitAuth.get("X-Authorization");
+		authKeysStr = authKeysStr.substring(1, authKeysStr.length()-1);
+		List<String> userIDs = Arrays.asList(userIDsStr.split(",", -1));
+		List<String> authKeys = Arrays.asList(authKeysStr.split(",", -1));
+		// Loops through all Spontit Key(s) and send notification
+		for(int i=0; i< userIDs.size(); i++) {
+			HashMap<String, String> userAuth = new HashMap<String, String>();
+			userAuth.put("X-Authorization", authKeys.get(i));
+			userAuth.put("X-UserId", userIDs.get(i));
+			// Makes HTTP post request to send update notification
+			HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), userAuth);
+			// Makes sure HTTP status code is 200
+			if(!HTTPresponse.get("statusCode").equals("200")) {
+				Logger.logError(Bundle.getString("liveNotSent"));
+			} 
+		} 
+		Logger.logInfo(Bundle.getString("liveSent") + streamer);
 	}
 }

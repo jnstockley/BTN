@@ -1,11 +1,11 @@
 //Logger.java
 package com.github.jnstockley;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
 /**
@@ -13,7 +13,7 @@ import java.util.Date;
  * 
  * @author Jack Stockley
  * 
- * @version 0.12-beta
+ * @version 0.13-beta
  *
  */
 public class Logger {
@@ -25,18 +25,10 @@ public class Logger {
 	protected static void logInfo(String message) {
 		// Gets current date
 		Date curDate = new Date();
-		// Clears the log after log file being active for over a day
-		try {
-			Path log = Paths.get("BTTN.log");
-			BasicFileAttributes attr = Files.readAttributes(log, BasicFileAttributes.class);
-			Date creation = new Date(attr.creationTime().toMillis());
-			long diffTime = curDate.getTime() - creation.getTime();
-			double diffDays = diffTime / (1000 * 60 * 60 * 24);
-			if(diffDays >= 1) {
-				clearLog();
-			}
-		} catch (IOException e1) {
-			System.err.println(Bundle.getString("logClear"));
+		// Makes sure log file exists
+		if(new File("BTTN.log").exists()) {
+			// Clears the log after log file has 500 or more lines
+			emptyLog();
 		}
 		// Builds full message with type of log and current date and time
 		String fullMsg = curDate.toString() + ": " + Bundle.getString("info") +" - " + message + '\n';
@@ -104,16 +96,27 @@ public class Logger {
 	}
 
 	/**
-	 * Deletes the old log file, only ran after log file is older than 1 day
+	 * Deletes the log file after the file contains for then 500 lines
+	 * @return True if log was cleared, false otherwise
 	 */
-	private static void clearLog() {
-		// Overwrites the old log file with an empty file
+	public static boolean emptyLog() {
+		// Get log file and path
+		File logFile = new File("BTTN.log");
+		Path logPath = Paths.get("BTTN.log");
+		// Checks if log has more then 500 lines and clears it
 		try {
-			new FileWriter("BTTN.log",false).close();
+			long lines = Files.lines(logPath).count();
+			if(lines >= 500) {
+				if(logFile.delete()) {
+					if(logFile.createNewFile()) {
+						return true;
+					}
+				}
+			}
+			return false;
 		} catch (IOException e) {
-			System.err.println(Bundle.getString("logWrite"));
-			System.exit(1);
+			Logger.logError(Bundle.getString("logClear"));
+			return false;
 		}
 	}
-
 }
