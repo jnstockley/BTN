@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
  * 
  * @author Jack Stockley
  * 
- * @version 0.13-beta
+ * @version 0.14-beta
  *
  */
 public class Notifications {
@@ -77,7 +77,7 @@ public class Notifications {
 	protected static void sendLiveNotification(HashMap<String, HashMap<String, String>> nowLive, HashMap<String, String> auth) {
 		// Gets the Spontit API Keys
 		HashMap<String, String> spontitAuth = new HashMap<String, String>();
-		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
+		spontitAuth.put("X-Authorization", (auth.get("spontit-authorization")));
 		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
 		// Creates the JSON required by Spontit to alert user to a new live channel
 		JSONObject json = new JSONObject();
@@ -102,12 +102,14 @@ public class Notifications {
 		// Loops through all Spontit Key(s) and send notification
 		for(int i=0; i< userIDs.size(); i++) {
 			HashMap<String, String> userAuth = new HashMap<String, String>();
-			userAuth.put("X-Authorization", authKeys.get(i));
-			userAuth.put("X-UserId", userIDs.get(i));
+			userAuth.put("X-Authorization", authKeys.get(i).replace("\"", ""));
+			userAuth.put("X-UserId", userIDs.get(i).replace("\"", ""));
 			// Makes HTTP post request to send update notification
 			HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), userAuth);
 			// Makes sure HTTP status code is 200
 			if(!HTTPresponse.get("statusCode").equals("200")) {
+				System.out.println(HTTPresponse);
+				System.out.println(userAuth);
 				Logger.logError(Bundle.getString("liveNotSent"));
 			} 
 		} 

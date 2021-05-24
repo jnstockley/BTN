@@ -1,6 +1,7 @@
 //Channel.java
 package com.github.jnstockley;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 0.13-beta
+ * @version 0.14-beta
  *
  */
 public class Channel {
@@ -34,14 +35,23 @@ public class Channel {
 	private static void addChannels(String filepath, BufferedReader reader) {
 		// Reads the JSON config file
 		JSONParser parser = new JSONParser();
-		JSONObject channels = null;
-		try {
-			channels = (JSONObject) parser.parse(new FileReader(filepath));
-		} catch (IOException | ParseException e) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
-		}
+		JSONObject json = new JSONObject();
+		JSONObject channels = new JSONObject();
+		File file = new File(filepath);
 		// Gets the number of current channels in the config file
-		int oldSize = channels.size();
+		int oldSize = 0;
+		if(file.exists() && file.length() != 0) {
+			try {
+				json = (JSONObject) parser.parse(new FileReader(filepath));
+			} catch (IOException | ParseException e) {
+				Logger.logError(Bundle.getString("badJSON", filepath));
+			}
+			if(json.containsKey("channels")) {
+				channels = (JSONObject) json.get("channels");
+				oldSize = channels.size();
+			}
+			
+		}
 		// Asks user to enter new channels
 		System.out.print(Bundle.getString("getChan"));
 		List<String> newChannels = null;
@@ -52,22 +62,23 @@ public class Channel {
 		}
 		// Converts channels into JSON with non-live state
 		for(String channel: newChannels) {
-			if(!channels.containsKey(channel)) {
-				channels.put(channel, false);
+			if(!channels.containsKey(channel.toLowerCase())) {
+				channels.put(channel.toLowerCase(), false);
 			}
 		}
+		json.put("channels", channels);
 		// Makes sure user actually added new channels and writes them to file
 		if(channels.size() != oldSize) {
 			FileWriter writer;
 			try {
 				writer = new FileWriter(filepath);
-				writer.write(channels.toJSONString());
+				writer.write(json.toJSONString());
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
 				Logger.logError(Bundle.getString("badWrite", filepath));
 			}
-			System.exit(0);
+			Logger.logInfo(Bundle.getString("goodAdd"));
 		} else {
 			Logger.logInfo(Bundle.getString("noChanAdd"));
 		}
@@ -82,16 +93,17 @@ public class Channel {
 	private static void removeChannels(String filepath, BufferedReader reader) {
 		// Reads the JSON config file
 		JSONParser parser = new JSONParser();
-		JSONObject channels = null;
+		JSONObject json = new JSONObject();
 		try {
-			channels = (JSONObject) parser.parse(new FileReader(filepath));
+			json = (JSONObject) parser.parse(new FileReader(filepath));
 		} catch (IOException | ParseException e) {
 			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
+		JSONObject channels = (JSONObject) json.get("channels");
 		// Gets the number of current channels in the config file
 		int oldSize = channels.size();
 		// Converts channels from JSON to a list
-		System.out.println(Bundle.getString("delChan"));
+		System.out.println(Bundle.getString("selChan"));
 		int index = 1;
 		Set<String> channelSet = channels.keySet();
 		List<String> channelNames = new ArrayList<String>();
@@ -116,12 +128,13 @@ public class Channel {
 		for(String channelIndex: indexs) {
 			channels.remove(channelNames.get(Integer.parseInt(channelIndex)-1));
 		}
+		json.put("channels", channels);
 		// Makes sure user actually is removing channels and writes them to file
 		if(channels.size() != oldSize) {
 			FileWriter writer;
 			try {
 				writer = new FileWriter(filepath);
-				writer.write(channels.toJSONString());
+				writer.write(json.toJSONString());
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {

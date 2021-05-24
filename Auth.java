@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,7 +20,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 0.13-beta
+ * @version 0.14-beta
  *
  */
 public class Auth {
@@ -114,8 +115,11 @@ public class Auth {
 		} catch (NumberFormatException | IOException e1) {
 			Logger.logError(Bundle.getString("invalidNum"));
 		}
-		List<String> authKeys = new ArrayList<String>();
-		List<String> userIDs = new ArrayList<String>();
+		//List<String> authKeys = new ArrayList<String>();
+		//List<String> userIDs = new ArrayList<String>();
+		JSONArray authKeys = new JSONArray();
+		JSONArray userIDs = new JSONArray();
+
 		// Allows user to enter X number of userIDs and API Key(s)
 		for(int i=0; i< numKeys; i++) {
 			// Gets the Spontit auth key
@@ -258,7 +262,7 @@ public class Auth {
 			}
 			// Checks if functions was called from update function 
 			if(!update) {
-				Logger.logInfo(Bundle.getString("removeSpontit"));
+				Logger.logWarn(Bundle.getString("removeSpontit"));
 			}
 		}else {
 			Logger.logError(Bundle.getString("noSpontit", filepath));

@@ -13,7 +13,7 @@ import java.util.Date;
  * 
  * @author Jack Stockley
  * 
- * @version 0.13-beta
+ * @version 0.14-beta
  *
  */
 public class Logger {
@@ -44,7 +44,6 @@ public class Logger {
 		}
 		// Prints message to console and exits program
 		System.out.println(message);
-		System.exit(0);
 	}
 
 	/**

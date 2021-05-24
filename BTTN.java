@@ -15,7 +15,7 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 0.13-beta
+ * @version 0.14-beta
  * 
  */
 public class BTTN {
@@ -44,14 +44,17 @@ public class BTTN {
 		}
 		// Calls the corresponding option selected by the user
 		switch(option) {
+		// Modify Channel
 		case 1:
-			Auth.setupAuth(filepath);
-			Helper.addMisc(filepath);
-			break;
-		case 2:
 			Channel.setupChannels(filepath);
 			Helper.addMisc(filepath);
 			break;
+		// Modify Keys
+		case 2:
+			Auth.setupAuth(filepath);
+			Helper.addMisc(filepath);
+			break;
+		// Upgrade config file
 		case 3:
 			Helper.configUpgrade(filepath);
 			Helper.addMisc(filepath);
@@ -102,6 +105,7 @@ public class BTTN {
 			} else {
 				Logger.logInfo(Bundle.getString("noUpdates"));
 			}
+			System.exit(0);
 			// Runs the setup functions
 		} else if(args.length == 2 && args[1].contains(Bundle.getString("setup"))) {
 			setup(args[0]);
@@ -110,8 +114,9 @@ public class BTTN {
 			Logger.logError(Bundle.getString("argsError"));
 		}
 		/* TODO
-		 * Improve notifications with stream name and game???
-		 * Check for bugs before 1.0 release, especially in file modifying
+		 * Double-check for bugs
+		 * After modifying file, ask user to quit or continue
+		 * Improve comments and javadoc
 		 */
 	}
 }

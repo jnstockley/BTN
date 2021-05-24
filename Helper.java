@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 0.13-beta
+ * @version 0.14-beta
  *
  */
 public class Helper {
@@ -29,7 +30,7 @@ public class Helper {
 	/**
 	 * Private variable that describes the latest version of the JSON config file
 	 */
-	private static final double jsonVersion = 0.13;
+	private static final double jsonVersion = 0.14;
 
 	/**
 	 * Reads the JSON config file and returns the old live status for each channel
@@ -281,6 +282,41 @@ public class Helper {
 				newSpontit.put("userID", "[" + userID + "]");
 				((JSONObject)json.get("auth")).put("spontit", newSpontit);
 				json.put("version", 0.13);
+				// Writes changes to file and informs user of upgrade!
+				try {
+					FileWriter writer = new FileWriter(filepath);
+					writer.write(json.toJSONString());
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					Logger.logError(Bundle.getString("badWrite", filepath));
+				}
+				configUpgrade(filepath);
+			} else {
+				Logger.logError(Bundle.getString("noSpontit"));
+			}
+		} else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.13){
+			if(json.containsKey("auth") && ((JSONObject) (json.get("auth"))).containsKey("spontit")){
+				// Performs upgrades to fix JSONArray bug in version 0.13
+				JSONObject auth = new JSONObject();
+				auth.put("twitch", (JSONObject)((JSONObject)json.get("auth")).get("twitch"));
+				JSONObject spontit = (JSONObject)((JSONObject)json.get("auth")).get("spontit");
+				JSONArray userIDs = new JSONArray();
+				JSONArray authKeys = new JSONArray();
+				String keyStr = spontit.get("authorization").toString().substring(1, spontit.get("authorization").toString().length()-1);
+				String userStr = spontit.get("userID").toString().substring(1, spontit.get("userID").toString().length()-1);
+				List<String> userList = Arrays.asList(userStr);
+				List<String> keyList = Arrays.asList(keyStr);
+				for(int i=0; i<userList.size(); i++) {
+					userIDs.add(userList.get(i));
+					authKeys.add(keyList.get(i));
+				}
+				spontit.put("authorization", authKeys);
+				spontit.put("userID", userIDs);
+				
+				auth.put("spontit", spontit);
+				json.put("auth", auth);
+				json.put("version", 0.14);
 				// Writes changes to file and informs user of upgrade!
 				try {
 					FileWriter writer = new FileWriter(filepath);
