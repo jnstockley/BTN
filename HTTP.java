@@ -15,7 +15,7 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 0.14-beta
+ * @version 1.0-RC1
  *
  */
 public class HTTP {
@@ -179,7 +179,7 @@ public class HTTP {
 			} catch (IOException e) {
 				Logger.logError(Bundle.getString("errRead"));
 			} 
-			response.put("data", response.toString());
+			response.put("data", strResponse.toString());
 		}
 		return response;
 	}
@@ -247,7 +247,7 @@ public class HTTP {
 			} catch (IOException e) {
 				Logger.logError(Bundle.getString("errRead"));
 			} 
-			response.put("data", response.toString());
+			response.put("data", strResponse.toString());
 		}
 		return response;
 	}

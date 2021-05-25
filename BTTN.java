@@ -15,10 +15,32 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 0.14-beta
+ * @version 1.0-RC1
  * 
  */
 public class BTTN {
+
+	/**
+	 * Simple helper function that asks user if they want to continue setting up the config file
+	 * @param reader BufferedReader used to read user input
+	 * @return Returns 'Y' if the user wants to continue setting up the config file and 'N' otherwise
+	 */
+	private static String getCont(BufferedReader reader) {
+		// Asks user if they want to continue
+		System.out.println(Bundle.getString("contSetup"));
+		String cont = "N";
+		// Read user input
+		try {
+			cont = reader.readLine();
+		} catch (IOException e) {
+			Logger.logError(Bundle.getString("invalidOpt"));
+		}
+		// Parse user input with current locale in mind
+		if(cont.equalsIgnoreCase("y") || cont.equalsIgnoreCase("s") || cont.equals("o")) {
+			return "Y";
+		}
+		return "N";
+	}
 
 	/**
 	 * A Helper Function which determines how the program
@@ -43,25 +65,33 @@ public class BTTN {
 			Logger.logError(Bundle.getString("invalidNum"));
 		}
 		// Calls the corresponding option selected by the user
-		switch(option) {
-		// Modify Channel
-		case 1:
-			Channel.setupChannels(filepath);
-			Helper.addMisc(filepath);
-			break;
-		// Modify Keys
-		case 2:
-			Auth.setupAuth(filepath);
-			Helper.addMisc(filepath);
-			break;
-		// Upgrade config file
-		case 3:
-			Helper.configUpgrade(filepath);
-			Helper.addMisc(filepath);
-			break;
-		default:
-			Logger.logError(Bundle.getString("invalidOpt"));
+		String cont = "Y";
+		while(cont.equals("Y")) {
+			cont = "N";
+			switch(option) {
+			// Modify Channel
+			case 1:
+				Channel.setupChannels(filepath);
+				Helper.addMisc(filepath);
+				cont = getCont(reader);
+				break;
+				// Modify Keys
+			case 2:
+				Auth.setupAuth(filepath);
+				Helper.addMisc(filepath);
+				cont = getCont(reader);
+				break;
+				// Upgrade config file
+			case 3:
+				Helper.configUpgrade(filepath);
+				Helper.addMisc(filepath);
+				cont = getCont(reader);
+				break;
+			default:
+				Logger.logError(Bundle.getString("invalidOpt"));
+			}
 		}
+
 	}
 
 	/**
@@ -113,10 +143,5 @@ public class BTTN {
 		} else {
 			Logger.logError(Bundle.getString("argsError"));
 		}
-		/* TODO
-		 * Double-check for bugs
-		 * After modifying file, ask user to quit or continue
-		 * Improve comments and javadoc
-		 */
 	}
 }

@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
  * 
  * @author Jack Stockley
  * 
- * @version 0.14-beta
+ * @version 1.0-RC1
  *
  */
 public class Bundle {

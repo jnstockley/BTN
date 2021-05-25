@@ -22,7 +22,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 0.14-beta
+ * @version 1.0-RC1
  *
  */
 public class Helper {
@@ -271,7 +271,9 @@ public class Helper {
 			Logger.logError(Bundle.getString("badJSON", filepath));
 		}
 		// Makes sure the JSON config file has required keys and known version number
-		if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.9) {
+		if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == jsonVersion) {
+			Logger.logInfo(Bundle.getString("upToDate", filepath));
+		}else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.9) {
 			if(json.containsKey("auth") && ((JSONObject) (json.get("auth"))).containsKey("spontit")) {
 				// Performs conversion from single entry to JSON Array and update version number
 				JSONObject spontit = (JSONObject)((JSONObject)json.get("auth")).get("spontit");
@@ -313,7 +315,7 @@ public class Helper {
 				}
 				spontit.put("authorization", authKeys);
 				spontit.put("userID", userIDs);
-				
+
 				auth.put("spontit", spontit);
 				json.put("auth", auth);
 				json.put("version", 0.14);

@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
  * 
  * @author Jack Stockley
  * 
- * @version 0.14-beta
+ * @version 1.0-RC1
  *
  */
 public class Notifications {
