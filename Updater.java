@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0-RC1
+ * @version 1.0-RC2
  *
  */
 public class Updater {
@@ -23,7 +23,7 @@ public class Updater {
 	/**
 	 * Private double representing the current version of the BTTN program
 	 */
-	private final static double version = 0.15;
+	private final static double version = 0.16;
 
 	/**
 	 * Makes HTTP request to server to get the latest version number publicly available

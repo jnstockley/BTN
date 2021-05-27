@@ -15,7 +15,7 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0-RC1
+ * @version 1.0-RC2
  *
  */
 public class HTTP {
@@ -148,14 +148,22 @@ public class HTTP {
 		// Ads the data to be sent and send the post request
 		OutputStream os = null;
 		int responseCode = -1;
-		try{
-			os = httpURLConnection.getOutputStream();
-			byte[] input = data.getBytes("utf-8");
-			os.write(input, 0, input.length);
-			os.flush();
-			os.close();
+		// Checks if no data was added and sends a POST rrequest with no data
+		if(data != null) {
+			try{
+				os = httpURLConnection.getOutputStream();
+				byte[] input = data.getBytes("utf-8");
+				os.write(input, 0, input.length);
+				os.flush();
+				os.close();
+			} catch (IOException e) {
+				Logger.logError(Bundle.getString("badData"));
+			}
+		}
+		try {
 			responseCode = httpURLConnection.getResponseCode();
-		} catch (IOException e) {
+
+		} catch(IOException e) {
 			Logger.logError(Bundle.getString("badData"));
 		}
 		// Creates a HashMap to store response code and response data

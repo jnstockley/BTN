@@ -3,6 +3,8 @@ package com.github.jnstockley;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +17,7 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0-RC1
+ * @version 1.0-RC2
  * 
  */
 public class BTTN {
@@ -55,6 +57,7 @@ public class BTTN {
 		System.out.println(Bundle.getString("modChan"));
 		System.out.println(Bundle.getString("modKeys"));
 		System.out.println(Bundle.getString("updateConfig"));
+		System.out.println(Bundle.getString("help"));
 		System.out.print(Bundle.getString("option"));
 		// Gets user input and makes sure it's valid
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -86,6 +89,16 @@ public class BTTN {
 				Helper.configUpgrade(filepath);
 				Helper.addMisc(filepath);
 				cont = getCont(reader);
+				break;
+				// Opens GitHub WiKi in web browser
+			case 4:
+				URI webpage;
+				try {
+					webpage = new URI("https://github.com/jnstockley/BTTN/wiki");
+					java.awt.Desktop.getDesktop().browse(webpage);
+				} catch (URISyntaxException | IOException e) {
+					Logger.logError("webError");
+				}
 				break;
 			default:
 				Logger.logError(Bundle.getString("invalidOpt"));
@@ -139,7 +152,7 @@ public class BTTN {
 			// Runs the setup functions
 		} else if(args.length == 2 && args[1].contains(Bundle.getString("setup"))) {
 			setup(args[0]);
-		// Displays an error if the args are invalid
+			// Displays an error if the args are invalid
 		} else {
 			Logger.logError(Bundle.getString("argsError"));
 		}

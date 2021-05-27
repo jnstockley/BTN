@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -18,7 +19,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0-RC1
+ * @version 1.0-RC2
  *
  */
 public class Auth {
@@ -41,12 +42,13 @@ public class Auth {
 		}
 		// Get the Twitch Authentication Key from console
 		System.out.print(Bundle.getString("twitchAuth"));
-		String authorization = null;
+		String secret = null;
 		try {
-			authorization = reader.readLine();
+			secret = reader.readLine();
 		} catch (IOException e) {
 			Logger.logError(Bundle.getString("badAuth"));
 		}
+		String authorization = getAuth(clientID, secret);
 		// Create JSON Object with Twitch keys
 		JSONObject twitchAuthJSON = new JSONObject();
 		twitchAuthJSON.put("clientID", clientID);
@@ -364,6 +366,33 @@ public class Auth {
 				Logger.logError(Bundle.getString("invalidOpt"));
 			}
 			break;
+		}
+	}
+
+	/**
+	 * Makes a POST request to the Twitch API to get the users access token 
+	 * from them clientID and clientSecret
+	 * @param clientID The user's clientID from Twitch.tv
+	 * @param clientSecret The user's clientSecret from Twitch.tv
+	 * @return The user's access token from Twitch.tv
+	 */
+	private static String getAuth(String clientID, String clientSecret) {
+		// Builds the URL to send the post request to
+		String url = "https://id.twitch.tv/oauth2/token?client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=client_credentials";
+		HashMap<String, String> HTTPResponse = HTTP.post(url, null);
+		JSONParser parser = new JSONParser();
+		JSONObject data = new JSONObject();
+		// Parses the data from the POST request and get user's access token
+		try {
+			data = (JSONObject)parser.parse(HTTPResponse.get("data"));
+		} catch (ParseException e) {
+			Logger.logError(url);
+		}
+		if(data.containsKey("access_token")) {
+			return data.get("access_token").toString();
+		} else {
+			Logger.logError(url);
+			return "";
 		}
 	}
 }

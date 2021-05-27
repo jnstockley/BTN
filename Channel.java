@@ -24,7 +24,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0-RC1
+ * @version 1.0-RC2
  *
  */
 public class Channel {
