@@ -116,9 +116,9 @@ public class Notifications {
 			HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), userAuth);
 			// Makes sure HTTP status code is 200
 			if(!HTTPresponse.get("statusCode").equals("200")) {
-				return true;
+				return false;
 			} 
 		}
-		return false;
+		return true;
 	}
 }
