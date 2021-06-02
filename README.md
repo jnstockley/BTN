@@ -19,8 +19,3 @@ It uses the official Twitch.tv API to determine when a streamer goes live, saves
 2. More lanuage support
 3. Notifications to launch twitch stream on mobile devices
 4. Youtube notifications (possible no promise)
-
-## Knwon Bugs
-Version 1.0:
-1. BTTN Doesn't send update notifications
-2. BTTN still checks for live channels, while waiting to send the next update notification
