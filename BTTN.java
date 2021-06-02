@@ -17,7 +17,7 @@ import java.util.Set;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0
+ * @version 1.01
  * 
  */
 public class BTTN {
@@ -156,5 +156,10 @@ public class BTTN {
 		} else {
 			Logger.logError(Bundle.getString("argsError"));
 		}
+		
+		/**
+		 * TODO
+		 * Fix duplicate code in sending notifications
+		 */
 	}
 }

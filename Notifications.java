@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0
+ * @version 1.01
  *
  */
 public class Notifications {
@@ -31,12 +31,9 @@ public class Notifications {
 		HashMap<String, String> spontitAuth = new HashMap<String, String>();
 		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
 		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
-		// Sends HTTP post request to send error notification
-		HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), spontitAuth);
-		// Makes sure HTTP status code is 200
-		if(HTTPresponse.get("statusCode").equals("200")) {
-			Logger.logWarn(Bundle.getString("errSent"));
-		} else {
+		if(sendNotification(json, spontitAuth)) {
+			Logger.logInfo(Bundle.getString("errSent"));
+		}else {
 			Logger.logError(Bundle.getString("errNotSent"));
 		}
 	}
@@ -57,10 +54,7 @@ public class Notifications {
 		HashMap<String, String> spontitAuth = new HashMap<String, String>();
 		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
 		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
-		// Makes HTTP post request to send update notification
-		HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), spontitAuth);
-		// Makes sure HTTP status code is 200
-		if(HTTPresponse.get("statusCode").equals("200")) {
+		if(sendNotification(json, spontitAuth)) {
 			Logger.logInfo(Bundle.getString("updateSent"));
 		} else {
 			Logger.logError(Bundle.getString("updateNotSent"));
@@ -92,6 +86,20 @@ public class Notifications {
 			json.put("pushTitle", streamer);
 			json.put("content", Bundle.getString("checkThem"));
 		}
+		if(sendNotification(json, spontitAuth)) {
+			Logger.logInfo(Bundle.getString("liveSent") + streamer);
+		} else {
+			Logger.logError(Bundle.getString("liveNotSent"));
+		}
+	}
+
+	/**
+	 * Sends the given notification to the device using the JSON data provided and the spontit auth credentials
+	 * @param json The JSON spontit uses to build the notification
+	 * @param spontitAuth The authentication needed to send the spontit notification
+	 * @return True if notification was sent, otherwise false
+	 */
+	private static boolean sendNotification(JSONObject json, HashMap<String, String> spontitAuth) {
 		// Parsing for multiple Spontit API Keys
 		String userIDsStr = spontitAuth.get("X-UserId");
 		userIDsStr = userIDsStr.substring(1, userIDsStr.length()-1);
@@ -108,11 +116,9 @@ public class Notifications {
 			HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), userAuth);
 			// Makes sure HTTP status code is 200
 			if(!HTTPresponse.get("statusCode").equals("200")) {
-				System.out.println(HTTPresponse);
-				System.out.println(userAuth);
-				Logger.logError(Bundle.getString("liveNotSent"));
+				return true;
 			} 
-		} 
-		Logger.logInfo(Bundle.getString("liveSent") + streamer);
+		}
+		return false;
 	}
 }

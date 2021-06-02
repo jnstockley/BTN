@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0
+ * @version 1.01
  *
  */
 public class Updater {
@@ -23,7 +23,7 @@ public class Updater {
 	/**
 	 * Private double representing the current version of the BTTN program
 	 */
-	private final static double version = 1.0;
+	private final static double version = 1.01;
 
 	/**
 	 * Makes HTTP request to server to get the latest version number publicly available
@@ -38,10 +38,10 @@ public class Updater {
 			// Checks if server version is newer then current version
 			double serverVersion = Double.parseDouble(response.get("data"));
 			// Sends notification if its been longer then update delay
-			if((serverVersion > version) && timeToSendAlert(30)) {
+			if((serverVersion > version) && timeToSendAlert(delay)) {
 				Notifications.sendUpdateNotification(serverVersion, auth);
-				Logger.logInfo(Bundle.getString("updateAvailable"));
 			}
+			Logger.logWarn(Bundle.getString("updateAvailable"));
 		} else {
 			Logger.logError(Bundle.getString("errCheck"));
 		}
