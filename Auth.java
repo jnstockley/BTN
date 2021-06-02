@@ -19,7 +19,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0-RC2
+ * @version 1.0
  *
  */
 public class Auth {
@@ -41,12 +41,12 @@ public class Auth {
 			Logger.logError(Bundle.getString("badClient"));
 		}
 		// Get the Twitch Authentication Key from console
-		System.out.print(Bundle.getString("twitchAuth"));
+		System.out.print(Bundle.getString("twitchSecrett"));
 		String secret = null;
 		try {
 			secret = reader.readLine();
 		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badAuth"));
+			Logger.logError(Bundle.getString("badSecret"));
 		}
 		String authorization = getAuth(clientID, secret);
 		// Create JSON Object with Twitch keys

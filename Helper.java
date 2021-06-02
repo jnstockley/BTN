@@ -22,7 +22,7 @@ import org.json.simple.parser.ParseException;
  * 
  * @author Jack Stockley
  * 
- * @version 1.0-RC2
+ * @version 1.0
  *
  */
 public class Helper {
@@ -30,7 +30,7 @@ public class Helper {
 	/**
 	 * Private variable that describes the latest version of the JSON config file
 	 */
-	private static final double jsonVersion = 0.14;
+	private static final double jsonVersion = 1.0;
 
 	/**
 	 * Reads the JSON config file and returns the old live status for each channel
@@ -273,6 +273,7 @@ public class Helper {
 		// Makes sure the JSON config file has required keys and known version number
 		if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == jsonVersion) {
 			Logger.logInfo(Bundle.getString("upToDate", filepath));
+		// Update JSON config to version 0.13
 		}else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.9) {
 			if(json.containsKey("auth") && ((JSONObject) (json.get("auth"))).containsKey("spontit")) {
 				// Performs conversion from single entry to JSON Array and update version number
@@ -297,6 +298,7 @@ public class Helper {
 			} else {
 				Logger.logError(Bundle.getString("noSpontit"));
 			}
+		// Update JSON config to version 0.14
 		} else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.13){
 			if(json.containsKey("auth") && ((JSONObject) (json.get("auth"))).containsKey("spontit")){
 				// Performs upgrades to fix JSONArray bug in version 0.13
@@ -332,6 +334,19 @@ public class Helper {
 			} else {
 				Logger.logError(Bundle.getString("noSpontit"));
 			}
+		// Update JSON config to version 1.0
+		} else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.14) {
+			json.put("version", 1.0);
+			// Writes changes to file and informs user of upgrade!
+			try {
+				FileWriter writer = new FileWriter(filepath);
+				writer.write(json.toJSONString());
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				Logger.logError(Bundle.getString("badWrite", filepath));
+			}
+			System.out.println(Bundle.getString("updateComplete"));
 		} else {
 			Logger.logError(Bundle.getString("noVersion"));
 		}
