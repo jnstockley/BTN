@@ -40,8 +40,11 @@ public class Updater {
 			// Sends notification if its been longer then update delay
 			if((serverVersion > version) && timeToSendAlert(delay)) {
 				Notifications.sendUpdateNotification(serverVersion, auth);
+				Logger.logWarn(Bundle.getString("updateAvailable"));
+			} else if(serverVersion > version){
+				Logger.logWarn(Bundle.getString("updateAvailable"));
+
 			}
-			Logger.logWarn(Bundle.getString("updateAvailable"));
 		} else {
 			Logger.logError(Bundle.getString("errCheck"));
 		}
