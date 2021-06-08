@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+# Spontit Update!!!
+I have sent spontit an email letting them know that their API is down, no idea if they will respond or not! I have released a pre-release BTTN version with email failover support. It is buggy so I reccomend backing up your config file. I am trying to find free cross-platform alternatives to Spontit but have not had much luck. I also am consdering making a web app to support notifications, but that is a last resort. I do still plan on working on BTTN, but will be taking a break until Spontit is back working or I find an alternative to Spontit.
+
 # Important Note!!!
 It appears that Spontit is having some issues sending out notifications, giving an HTTP 502 Bad Gateway error code.  Sadly, their is nothing I can do to fix their error code. I do hope to add a backup way to send a notifcation via email or text in the next version. Sorry for any inconveniences.
 
