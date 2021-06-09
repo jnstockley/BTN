@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+# New Service Found
+I believe I have found a new service to use for sending push notifications. Its called [Alertyz](https://alertzy.app/). I still plan on doing a little bit more research to see if I can find anything different which might be better but this app seems to have very similar features to Spontit. Right now I am planning on releasing a version 1.1 which supports Alertzy. I still plan on doing a re-write to make the program more stable but I want to get notifications working first. Look for an update within a couple of days.
+
 # Spontit Update!!!
 I have sent spontit an email letting them know that their API is down, no idea if they will respond or not! I have released a pre-release BTTN version with email failover support. It is buggy so I reccomend backing up your config file. I am trying to find free cross-platform alternatives to Spontit but have not had much luck. I also am consdering making a web app to support notifications, but that is a last resort. I do still plan on working on BTTN, but will be taking a break until Spontit is back working or I find an alternative to Spontit.
 
