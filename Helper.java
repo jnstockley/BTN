@@ -1,405 +1,217 @@
-//Helper.java
 package com.github.jnstockley;
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 /**
- * Helper class, which focuses on retrieving data required throughout the program
+ * 
+ * Class that holds helper functions used throughout the program
  * 
  * @author Jack Stockley
  * 
- * @version 1.01
+ * @version 1.5
  *
  */
 public class Helper {
 
 	/**
-	 * Private variable that describes the latest version of the JSON config file
+	 *  Name of the Class used for Logging error
 	 */
-	private static final double jsonVersion = 1.0;
+	private static final String CLASSNAME = Helper.class.getName();
 
 	/**
-	 * Reads the JSON config file and returns the old live status for each channel
-	 * @param filepath Location of JSON config file
-	 * @return HashMap with a channel and a boolean representing live state
+	 * Uses the Twitch API to check the current status of a channel and get required data if live
+	 * @param auth Auth object that holds the API keys
+	 * @param channel The name of the channel to check the status of
+	 * @return JSONObject of the channel if found otherwise null;
 	 */
-	protected static HashMap<String, Boolean> getOldStatus(String filepath) {
-		// Create HashMap
-		HashMap<String, Boolean> oldStatus = new HashMap<String, Boolean>();
-		// Reads the JSON file and gets the channels sections
-		JSONObject statuses = getSection(filepath, "channels");
-		// Converts JSON to HashMap
-		for(Object channel: statuses.keySet()) {
-			oldStatus.put(channel.toString(), (Boolean) statuses.get(channel.toString()));
+	public static JSONObject curLiveStatus(Auth auth, String channel) {
+		// Build the HTTP POST request
+		OkHttpClient client = new OkHttpClient();
+		Request request = new Request.Builder()
+				.url("https://api.twitch.tv/helix/search/channels?query=" + channel)
+				.header("client-id", auth.getTwitchClientID())
+				.header("Authorization", "Bearer " + auth.getTwitchAuthorization())
+				.build();
+		// Makes the HTTP request
+		try(Response response = client.newCall(request).execute()){
+			// Parse the HTTP response
+			JSONParser parser = new JSONParser();
+			JSONArray responseJSON = (JSONArray)((JSONObject) parser.parse(response.body().string())).get("data");
+			for(Object stream: responseJSON) {
+				// Find the specific channel and return the JSON Object of the channel
+				JSONObject streamJSON = (JSONObject)parser.parse(stream.toString());
+				if(streamJSON.get("display_name").toString().equalsIgnoreCase(channel)) {
+					return streamJSON;
+				}
+			}
+			return null;
+		}catch(IOException | ParseException e) {
+			Notifications.sendErrorNotification(Bundle.getBundle("errorCheckingStatus", channel), auth.getAlertzyAccountKey());
+			Logging.logError(CLASSNAME, e);
+			return null;
 		}
-		return oldStatus;
 	}
 
 	/**
-	 * Reads the JSON config file and gets the API Keys required for the program to run and returns them
-	 * @param filepath Location of JSON config file
-	 * @return HashMap with all the API keys used in the program
-	 */
-	protected static HashMap<String, String> getAuth(String filepath) {
-		// Makes sure the JSON config file isn't empty
-		HashMap<String, String> auth = new HashMap<String, String>();
-		File file = new File(filepath);
-		if(file.length() == 0) {
-			Logger.logError(Bundle.getString("emptyFile", filepath));
-		}
-		// Gets the auth section from the JSON object
-		JSONObject authJSON = getSection(filepath, "auth");
-		// Makes sure the JSON auth section has Twitch key and get keys and convert them to HashMap
-		if(authJSON.containsKey("twitch")) {
-			JSONObject twitch = (JSONObject) authJSON.get("twitch");
-			if(twitch.containsKey("clientID") && twitch.containsKey("authorization")) {
-				auth.put("twitch-client-id", twitch.get("clientID").toString());
-				auth.put("twitch-authorization", "Bearer " + twitch.get("authorization").toString());
-			} else {
-				Logger.logError(Bundle.getString("noTwitchKey"));
-			}
-		} else {
-			Logger.logError(Bundle.getString("noTwitch", filepath));
-		}
-		// Makes sure the JSON auth section has Spontit key and get keys and convert them to HashMap
-		if(authJSON.containsKey("spontit")) {
-			JSONObject spontit = (JSONObject) authJSON.get("spontit");
-			if(spontit.containsKey("userID") && spontit.containsKey("authorization")) {
-				auth.put("spontit-user-id", spontit.get("userID").toString());
-				auth.put("spontit-authorization", spontit.get("authorization").toString());
-			} else {
-				Logger.logError(Bundle.getString("noSpontitKey"));
-			}
-		} else {
-			Logger.logError(Bundle.getString("noSpontit", filepath));
-		}
-		return auth;
-	}
-
-	/**
-	 * Uses the Twitch API to get the current live status, and game channel is streaming of the channels in the JSON config file
-	 * @param channels Set of all the channels to check
-	 * @param auth HashMap with the API Keys
-	 * @return HashMap with the channel and another HashMap with String representation of live status and game streaming
-	 */
-	protected static HashMap<String, HashMap<String, String>> getStatus(Set<String> channels, HashMap<String, String> auth) {
-		// Get the Twitch API keys and converts them to one the Twitch API can easily understand
-		HashMap<String, HashMap<String, String>> currStatus = new HashMap<String, HashMap<String, String>>();
-		HashMap<String, String> twitchAuth = new HashMap<String, String>();
-		twitchAuth.put("client-id", auth.get("twitch-client-id"));
-		twitchAuth.put("Authorization", auth.get("twitch-authorization"));
-		JSONParser parser = new JSONParser();
-		HashMap<String, String> response;
-		// Makes and hTTP get request for each channel to get live status
-		for(String channel: channels) {
-			response = HTTP.get("https://api.twitch.tv/helix/search/channels?query=" + channel, twitchAuth);
-			// Makes sure HTTP request returned 200 status code
-			if(Integer.parseInt(response.get("statusCode"))!=200) {
-				Notifications.sendErrorNotification(response, auth);
-				Logger.logError(Bundle.getString("twitchStatus", response.toString()));
-			} else {
-				//TODO Make sure comments are actuate
-				// Gets JSON data from HTTP request
-				JSONObject json = null;
-				try {
-					json = (JSONObject) parser.parse(response.get("data"));
-				} catch (ParseException e1) {
-					Logger.logError(Bundle.getString("badJSONForm"));
-				}
-				// Parse JSON from HTTP request
-				Object[] jsonArr = ((JSONArray) json.get("data")).toArray();
-				List<String> data = new ArrayList<String>();
-				for(int i=0; i<jsonArr.length; i++) {
-					data.add(jsonArr[i].toString());
-				}
-				// Parses JSON data
-				for(String channelData: data) {
-					HashMap<String, String> chanData = new HashMap<String, String>();
-					JSONObject channelJson = null;
-					try {
-						channelJson = (JSONObject)parser.parse(channelData);
-					} catch (ParseException e) {
-						Logger.logError(Bundle.getString("badJSONForm"));
-					}
-					// Makes sure channels name match and checks if live status is true
-					if(channelJson.get("display_name").equals(channel) && channelJson.get("is_live").toString().equals("true")) {
-						chanData.put("live", "true");
-						chanData.put("game", channelJson.get("game_name").toString());
-						chanData.put("title", channelJson.get("title").toString());
-						currStatus.put(channel, chanData);
-					}
-				}
-				if(!currStatus.containsKey(channel)) {
-					HashMap<String, String> chanData = new HashMap<String, String>();
-					chanData.put("live", "false");
-					currStatus.put(channel, chanData);
-				}	
-			}
-		}
-		return currStatus;
-	}
-
-	/**
-	 * Writes live status changes for the channels to the JSON config file
-	 * @param currStatus HashMap with update live status for channels
-	 * @param filepath Location of JSON config file
+	 * Reads the JSON config file, and gets the old live status of a channel
+	 * @param file The JSON config file
+	 * @return A HashMap with the name of the channel and the old live status
 	 */
 	@SuppressWarnings("unchecked")
-	protected static void updateStatusFile(HashMap<String, HashMap<String, String>> currStatus, String filepath) {
-		HashMap<String, Boolean> liveStatus = new HashMap<String, Boolean>();
-		Set<String> channels = currStatus.keySet();
-		for(String channel: channels) {
-			liveStatus.put(channel, Boolean.parseBoolean(currStatus.get(channel).get("live")));
-		}
+	public static HashMap<String, Boolean> getOldStatus(File file) {
+		// Read the JSON data and parse it
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
-		// Reads data from JSON config file
 		try {
-			json = (JSONObject) parser.parse(new FileReader(filepath));
-		} catch (IOException | ParseException e1) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
+			json = (JSONObject) parser.parse(new FileReader(file));
+		} catch (IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
 		}
-		// Update live status
-		JSONObject channelJSON = new JSONObject(liveStatus);
-		json.remove("channels");
-		json.put("channels", channelJSON);
-		// Writes changes to JSON config file
-		FileWriter writer;
+		// Makes sure JSON config has channels to check
+		if(json.containsKey("channels")) {
+			// Convert JSON to HashMap and return it
+			JSONObject channels = (JSONObject) json.get("channels");
+			return (HashMap<String, Boolean>) channels;
+		} else {
+			Logging.logError(CLASSNAME, Bundle.getBundle("noChannels", file.getName()));
+			return null;
+		}
+	}
+
+	/**
+	 * Gets the current live status from the channels list and writes it to the JSON config file
+	 * @param channels List of channel objects
+	 * @param file JSON config file which contains the channels
+	 */
+	@SuppressWarnings("unchecked")
+	public static void updateStatus(List<Channel> channels, File file) {
+		// Reads the JSON from the config file and parses it
+		JSONParser parser = new JSONParser();
+		JSONObject json = new JSONObject();
 		try {
-			writer = new FileWriter(filepath);
+			json = (JSONObject) parser.parse(new FileReader(file));
+		} catch (IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		// Gets the channels JSON object and updates it with the new live status
+		JSONObject channelsJSON = (JSONObject) json.get("channels");
+		for(Channel channel: channels) {
+			channelsJSON.put(channel.getChannelName(), channel.isLiveStatus());
+		}
+		// Overwrite the channels JSON Object and write to file
+		json.put("channels", channelsJSON);
+		try {
+			FileWriter writer = new FileWriter(file);
 			writer.write(json.toJSONString());
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badWrite", filepath));
+			Logging.logError(CLASSNAME, e);
 		}
 	}
 
 	/**
-	 * Reads the JSON config file and get update notification delay
-	 * @param filepath Location of JSON config file
-	 * @return An integer representing number of minutes between update notification being sent
+	 * Checks if the Twitch channel is valid using regex and the Twitch API
+	 * @param channel The name of the channel to check if it's valid
+	 * @return True if the channel name is valid otherwise false
 	 */
-	protected static int getDelay(String filepath) {
-		// Set default delay
-		int delay = 30;
-		JSONParser parser = new JSONParser();
-		JSONObject json = new JSONObject();
-		// Makes sure JSON config file isn't empty
-		File file = new File(filepath);
-		if(file.length() != 0) {
-			try {
-				json = (JSONObject) parser.parse(new FileReader(filepath));
-				// Reads update delay value if present
-				if(json.containsKey("updateDelay")) {
-					delay = Integer.parseInt(json.get("updateDelay").toString());
-				}
-			} catch (IOException | ParseException e) {
-				Logger.logError(Bundle.getString("badWrite", filepath));
-			}
-		}
-		return delay;
-	}
-
-	/**
-	 * Reads the JSON config file and returns a specified JSON key 'section'
-	 * @param filepath Location of JSON config file
-	 * @param section String representing the JSON key to be returned
-	 * @return JSON Object containing the value from the specified key
-	 */
-	private static JSONObject getSection(String filepath, String section) {
-		JSONParser parser = new JSONParser();
-		JSONObject jsonSection = new JSONObject();
-		// Reads the JSON key from the JSON config file and returns it
-		try {
-			jsonSection = (JSONObject) ((JSONObject) parser.parse(new FileReader(filepath))).get(section);
-		} catch (IOException | ParseException e) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
-		}
-		return jsonSection;
-	}
-
-	/**
-	 * Helper function witch runs at the start of the main program to make sure the version
-	 * number of the JSON config file is up to date
-	 * @param filepath Location of JSON config file
-	 * @return True if the config file is up to date, otherwise false
-	 */
-	protected static boolean configUpToDate(String filepath) {
-		// Reads the config file
-		JSONObject json = new JSONObject();
-		JSONParser parser = new JSONParser();
-		try {
-			json = (JSONObject) parser.parse(new FileReader(filepath));
-		} catch (IOException | ParseException e) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
-		}
-		// Makes sure JSON config file has version key and is up to date
-		if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == jsonVersion) {
-			return true;
-		} else {
+	@SuppressWarnings({ "unchecked", "deprecation" })
+	public static boolean validChannel(String channel) {
+		// Uses regex to make sure username fits Twitch's username requirements
+		Pattern chanPattern = Pattern.compile("[a-zA-Z0-9]{4,25}");
+		Matcher chanMatcher = chanPattern.matcher(channel);
+		if(!chanMatcher.find()) {
 			return false;
 		}
+		// Builds the JSONObject requires for the Twitch API
+		JSONObject data = new JSONObject();
+		data.put("operationName", "UsernameValidator_User");
+		JSONObject username = new JSONObject();
+		username.put("username", channel);
+		data.put("variables", username);
+		JSONObject extensions = new JSONObject();
+		JSONObject persistedQuery = new JSONObject();
+		persistedQuery.put("version", 1);
+		persistedQuery.put("sha256Hash", "fd1085cf8350e309b725cf8ca91cd90cac03909a3edeeedbd0872ac912f3d660");
+		extensions.put("persistedQuery", persistedQuery);
+		data.put("extensions", extensions);
+		// Builds the HTTP POST request with the JSON data
+		OkHttpClient client = new OkHttpClient();
+		RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), data.toJSONString());
+		Request request = new Request.Builder()
+				.url("https://gql.twitch.tv/gql#origin=twilight")
+				.header("client-id", "kimne78kx3ncx6brgo4mv6wki5h1ko")
+				.post(body)
+				.build();
+		// Sends the HTTP POST request
+		try(Response response = client.newCall(request).execute()){
+			// Parse the HTTP response and check if channel is available, if available, then channel is not valid
+			JSONParser parser = new JSONParser();
+			JSONObject responseJSON = (JSONObject)((JSONObject) parser.parse(response.body().string())).get("data");
+			if(responseJSON.containsKey("isUsernameAvailable")) {
+				boolean validChan = !Boolean.parseBoolean(responseJSON.get("isUsernameAvailable").toString());
+				if(!validChan) {
+					Logging.logWarn(CLASSNAME, Bundle.getBundle("invalidChan", channel));
+				}
+				return validChan;
+			}
+		}catch(IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		return false;
 	}
 
 	/**
-	 * Performs upgrade to JSON config file to add new features and fix bugs
-	 * @param filepath Location of the JSON config file
+	 * Simple function to make sure JSON config file contains the required keys
+	 * @return True if JSON config is valid, otherwise false
 	 */
-	@SuppressWarnings("unchecked")
-	protected static void configUpgrade(String filepath) {
-		// Reads the config file
+	public static boolean validConfig() {
 		JSONObject json = new JSONObject();
 		JSONParser parser = new JSONParser();
 		try {
-			json = (JSONObject) parser.parse(new FileReader(filepath));
-		} catch (IOException | ParseException e1) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
+			json = (JSONObject) parser.parse(new FileReader(BTTN.configFile));
+		} catch (IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
+			return false;
 		}
-		// Makes sure the JSON config file has required keys and known version number
-		if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == jsonVersion) {
-			Logger.logInfo(Bundle.getString("upToDate", filepath));
-		// Update JSON config to version 0.13
-		}else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.9) {
-			if(json.containsKey("auth") && ((JSONObject) (json.get("auth"))).containsKey("spontit")) {
-				// Performs conversion from single entry to JSON Array and update version number
-				JSONObject spontit = (JSONObject)((JSONObject)json.get("auth")).get("spontit");
-				String authorization = spontit.get("authorization").toString();
-				String userID = spontit.get("userID").toString();
-				JSONObject newSpontit = new JSONObject();
-				newSpontit.put("authorization", "[" + authorization + "]");
-				newSpontit.put("userID", "[" + userID + "]");
-				((JSONObject)json.get("auth")).put("spontit", newSpontit);
-				json.put("version", 0.13);
-				// Writes changes to file and informs user of upgrade!
-				try {
-					FileWriter writer = new FileWriter(filepath);
-					writer.write(json.toJSONString());
-					writer.flush();
-					writer.close();
-				} catch (IOException e) {
-					Logger.logError(Bundle.getString("badWrite", filepath));
-				}
-				configUpgrade(filepath);
-			} else {
-				Logger.logError(Bundle.getString("noSpontit"));
-			}
-		// Update JSON config to version 0.14
-		} else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.13){
-			if(json.containsKey("auth") && ((JSONObject) (json.get("auth"))).containsKey("spontit")){
-				// Performs upgrades to fix JSONArray bug in version 0.13
-				JSONObject auth = new JSONObject();
-				auth.put("twitch", (JSONObject)((JSONObject)json.get("auth")).get("twitch"));
-				JSONObject spontit = (JSONObject)((JSONObject)json.get("auth")).get("spontit");
-				JSONArray userIDs = new JSONArray();
-				JSONArray authKeys = new JSONArray();
-				String keyStr = spontit.get("authorization").toString().substring(1, spontit.get("authorization").toString().length()-1);
-				String userStr = spontit.get("userID").toString().substring(1, spontit.get("userID").toString().length()-1);
-				List<String> userList = Arrays.asList(userStr);
-				List<String> keyList = Arrays.asList(keyStr);
-				for(int i=0; i<userList.size(); i++) {
-					userIDs.add(userList.get(i));
-					authKeys.add(keyList.get(i));
-				}
-				spontit.put("authorization", authKeys);
-				spontit.put("userID", userIDs);
-
-				auth.put("spontit", spontit);
-				json.put("auth", auth);
-				json.put("version", 0.14);
-				// Writes changes to file and informs user of upgrade!
-				try {
-					FileWriter writer = new FileWriter(filepath);
-					writer.write(json.toJSONString());
-					writer.flush();
-					writer.close();
-				} catch (IOException e) {
-					Logger.logError(Bundle.getString("badWrite", filepath));
-				}
-				System.out.println(Bundle.getString("updateComplete"));
-			} else {
-				Logger.logError(Bundle.getString("noSpontit"));
-			}
-		// Update JSON config to version 1.0
-		} else if(json.containsKey("version") && Double.parseDouble(json.get("version").toString()) == 0.14) {
-			json.put("version", 1.0);
-			// Writes changes to file and informs user of upgrade!
-			try {
-				FileWriter writer = new FileWriter(filepath);
-				writer.write(json.toJSONString());
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				Logger.logError(Bundle.getString("badWrite", filepath));
-			}
-			System.out.println(Bundle.getString("updateComplete"));
-		} else {
-			Logger.logError(Bundle.getString("noVersion"));
+		if(!json.containsKey("channels")) {
+			return false;
 		}
-	}
-
-	/**
-	 * Helper function which makes sure the miscellaneous JSON keys are in the JSON config file
-	 * and if not adds them to the file
-	 * @param filepath Location of the JSON config file
-	 */
-	@SuppressWarnings("unchecked")
-	protected static void addMisc(String filepath) {
-		// Reads the JSON config file
-		JSONObject json = new JSONObject();
-		JSONParser parser = new JSONParser();
-		try {
-			json = (JSONObject) parser.parse(new FileReader(filepath));
-		} catch (IOException | ParseException e1) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
+		JSONObject channels = (JSONObject) json.get("channels");
+		if(channels.size() == 0) {
+			return false;
 		}
-		// Makes sure version key is in and if not adds current JSON version number
-		if(!json.containsKey("version")) {
-			json.put("version", jsonVersion);
-			// Writes changes to JSON file
-			try {
-				FileWriter writer = new FileWriter(filepath);
-				writer.write(json.toJSONString());
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				Logger.logError(Bundle.getString("badWrite", filepath));
-			}
+		if(!json.containsKey("auth")) {
+			return false;
 		}
-		// Makes sure update delay key is in and if not asks user to enter a value
-		if(!json.containsKey("updateDelay")) {
-			System.out.print(Bundle.getString("updateDelay"));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-			int delay = -1;
-			try {
-				delay = Integer.parseInt(reader.readLine());
-				json.put("updateDelay", delay);
-				// Writes changes to JSON file
-				try {
-					FileWriter writer = new FileWriter(filepath);
-					writer.write(json.toJSONString());
-					writer.flush();
-					writer.close();
-				} catch (IOException e) {
-					Logger.logError(Bundle.getString("badWrite", filepath));
-				}
-			} catch (NumberFormatException | IOException e) {
-				Logger.logError(Bundle.getString("invalidNum"));
-			}
+		JSONObject auth = (JSONObject) json.get("auth");
+		if(!auth.containsKey("twitchAuthorization")) {
+			return false;
 		}
+		if(!auth.containsKey("twitchClientID")) {
+			return false;
+		}
+		if(!auth.containsKey("alertzyAccountKeys")) {
+			return false;
+		}
+		return true;
 	}
 }

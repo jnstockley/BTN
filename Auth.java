@@ -1,398 +1,359 @@
-//Auth.java
 package com.github.jnstockley;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+
 /**
- * Helps with setting up the JSON config file with API key(s) for the services required
- * by BTTN.
+ * 
+ * Handles reading and writing the all of the users API Keys required for BTTN.
  * 
  * @author Jack Stockley
  * 
- * @version 1.01
+ * @version 1.5
  *
  */
 public class Auth {
 
 	/**
-	 * Adds the Twitch Auth Key and Client ID to the JSON config file
-	 * @param filepath The location of the Config file, in JSON  format
-	 * @param reader A BufferedReader which reads user input from the console
-	 * @param update Variable used to determine if function was called from update function
+	 *  Name of the Class used for Logging error
 	 */
-	@SuppressWarnings("unchecked")
-	private static void twitchAddAuth(String filepath, BufferedReader reader, boolean update) {
-		System.out.print(Bundle.getString("twitchClient"));
-		// Get the Twitch client ID from console
-		String clientID = null;
-		try {
-			clientID = reader.readLine();
-		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badClient"));
+	private static final String CLASSNAME = Auth.class.getName();
+
+	/**
+	 *  Users Twitch Authorization Key
+	 */
+	private String twitchAuthorization;
+
+	/**
+	 *  Users Twitch ClientID
+	 */
+	private String twitchClientID;
+
+	/**
+	 *  List of users Alertzy Account Key(s)
+	 */
+	private List<String> alertzyAccountKeys;
+
+	/**
+	 * Get the Twitch Authorization Key used to check Twitch API
+	 * @return The Twitch Authorization API Key
+	 */
+	public String getTwitchAuthorization() {
+		return twitchAuthorization;
+	}
+
+	/**
+	 * Set the Twitch Authorization Key used to check Twitch API
+	 * @param twitchAuthorization The Twitch Authorization API Key
+	 */
+	public void setTwitchAuthorization(String twitchAuthorization) {
+		this.twitchAuthorization = twitchAuthorization;
+	}
+
+	/**
+	 * Get the Twitch Client ID used to check Twitch API
+	 * @return The Twitch Client ID
+	 */
+	public String getTwitchClientID() {
+		return twitchClientID;
+	}
+
+	/**
+	 * Set the Twitch Client ID used to check Twitch API
+	 * @param twitchClientID The Twitch ClientID
+	 */
+	public void setTwitchClientID(String twitchClientID) {
+		this.twitchClientID = twitchClientID;
+	}
+
+	/**
+	 * Get the Alertzy Account Key(s) used to check send notifications
+	 * @return The Alertzy Account Key(s)
+	 */
+	public List<String> getAlertzyAccountKey() {
+		return alertzyAccountKeys;
+	}
+
+	/**
+	 * Set the Alertzy Account Key(s) used to check send notifications
+	 * @param alertzyAccountKey The Alertzy Account Key(s)
+	 */
+	public void setAlertzyAccountKey(List<String> alertzyAccountKey) {
+		this.alertzyAccountKeys = alertzyAccountKey;
+	}
+
+	/**
+	 * Create an Auth Object which stores all the API keys used to run BTTN and makes sure they are valid
+	 * @param file The JSON Config file which stores the API Keys
+	 */
+	public Auth(File file) {
+		// Makes sure the file is not empty
+		if(file.length() == 0) {
+			Logging.logError(CLASSNAME, Bundle.getBundle("isEmpty", file.getName()));
 		}
-		// Get the Twitch Authentication Key from console
-		System.out.print(Bundle.getString("twitchSecrett"));
-		String secret = null;
-		try {
-			secret = reader.readLine();
-		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badSecret"));
-		}
-		String authorization = getAuth(clientID, secret);
-		// Create JSON Object with Twitch keys
-		JSONObject twitchAuthJSON = new JSONObject();
-		twitchAuthJSON.put("clientID", clientID);
-		twitchAuthJSON.put("authorization", authorization);
+		// Parse the JSON config file to JSONObject
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
-		// Checks if config file is empty
-		File file = new File(filepath);
-		if(file.length() != 0) {
-			try {
-				json = (JSONObject) parser.parse(new FileReader(filepath));
-			} catch (IOException | ParseException e) {
-				Logger.logError(Bundle.getString("badJSON", filepath));
-			}
-		}
-		// Checks if config file has auth key in JSON object and builds appropriate JSON object
-		if(json.containsKey("auth")) {
-			if(((JSONObject)json.get("auth")).containsKey("twitch")){
-				Logger.logError(Bundle.getString("twitchKeys"));
-			}
-			JSONObject authJson = (JSONObject)json.get("auth");
-			authJson.put("twitch", twitchAuthJSON);
-			json.put("auth", authJson);
-		} else {
-			JSONObject twitch = new JSONObject();
-			twitch.put("twitch", twitchAuthJSON);
-			json.put("auth", twitch);
-		}
-		// Writes the JSON object to the file
-		FileWriter writer;
 		try {
-			writer = new FileWriter(filepath);
+			json = (JSONObject) parser.parse((new FileReader(file)));
+		} catch (IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		// Makes sure JSON contains JSONObject which stores API Keys
+		if(json.containsKey("auth")) {
+			JSONObject auth = (JSONObject) json.get("auth");
+			if(auth.containsKey("twitchAuthorization") && auth.containsKey("twitchClientID") && auth.containsKey("alertzyAccountKeys")) {
+				// Sets the API Keys from config file and parser Alertzy Account Key(s) into list
+				twitchAuthorization = auth.get("twitchAuthorization").toString();
+				twitchClientID = auth.get("twitchClientID").toString();
+				String alertzyKeys = auth.get("alertzyAccountKeys").toString();
+				alertzyKeys = alertzyKeys.substring(1, alertzyKeys.length()-1);
+				alertzyKeys = alertzyKeys.replaceAll("\"", "");
+				alertzyAccountKeys = Arrays.asList(alertzyKeys.split(",", -1));
+			} else {
+				// Missing at least one API Key
+				Logging.logError(CLASSNAME, Bundle.getBundle("missingAPIKey", file.getName()));
+			}
+		} else {
+			// No Auth section
+			Logging.logError(CLASSNAME, Bundle.getBundle("noAPIKeys", file.getName()));	
+		}
+	}
+
+	/**
+	 * Asks the user for the required keys and writes them to the JSON config file
+	 * @param reader BufferedReader used to get user input from the console
+	 */
+	@SuppressWarnings("unchecked")
+	public static void addAPIKeys(BufferedReader reader) {
+		// Checks if JSON config file exists and creates new file if needed
+		if(!BTTN.configFile.exists()) {
+			try {
+				BTTN.configFile.createNewFile();
+			} catch (IOException e) {
+				Logging.logError(CLASSNAME, e);
+			}
+		}
+		// Reads in the current JSON config file
+		JSONParser parser = new JSONParser();
+		JSONObject json = new JSONObject();
+		if(BTTN.configFile.length() != 0) {
+			try {
+				json = (JSONObject) parser.parse(new FileReader(BTTN.configFile));
+			} catch (IOException | ParseException e) {
+				Logging.logError(CLASSNAME, e);
+			}
+		}		
+		JSONObject authJSON = new JSONObject();
+		if(json.containsKey("auth")) {
+			authJSON = (JSONObject) json.get("auth");
+		}
+		// Ask to add Twitch API Keys
+		System.out.print(Bundle.getBundle("addTwitchAPI"));
+		String option = "";
+		try {
+			option = reader.readLine();
+		} catch (IOException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		// Add Twitch API Keys
+		if(option.equalsIgnoreCase(Bundle.getBundle("y")) || option.equalsIgnoreCase(Bundle.getBundle("yes"))) {
+			System.out.print(Bundle.getBundle("twitchSecret"));
+			String clientSecret = "";
+			try {
+				clientSecret = reader.readLine();
+			} catch (IOException e) {
+				Logging.logError(CLASSNAME, e);
+			}
+			System.out.print(Bundle.getBundle("twitchClient"));
+			String clientID = "";
+			try {
+				clientID = reader.readLine();
+			} catch (IOException e) {
+				Logging.logError(CLASSNAME, e);
+			}
+			// Sends the user's clientID and clientSecret to Twitch to get use's Authorization Key
+			String authorization = getAuthKey(clientID, clientSecret);
+			if(authorization == null) {
+				Logging.logError(CLASSNAME, Bundle.getBundle("invalidTwitchKeys"));
+			}
+			// Builds the JSONObject
+			authJSON.put("twitchAuthorization", authorization);
+			authJSON.put("twitchClientID", clientID);
+		}
+		// Ask to add Alertzy API Key
+		System.out.print(Bundle.getBundle("addAlertzy"));
+		try {
+			option = reader.readLine();
+		} catch (IOException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		// Add Alertzy API Key
+		if(option.equalsIgnoreCase(Bundle.getBundle("y")) || option.equalsIgnoreCase(Bundle.getBundle("yes"))) {
+			// Asks user how many Alertzy API Keys they want to add
+			System.out.print(Bundle.getBundle("numAlertzyKeys"));
+			int numKeys = -1;
+			try {
+				numKeys = Integer.parseInt(reader.readLine());
+			} catch (NumberFormatException | IOException e) {
+				Logging.logError(CLASSNAME, e);
+			}
+			// Number of Alertzy API less then 0
+			if(numKeys < 0) {
+				Logging.logError(CLASSNAME, Bundle.getBundle("noAlertzyKeys"));
+			}
+			// Asks user for each Alertzy Account Key and add them to the List
+			List<String> accountKeys = new ArrayList<String>();
+			for(int i=0; i<numKeys; i++) {
+				int temp = i + 1;
+				System.out.print(Bundle.getBundle("enterAlertzyKey", "(" + temp + "/" + numKeys + ")"));
+				String accountKey = "";
+				try {
+					accountKey = reader.readLine();
+				} catch (IOException e) {
+					Logging.logError(CLASSNAME, e);
+				}
+				accountKeys.add(accountKey);
+			}
+			authJSON.put("alertzyAccountKeys", accountKeys);
+		}
+		// No API Keys were selected to be added
+		if(authJSON.isEmpty()) {
+			Logging.logWarn(CLASSNAME, Bundle.getBundle("noAPIKeysAdded"));
+		}
+		// Adds API Keys to current JSON and writes file out
+		json.put("auth", authJSON);
+		try {
+			FileWriter writer = new FileWriter(BTTN.configFile);
 			writer.write(json.toJSONString());
 			writer.flush();
 			writer.close();
+			Logging.logInfo(CLASSNAME, Bundle.getBundle("APIKeysAdded", BTTN.configFile.getName()));
 		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badWrite", filepath));
-		}
-		// Checks if functions was called from update function
-		if(update) {
-			Logger.logInfo(Bundle.getString("updateTwitch"));
-		} else {
-			Logger.logInfo(Bundle.getString("addTwitch"));
+			Logging.logError(CLASSNAME, e);
 		}
 	}
 
 	/**
-	 * Adds the Spontit Auth Key(s) and User ID to the JSON config file
-	 * Allows multiple keys and userIDs to overcome Spontit issues with multi-device
-	 * support
-	 * @param filepath The location of the Config file, in JSON  format
-	 * @param reader A BufferedReader which reads user input from the console
-	 * @param update Variable used to determine if function was called from update function
+	 * Asks the user which set of API Keys to remove and removes them
+	 * @param reader BufferedReader used to get user input from the console
 	 */
 	@SuppressWarnings("unchecked")
-	private static void spontitAddAuth(String filepath, BufferedReader reader, boolean update) {
-		// Asks the user how many Spontit API keys they want to add, used to
-		// overcome issue with Spontit and multi-device support
-		System.out.println(Bundle.getString("numUsers"));
-		System.out.print(Bundle.getString("number"));
-		int numKeys = -1;
-		try {
-			numKeys = Integer.parseInt(reader.readLine());
-		} catch (NumberFormatException | IOException e1) {
-			Logger.logError(Bundle.getString("invalidNum"));
-		}
-		//List<String> authKeys = new ArrayList<String>();
-		//List<String> userIDs = new ArrayList<String>();
-		JSONArray authKeys = new JSONArray();
-		JSONArray userIDs = new JSONArray();
-
-		// Allows user to enter X number of userIDs and API Key(s)
-		for(int i=0; i< numKeys; i++) {
-			// Gets the Spontit auth key
-			System.out.print(Bundle.getString("spontitAuth"));
-			String authorization = null;
-			try {
-				authorization = reader.readLine();
-			} catch (IOException e) {
-				Logger.logError(Bundle.getString("badAuth"));
-			}
-			// Gets the Spontit User ID
-			System.out.print(Bundle.getString("spontitUser"));
-			String userID = null;
-			try {
-				userID = reader.readLine();
-			} catch (IOException e) {
-				Logger.logError(Bundle.getString("badUser"));
-			}
-			authKeys.add(authorization);
-			userIDs.add(userID);
-		}
-		// Builds the Spontit JSON Object
-		JSONObject spontitAuthJSON = new JSONObject();
-		spontitAuthJSON.put("userID", userIDs);
-		spontitAuthJSON.put("authorization", authKeys);
+	public static void removeAPIKeys(BufferedReader reader) {
 		JSONParser parser = new JSONParser();
 		JSONObject json = new JSONObject();
-		// Checks if the config file is empty
-		File file = new File(filepath);
-		if(file.length() !=0) {
-			try {
-				json = (JSONObject) parser.parse(new FileReader(filepath));
-			} catch (IOException | ParseException e) {
-				Logger.logError(Bundle.getString("badJSON", filepath));
-			}
-		}
-		// Checks if config file has auth key in JSON object and builds appropriate JSON object
-		if(json.containsKey("auth")) {
-			if(((JSONObject)json.get("auth")).containsKey("spontit")){
-				Logger.logError(Bundle.getString("spontitKeys"));
-			}
-			JSONObject authJson = (JSONObject)json.get("auth");
-			authJson.put("spontit", spontitAuthJSON);
-			json.put("auth", authJson);
-		} else {
-			JSONObject spontit = new JSONObject();
-			spontit.put("spontit", spontitAuthJSON);
-			json.put("auth", spontit);
-		}
-		// Writes the JSON object to the config file
-		FileWriter writer;
+		// Ask to remove Twitch API Keys
+		System.out.print(Bundle.getBundle("removeTwitchAPI"));
+		String option = "";
 		try {
-			writer = new FileWriter(filepath);
+			option = reader.readLine();
+		} catch (IOException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		if(!BTTN.configFile.exists() || BTTN.configFile.length() == 0) {
+			Logging.logError(CLASSNAME, Bundle.getBundle("isEmpty", BTTN.configFile.getName()));
+		}
+		// Remove Twitch API Keys
+		if(option.equalsIgnoreCase(Bundle.getBundle("y")) || option.equalsIgnoreCase(Bundle.getBundle("yes"))) {
+			try {
+				json = (JSONObject) parser.parse(new FileReader(BTTN.configFile));
+			} catch (IOException | ParseException e) {
+				Logging.logError(CLASSNAME, e);
+			}
+			if(json.containsKey("auth")) {
+				JSONObject authJSON = (JSONObject) json.get("auth");
+				if(authJSON.containsKey("twitchAuthorization") && authJSON.containsKey("twitchClientID")) {
+					authJSON.remove("twitchAuthorization");
+					authJSON.remove("twitchClientID");
+					json.put("auth", authJSON);
+				}
+			}
+		}
+		// Ask to remove Alertzy API Key
+		System.out.print(Bundle.getBundle("removeAlertzyAPI"));
+		try {
+			option = reader.readLine();
+		} catch (IOException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		// Remove Alertzy API Key
+		if(option.equalsIgnoreCase(Bundle.getBundle("y")) || option.equalsIgnoreCase(Bundle.getBundle("yes"))) {
+			if(json.isEmpty()) {
+				try {
+					json = (JSONObject) parser.parse(new FileReader(BTTN.configFile));
+				} catch (IOException | ParseException e) {
+					Logging.logError(CLASSNAME, e);
+				}
+			}
+			if(json.containsKey("auth")) {
+				JSONObject authJSON = (JSONObject) json.get("auth");
+				if(authJSON.containsKey("alertzyAccountKeys")) {
+					authJSON.remove("alertzyAccountKeys");
+					json.put("auth", authJSON);
+				}
+			}
+		}
+		if(json.isEmpty()) {
+			Logging.logError(CLASSNAME, Bundle.getBundle("noAPIKeysSelRem"));
+		}
+		//Write JSON to file
+		try {
+			FileWriter writer = new FileWriter(BTTN.configFile);
 			writer.write(json.toJSONString());
 			writer.flush();
 			writer.close();
+			Logging.logInfo(CLASSNAME, Bundle.getBundle("APIKeysRemoved"));
 		} catch (IOException e) {
-			Logger.logError(Bundle.getString("badWrite", filepath));
-		}
-		// Checks if functions was called from update function 
-		if(update) {
-			Logger.logInfo(Bundle.getString("updateSpontit"));
-		} else {
-			Logger.logInfo(Bundle.getString("addSpontit"));
+			Logging.logError(CLASSNAME, e);
 		}
 	}
 
 	/**
-	 * Removes the Twitch Auth Key and Client ID to the JSON config file
-	 * @param filepath The location of the Config file, in JSON  format
-	 * @param reader A BufferedReader which reads user input from the console
-	 * @param update Variable used to determine if function was called from update function
+	 * Helper functions which sends the users clientID and clientSecret to the Twitch API to get their Authorization key
+	 * required to access the Channel Status API
+	 * @param clientID User's Twitch clientID
+	 * @param clientSecret User's Twitch clientSecret
+	 * @return The user's Twitch Authorization key
 	 */
-	private static void twitchRemoveAuth(String filepath, BufferedReader reader, boolean update) {
-		JSONParser parser = new JSONParser();
-		JSONObject json = new JSONObject();
-		// Checks if config file is empty
-		File file = new File(filepath);
-		if(file.length() ==0) {
-			Logger.logError(Bundle.getString("emptyAuth", filepath));
-		}
-		// Reads JSON file
-		try {
-			json = (JSONObject) parser.parse(new FileReader(filepath));
-		} catch (IOException | ParseException e) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
-		}
-		// Checks JSON object for required JSON keys and removes the Twitch JSON key
-		if(json.containsKey("auth") && ((JSONObject)json.get("auth")).containsKey("twitch")){
-			((JSONObject)json.get("auth")).remove("twitch");
-			FileWriter writer;
-			try {
-				writer = new FileWriter(filepath);
-				writer.write(json.toJSONString());
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				Logger.logError(Bundle.getString("badWrite", filepath));
+	private static String getAuthKey(String clientID, String clientSecret) {
+		// Building the HTTP request
+		OkHttpClient client = new OkHttpClient();
+		RequestBody formBody = new FormBody.Builder()
+				.add("", "")
+				.build();
+		Request request = new Request.Builder()
+				.url("https://id.twitch.tv/oauth2/token?client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=client_credentials")
+				.post(formBody)
+				.build();
+		// Send the request and make sure request is valid and return key
+		try(Response response = client.newCall(request).execute()){
+			JSONParser parser = new JSONParser();
+			JSONObject responseJSON = (JSONObject) parser.parse(response.body().string());
+			if(responseJSON.containsKey("access_token")) {
+				return responseJSON.get("access_token").toString();
 			}
-			// Checks if functions was called from update function 
-			if(!update) {
-				Logger.logWarn(Bundle.getString("removeTwitch"));
-			}
-		}else {
-			Logger.logWarn(Bundle.getString("noTwitch", filepath));
+			return null;
+		}catch(IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
+			return null;
 		}
 	}
 
-	/**
-	 * Removes the Spontit Auth Key and User ID to the JSON config file
-	 * @param filepath The location of the Config file, in JSON  format
-	 * @param reader A BufferedReader which reads user input from the console
-	 * @param update Variable used to determine if function was called from update function
-	 */
-	private static void spontitRemoveAuth(String filepath, BufferedReader reader, boolean update) {
-		JSONParser parser = new JSONParser();
-		JSONObject json = new JSONObject();
-		// Checks if config file is empty
-		File file = new File(filepath);
-		if(file.length() ==0) {
-			Logger.logError(Bundle.getString("emptyAuth", filepath));
-		}
-		//Reads JSON file
-		try {
-			json = (JSONObject) parser.parse(new FileReader(filepath));
-		} catch (IOException | ParseException e) {
-			Logger.logError(Bundle.getString("badJSON", filepath));
-		}
-		// Checks JSON object for required JSON keys and removes the Spontit JSON key
-		if(json.containsKey("auth") && ((JSONObject)json.get("auth")).containsKey("spontit")){
-			((JSONObject)json.get("auth")).remove("spontit");
-			FileWriter writer;
-			try {
-				writer = new FileWriter(filepath);
-				writer.write(json.toJSONString());
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				Logger.logError(Bundle.getString("badWrite", filepath));
-			}
-			// Checks if functions was called from update function 
-			if(!update) {
-				Logger.logWarn(Bundle.getString("removeSpontit"));
-			}
-		}else {
-			Logger.logError(Bundle.getString("noSpontit", filepath));
-		}
-	}
-
-	/**
-	 * Gets the service the user wants to modify and returns it
-	 * @param reader A BufferedReader which reads user input from the console
-	 * @return An integer representing the service number the user wants to modify
-	 */
-	private static int authSelection(BufferedReader reader) {
-		// Prints the services and asks user which service they want to modify
-		System.out.println(Bundle.getString("authType"));
-		System.out.println(Bundle.getString("twitch"));
-		System.out.println(Bundle.getString("spontit"));
-		System.out.print(Bundle.getString("option"));
-		// Makes sure option number is valid and returns it
-		int option = -1;
-		try {
-			option = Integer.parseInt(reader.readLine());
-		} catch (NumberFormatException | IOException e) {
-			Logger.logError(Bundle.getString("invalidOpt"));
-		}
-		if(option > 2 || option < 1) {
-			Logger.logError(Bundle.getString("invalidOpt"));
-		}
-		return option;
-	}
-
-	/**
-	 * Main function which helps with selecting the service the user wants to modify
-	 * and runs the corresponding function
-	 * @param filepath The location of the Config file, in JSON  format
-	 */
-	protected static void setupAuth(String filepath) {
-		// Prints the ways the user can modify the config file
-		System.out.println(Bundle.getString("selOpt"));
-		System.out.println(Bundle.getString("addAuth"));
-		System.out.println(Bundle.getString("removeAuth"));
-		System.out.println(Bundle.getString("updateAuth"));
-		System.out.print(Bundle.getString("option"));
-		// Makes sure the option number is valid
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		int option = -1;
-		try {
-			option = Integer.parseInt(reader.readLine());
-		} catch (NumberFormatException | IOException e) {
-			Logger.logError(Bundle.getString("invalidOpt"));
-		}
-		if(option > 3 || option < 1) {
-			Logger.logError(Bundle.getString("invalidOpt"));
-		}
-		// Gets the service the user wants to modify
-		int service = authSelection(reader);
-		switch(option) {
-		// Add functions
-		case 1:
-			switch(service) {
-			case 1:
-				// Add Twitch
-				twitchAddAuth(filepath, reader, false);
-				break;
-			case 2:
-				// Add Spontit
-				spontitAddAuth(filepath, reader, false);
-				break;
-			}
-			break;
-		default:
-			Logger.logError(Bundle.getString("invalidOpt"));
-			// Remove functions
-		case 2:
-			switch(service) {
-			case 1:
-				// Remove Twitch
-				twitchRemoveAuth(filepath, reader, false);
-				break;
-			case 2:
-				// Remove Spontit
-				spontitRemoveAuth(filepath, reader, false);
-				break;
-			default:
-				Logger.logError(Bundle.getString("invalidOpt"));
-			}
-			break;
-			// Update functions
-		case 3:
-			switch(service) {
-			case 1:
-				// Update Twitch
-				twitchRemoveAuth(filepath, reader, true);
-				twitchAddAuth(filepath, reader, true);
-				break;
-			case 2:
-				// Update Spontit
-				spontitRemoveAuth(filepath, reader, true);
-				spontitAddAuth(filepath, reader, true);
-				break;
-			default:
-				Logger.logError(Bundle.getString("invalidOpt"));
-			}
-			break;
-		}
-	}
-
-	/**
-	 * Makes a POST request to the Twitch API to get the users access token 
-	 * from them clientID and clientSecret
-	 * @param clientID The user's clientID from Twitch.tv
-	 * @param clientSecret The user's clientSecret from Twitch.tv
-	 * @return The user's access token from Twitch.tv
-	 */
-	private static String getAuth(String clientID, String clientSecret) {
-		// Builds the URL to send the post request to
-		String url = "https://id.twitch.tv/oauth2/token?client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=client_credentials";
-		HashMap<String, String> HTTPResponse = HTTP.post(url, null);
-		JSONParser parser = new JSONParser();
-		JSONObject data = new JSONObject();
-		// Parses the data from the POST request and get user's access token
-		try {
-			data = (JSONObject)parser.parse(HTTPResponse.get("data"));
-		} catch (ParseException e) {
-			Logger.logError(url);
-		}
-		if(data.containsKey("access_token")) {
-			return data.get("access_token").toString();
-		} else {
-			Logger.logError(url);
-			return "";
-		}
-	}
 }

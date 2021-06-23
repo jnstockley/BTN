@@ -1,124 +1,187 @@
-//Notifications.java
 package com.github.jnstockley;
-import java.util.Arrays;
-import java.util.HashMap;
+
+import java.io.IOException;
 import java.util.List;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
- * Handles sending notifications for new live channels, BTTN update, or errors checking for live status changes
+ * 
+ * Sends all the notification used throughout BTTN and handles sending failover notification if needed
  * 
  * @author Jack Stockley
  * 
- * @version 1.01
+ * @version 1.5
  *
  */
 public class Notifications {
 
 	/**
-	 * Sends a Spontit Notification alerting user an error when checking the Twitch API
-	 * @param response The response from the Twitch API
-	 * @param auth HashMap with the API keys for Spontit
+	 *  Name of the file used to log data
 	 */
-	@SuppressWarnings("unchecked")
-	protected static void sendErrorNotification(HashMap<String, String> response, HashMap<String, String> auth) {
-		// Creates the JSON required by Spontit to alert user to error
-		JSONObject json = new JSONObject();
-		json.put("pushTitle", Bundle.getString("errorStatus"));
-		json.put("content", Bundle.getString("errCode") + response.get("statusCode"));
-		// Gets Spontit API Keys
-		HashMap<String, String> spontitAuth = new HashMap<String, String>();
-		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
-		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
-		if(sendNotification(json, spontitAuth)) {
-			Logger.logInfo(Bundle.getString("errSent"));
-		}else {
-			Logger.logError(Bundle.getString("errNotSent"));
+	private static final String CLASSNAME = Notifications.class.getName();
+
+	/**
+	 * Builds the error notification to be sent when an error occurs
+	 * @param error The string representation of the error
+	 * @param keys List of Strings representing the Alertzy API Key(s)
+	 */
+	public static void sendErrorNotification(String error, List<String> keys) {
+		// Builds the key string used to send notifications to multiple people with Alertzy
+		String keysStr = "";
+		for(String key: keys) {
+			keysStr += key + "_";
+		}
+		// Builds the title of the notification and the url to the send the error notification
+		keysStr = keysStr.substring(0, keysStr.length()-1);
+		String title = Bundle.getBundle("encounteredError");
+		String url = "https://alertzy.app/send?accountKey=" + keysStr + "&title=" + title + "&message=" + error;
+		// True if the notification was sent otherwise false
+		boolean success = sendNotification(url);
+		if(success) {
+			Logging.logWarn(CLASSNAME, Bundle.getBundle("errorNotificationSent"));
+		} else {
+			Failover failover = new Failover(BTTN.configFile);
+			failover.sendFailover(title, error, "");
+			// Determine if the notification was not sent at all or not sent to all the keys
+			if(keys.size() > 1) {
+				Logging.logError(CLASSNAME, Bundle.getBundle("notSentEveryone"));
+			} else {
+				Logging.logError(CLASSNAME, Bundle.getBundle("notSent"));
+			}
 		}
 	}
 
 	/**
-	 * Sends a Spontit Notification alerting the user that BTTN has an update available
-	 * @param version Double representing the new version number to update to
-	 * @param auth HashMap with the API keys for Spontit
+	 * Builds the update notification to be sent when an update is available
+	 * @param newVersion The new version number of BTTN
+	 * @param keys List of Strings representing the Alertzy API Key(s)
 	 */
 	@SuppressWarnings("unchecked")
-	protected static void sendUpdateNotification(double version, HashMap<String, String> auth) {
-		// Creates the JSON required by Spontit to alert user to BTTN update
-		JSONObject json = new JSONObject();
-		json.put("pushTitle", Bundle.getString("BTTNUpdate"));
-		json.put("content", Bundle.getString("updateTo", Double.toString(version)));
-		json.put("link", "https://github.com/jnstockley/BTTN/releases");
-		// Gets Spontit API Keys
-		HashMap<String, String> spontitAuth = new HashMap<String, String>();
-		spontitAuth.put("X-Authorization", auth.get("spontit-authorization"));
-		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
-		if(sendNotification(json, spontitAuth)) {
-			Logger.logInfo(Bundle.getString("updateSent"));
+	public static void sendUpdateNotification(double newVersion, List<String> keys) {
+		// Builds the key string used to send notifications to multiple people with Alertzy
+		String keysStr = "";
+		for(String key: keys) {
+			keysStr += key + "_";
+		}
+		// Builds the title of the notification and the url to the send the update notification
+		keysStr = keysStr.substring(0, keysStr.length()-1);
+		String title = Bundle.getBundle("newVersion");
+		String message = Bundle.getBundle("downloadUpdate");
+		String link = "https://github.com/jnstockley/BTTN/releases";
+		// Creates the JSONObject used to add a button to open up the GitHub releases page in Alertzy
+		JSONObject button = new JSONObject();
+		button.put("text", Bundle.getBundle("viewUpdate"));
+		button.put("link", link);
+		button.put("color", "primary");
+		String url = "https://alertzy.app/send?accountKey=" + keysStr + "&title=" + title + "&message=" + message + "&buttons=[" + button.toJSONString() + "]";
+		// True if the notification was sent otherwise false
+		boolean success = sendNotification(url);
+		if(success) {
+			Logging.logInfo(CLASSNAME, Bundle.getBundle("updateTo", Double.toString(newVersion)));
 		} else {
-			Logger.logError(Bundle.getString("updateNotSent"));
+			// Builds the failover message
+			Failover failover = new Failover(BTTN.configFile);
+			failover.sendFailover(title, message, link);
+			// Determine if the notification was not sent at all or not sent to all the keys
+			if(keys.size() > 1) {
+				Logging.logError(CLASSNAME, Bundle.getBundle("notSentEveryone"));
+			} else {
+				Logging.logError(CLASSNAME, Bundle.getBundle("notSent"));
+			}
 		}
 	}
 
 	/**
-	 * Sends Spontit Notification(s) alerting the user that a Twitch channel
-	 * has gone live with the category the streamer is streaming in
-	 * @param nowLive List of channel(s) that are now live
-	 * @param auth HashMap with the API keys for Spontit
+	 * Builds the live notification to be sent when a channel has gone live
+	 * @param channels List of channel objects that have just gone live
+	 * @param keys List of Strings representing the Alertzy API Key(s)
 	 */
 	@SuppressWarnings("unchecked")
-	protected static void sendLiveNotification(HashMap<String, HashMap<String, String>> nowLive, HashMap<String, String> auth) {
-		// Gets the Spontit API Keys
-		HashMap<String, String> spontitAuth = new HashMap<String, String>();
-		spontitAuth.put("X-Authorization", (auth.get("spontit-authorization")));
-		spontitAuth.put("X-UserId", auth.get("spontit-user-id"));
-		// Creates the JSON required by Spontit to alert user to a new live channel
-		JSONObject json = new JSONObject();
-		String streamer = nowLive.keySet().toString();
-		streamer = streamer.substring(1, streamer.length()-1);
-		if(nowLive.size() == 1) {
-			json.put("pushTitle", streamer + " " + Bundle.getString("isLive"));
-			json.put("link", "https://twitch.tv/" + streamer);
-			json.put("content", nowLive.get(streamer).get("title") + ": " + nowLive.get(streamer).get("game"));
-		} else {
-			streamer += " "+ Bundle.getString("areLive");
-			json.put("pushTitle", streamer);
-			json.put("content", Bundle.getString("checkThem"));
+	public static void sendLiveNotification(List<Channel> channels, List<String> keys) {
+		// Builds the key string used to send notifications to multiple people with Alertzy
+		String keysStr = "";
+		for(String key: keys) {
+			keysStr += key + "_";
 		}
-		if(sendNotification(json, spontitAuth)) {
-			Logger.logInfo(Bundle.getString("liveSent") + streamer);
+		// Builds the title of the notification and the url to the send the live notification
+		keysStr = keysStr.substring(0, keysStr.length()-1);
+		String title = "";
+		String message = "";
+		String link = "";
+		// One channel has gone live, includes stream name, stream category and streamer name
+		if(channels.size() == 1) {
+			title = Bundle.getBundle("isLive", channels.get(0).getChannelName());
+			message = channels.get(0).getStreamName() + ": " + channels.get(0).getCategory();
+			link = "twitch://stream" + channels.get(0).getChannelName();
+			// Multiple channels have gone live includes the name of the streamers
 		} else {
-			Logger.logError(Bundle.getString("liveNotSent"));
+			for(Channel channel: channels) {
+				title += channel.getChannelName() + ", ";
+			}
+			title = Bundle.getBundle("areLive",title.substring(0, title.length()-2));
+			link = "https://twitch.tv";
+		}
+		// Creates the JSONObject used to add a button to open up the Twitch Stream(s) in Alertzy
+		JSONObject button = new JSONObject();
+		button.put("text", Bundle.getBundle("openStream"));
+		button.put("link", link);
+		button.put("color", "primary");
+		String url = "https://alertzy.app/send?accountKey=" + keysStr + "&title=" + title + "&message=" + message + "&buttons=[" + button.toJSONString() + "]";
+		// True if the notification was sent otherwise false
+		boolean success = sendNotification(url);
+		if(success) {
+			Logging.logInfo(CLASSNAME, Bundle.getBundle("notificationSent", channels.toString()));
+		} else {
+			// Builds the failover message
+			Failover failover = new Failover(BTTN.configFile);
+			if(message.isEmpty()) {
+				failover.sendFailover(title, title, link);
+			} else {
+				failover.sendFailover(title, message, link);
+			}
+			// Determine if the notification was not sent at all or not sent to all the keys
+			if(keys.size() > 1) {
+				Logging.logError(CLASSNAME, Bundle.getBundle("notSentEveryone"));
+			} else {
+				Logging.logError(CLASSNAME, Bundle.getBundle("notSent"));
+			}
 		}
 	}
 
 	/**
-	 * Sends the given notification to the device using the JSON data provided and the spontit auth credentials
-	 * @param json The JSON spontit uses to build the notification
-	 * @param spontitAuth The authentication needed to send the spontit notification
-	 * @return True if notification was sent, otherwise false
+	 * The function that makes the HTTP request to send the notification
+	 * @param url The URL to send the HTTP request to
+	 * @return True if the notification was send, otherwise false
 	 */
-	private static boolean sendNotification(JSONObject json, HashMap<String, String> spontitAuth) {
-		// Parsing for multiple Spontit API Keys
-		String userIDsStr = spontitAuth.get("X-UserId");
-		userIDsStr = userIDsStr.substring(1, userIDsStr.length()-1);
-		String authKeysStr = spontitAuth.get("X-Authorization");
-		authKeysStr = authKeysStr.substring(1, authKeysStr.length()-1);
-		List<String> userIDs = Arrays.asList(userIDsStr.split(",", -1));
-		List<String> authKeys = Arrays.asList(authKeysStr.split(",", -1));
-		// Loops through all Spontit Key(s) and send notification
-		for(int i=0; i< userIDs.size(); i++) {
-			HashMap<String, String> userAuth = new HashMap<String, String>();
-			userAuth.put("X-Authorization", authKeys.get(i).replace("\"", ""));
-			userAuth.put("X-UserId", userIDs.get(i).replace("\"", ""));
-			// Makes HTTP post request to send update notification
-			HashMap<String, String> HTTPresponse = HTTP.post("https://api.spontit.com/v3/push", json.toJSONString(), userAuth);
-			// Makes sure HTTP status code is 200
-			if(!HTTPresponse.get("statusCode").equals("200")) {
+	private static boolean sendNotification(String url) {
+		// Build the HTTP request
+		OkHttpClient client = new OkHttpClient();
+		Request request = new Request.Builder()
+				.url(url)
+				.build();
+		// Send the HTTP request
+		try(Response response = client.newCall(request).execute()){
+			// Parse the HTTP response and makes sure it was sent
+			JSONParser parser = new JSONParser();
+			JSONObject responseJSON = (JSONObject) parser.parse(response.body().string());
+			String success = responseJSON.get("response").toString();
+			if(success.equalsIgnoreCase("success")) {
+				return true;
+			} else if(success.equalsIgnoreCase("mixed")) {
 				return false;
-			} 
+			} else {
+				return false;
+			}
+		} catch(IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
+			return false;
 		}
-		return true;
 	}
 }

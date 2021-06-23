@@ -1,165 +1,152 @@
-//BTTN.java
 package com.github.jnstockley;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * 
- * The main class of the program which runs the program, helps
- * with setting up the JSON config file, and reading the JSON
- * file to get user specific data.
+ * The main function for BTTN which passes arguments
+ * and controls the flow of BTTN
  * 
  * @author Jack Stockley
- * 
- * @version 1.01
- * 
+ *
+ * @version 1.5
+ *
  */
 public class BTTN {
 
 	/**
-	 * Simple helper function that asks user if they want to continue setting up the config file
-	 * @param reader BufferedReader used to read user input
-	 * @return Returns 'Y' if the user wants to continue setting up the config file and 'N' otherwise
+	 *  Boolean used to determine if the program is ran in setup mode
 	 */
-	private static String getCont(BufferedReader reader) {
-		// Asks user if they want to continue
-		System.out.println(Bundle.getString("contSetup"));
-		String cont = "N";
-		// Read user input
-		try {
-			cont = reader.readLine();
-		} catch (IOException e) {
-			Logger.logError(Bundle.getString("invalidOpt"));
-		}
-		// Parse user input with current locale in mind
-		if(cont.equalsIgnoreCase("y") || cont.equalsIgnoreCase("s") || cont.equals("o")) {
-			return "Y";
-		}
-		return "N";
-	}
+	private static boolean setupMode = false;
 
 	/**
-	 * A Helper Function which determines how the program
-	 * needs to proceeded while setting up the config file.
-	 * Take a String which is the file path to an already created
-	 * JSON file.
-	 * @param filepath Path to JSON file, which already exists
+	 *  Name of the Class used for Logging error
 	 */
-	private static void setup(String filepath) {
-		// Setup Questions
-		System.out.println(Bundle.getString("setupQ"));
-		System.out.println(Bundle.getString("modChan"));
-		System.out.println(Bundle.getString("modKeys"));
-		System.out.println(Bundle.getString("updateConfig"));
-		System.out.println(Bundle.getString("help"));
-		System.out.print(Bundle.getString("option"));
-		// Gets user input and makes sure it's valid
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		int option = -1;
-		try {
-			option = Integer.parseInt(reader.readLine());
-		} catch (NumberFormatException | IOException e) {
-			Logger.logError(Bundle.getString("invalidNum"));
-		}
-		// Calls the corresponding option selected by the user
-		String cont = "Y";
-		while(cont.equals("Y")) {
-			cont = "N";
-			switch(option) {
-			// Modify Channel
-			case 1:
-				Channel.setupChannels(filepath);
-				Helper.addMisc(filepath);
-				cont = getCont(reader);
-				break;
-				// Modify Keys
-			case 2:
-				Auth.setupAuth(filepath);
-				Helper.addMisc(filepath);
-				cont = getCont(reader);
-				break;
-				// Upgrade config file
-			case 3:
-				Helper.configUpgrade(filepath);
-				Helper.addMisc(filepath);
-				cont = getCont(reader);
-				break;
-				// Opens GitHub WiKi in web browser
-			case 4:
-				URI webpage;
-				try {
-					webpage = new URI("https://github.com/jnstockley/BTTN/wiki");
-					java.awt.Desktop.getDesktop().browse(webpage);
-				} catch (URISyntaxException | IOException e) {
-					Logger.logError("webError");
-				}
-				break;
-			default:
-				Logger.logError(Bundle.getString("invalidOpt"));
-			}
-		}
-
-	}
+	private static final String CLASSNAME = BTTN.class.getName();
 
 	/**
-	 * The main function of the program which setups all the variables
-	 * used throughout the program. If user provided, runs the setup
-	 * part of the program to help with configuration.
-	 * @param args Either 1 or 2 arguments. The first one should
-	 * always be the JSON config file, the second, optional argument, must be 
-	 * a keyword 'setup' or the equivalent in the users language.
+	 * File containing all of the configuration used for
+	 * BTTN and the old status of channels being checked
+	 */
+	public static File configFile;
+
+	/**
+	 * Auth Object which holds all the users API Keys
+	 */
+	public static Auth auth;
+
+	/**
+	 * Boolean used to determine if BTTN should display
+	 * more information when throwing errors
+	 */
+	public static boolean debug = false;
+
+	/**
+	 * The main function which runs BTTN
+	 * @param args The command line arguments used to run the program
 	 */
 	public static void main(String[] args) {
-		// Checks to make sure arguments provided are valid
-		if(args.length == 1){
-			if(!Helper.configUpToDate(args[0])) {
-				Logger.logError(Bundle.getString("badJSONVersion"));
+		// Read the arguments passed
+		argsHandler(args);
+		// Check for update
+		Updater.updateAvailable();
+		// Program not in setup mode
+		if(!setupMode) {
+			if(!Helper.validConfig()) {
+				Logging.logError(CLASSNAME, Bundle.getBundle("invalidConfig", BTTN.configFile.getName()));
 			}
-			// Creates 'dictionaries' used throughout the program
-			HashMap<String, Boolean> oldStatus = Helper.getOldStatus(args[0]);
-			HashMap<String, HashMap<String, String>> currStatus = new HashMap<String, HashMap<String, String>>();
-			HashMap<String, String> auth = Helper.getAuth(args[0]);
-			// Gets how often update notifications are sent out
-			int delay = Helper.getDelay(args[0]);
-			//Checks for updates
-			Updater.checkUpdate(auth, delay);
-			// Creates lists of channels and channels that are live
-			HashMap<String, HashMap<String, String>> nowLive = new HashMap<String, HashMap<String, String>>();
-			Set<String> channels = new HashSet<String>();
-			channels = oldStatus.keySet();
-			currStatus = Helper.getStatus(channels, auth);
-			// Loops through all the channels and sees if the channels has gone live
-			for(String channel: currStatus.keySet()) {
-				if(currStatus.get(channel).get("live").equals("true") && !oldStatus.get(channel)) {
-					nowLive.put(channel, currStatus.get(channel));
+			// Get API Keys from config file
+			auth = new Auth(configFile);
+			// Get Old Twitch.tv Live status
+			List<Channel> allChannels = new ArrayList<Channel>();
+			HashMap <String, Boolean> channels = Helper.getOldStatus(configFile);
+			// Gets current Twitch.tv Live Status
+			Set<String> channelNames = channels.keySet();
+			for(String name: channelNames) {
+				Channel channel = new Channel(Helper.curLiveStatus(auth, name), channels.get(name));
+				allChannels.add(channel);
+			}
+			// Determine which channels have just gone live
+			List<Channel> nowLive = new ArrayList<Channel>();
+			for(Channel chan: allChannels) {
+				if(chan.statusChange()) {
+					nowLive.add(chan);
 				}
 			}
-			// Updates the config file with new status
-			Helper.updateStatusFile(currStatus, args[0]);
-			// Sends out live notification is channels are now live
+			// Send live notification for channels that have just gone live
 			if(!nowLive.isEmpty()) {
-				Notifications.sendLiveNotification(nowLive, auth);
+				Notifications.sendLiveNotification(nowLive, auth.getAlertzyAccountKey());
+
 			} else {
-				Logger.logInfo(Bundle.getString("noUpdates"));
+				Logging.logInfo(CLASSNAME, 	Bundle.getBundle("statusUnchanged"));
 			}
-			System.exit(0);
-			// Runs the setup functions
-		} else if(args.length == 2 && args[1].contains(Bundle.getString("setup"))) {
-			setup(args[0]);
-			// Displays an error if the args are invalid
+			// Update config file with new live statuses
+			Helper.updateStatus(allChannels, configFile);
+			// Program in setup mode
 		} else {
-			Logger.logError(Bundle.getString("argsError"));
+			SetupManager.setup(configFile);
 		}
-		
-		/**
-		 * TODO
-		 * Fix duplicate code in sending notifications
-		 */
+	}
+
+	/**
+	 * Helper functions which handles all the CLI arguments that could be passed to BTTN
+	 * @param args String array of all the CLI arguments
+	 */
+	private static void argsHandler(String[] args) {
+		// Adding all the possible arguments that could be passed
+		Options options = new Options();
+		options.addOption(Bundle.getBundle("config"), true, Bundle.getBundle("configDesc"));
+		options.addOption(Bundle.getBundle("setup"), false, Bundle.getBundle("setupDesc"));
+		options.addOption(Bundle.getBundle("version"), false, Bundle.getBundle("versionDesc"));
+		options.addOption(Bundle.getBundle("debug"), false, Bundle.getBundle("debugDesc"));
+		options.addOption(Bundle.getBundle("help"), false, Bundle.getBundle("helpDesc"));
+		// Reading in all the CLI arguments
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmd = null;
+		try {
+			cmd = parser.parse(options, args);
+		} catch (ParseException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		// Help argument was passed
+		if(cmd.hasOption(Bundle.getBundle("help"))) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp(Bundle.getBundle("BTTNUsage"), options);
+			System.exit(0);
+		}
+		// Version argument has passed, used to display which 'branch' BTTN is in
+		if(cmd.hasOption(Bundle.getBundle("version"))) {
+			if(Updater.TESTING) {
+				System.out.println(Bundle.getBundle("BTTNTesting", Double.toString(Updater.VERSION)));
+			} else {
+				System.out.println(Bundle.getBundle("BTTNRelease", Double.toString(Updater.VERSION)));
+			}
+			System.out.println(Bundle.getBundle("build", Updater.BUILD));
+			System.exit(0);
+		}
+		// Config argument was passed which has the path to the JSON config file
+		if(cmd.hasOption(Bundle.getBundle("config"))) {
+			BTTN.configFile = new File(cmd.getOptionValue("config"));
+		}
+		// Debug argument was passed which puts BTTN in debug mode
+		if(cmd.hasOption(Bundle.getBundle("debug"))) {
+			System.out.println(Bundle.getBundle("debugMode"));
+			debug = true;
+		}
+		// Setup argument was passed, which puts BTTN in setup mode
+		if(cmd.hasOption(Bundle.getBundle("setup"))) {
+			setupMode = true;
+		}
 	}
 }
