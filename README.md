@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+# Version 1.51
+Please update to version 1.51 to get bug fixes! This update fixes a bug where BTTN would not send update notifications.
+
 # Version 1.5
 BTTN Version 1.5 has been released! This version of BTTN has been written from the ground up and supports the new notification service Alertzy. This version is not compatible with the old version of BTTN and the config file from older versions should not be used! Also with the release of Version 1.5! I will stop supporting older versions after 1 month of Version 1.5 being released. Version 1.01 and older will be un-supported and removed from the WiKi on July 23rd, 2021.
 
