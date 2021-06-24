@@ -17,7 +17,7 @@ import okhttp3.Response;
  * 
  * @author Jack Stockley
  * 
- * @version 1.5
+ * @version 1.51
  *
  */
 public class Updater {
@@ -30,12 +30,12 @@ public class Updater {
 	/**
 	 * The current version number of BTTN
 	 */
-	public static final double VERSION = 1.5;
+	public static final double VERSION = 1.51;
 
 	/**
 	 * The build version of BTTN
 	 */
-	public static final String BUILD = "JUN-23-21";
+	public static final String BUILD = "JUN-24-21";
 
 	/**
 	 * True if this build is part of the TESTING branch otherwise false
@@ -60,8 +60,7 @@ public class Updater {
 				Notifications.sendUpdateNotification(serverVersion, auth.getAlertzyAccountKey());
 				System.exit(0);
 			} else if(serverVersion > VERSION){
-				Logging.logWarn(CLASSNAME, Bundle.getBundle("updateAvailable"));
-				System.exit(0);
+				Logging.logError(CLASSNAME, Bundle.getBundle("updateAvailable"));
 			}
 		} catch (IOException e) {
 			Logging.logError(CLASSNAME, e);

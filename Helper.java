@@ -26,7 +26,7 @@ import okhttp3.Response;
  * 
  * @author Jack Stockley
  * 
- * @version 1.5
+ * @version 1.51
  *
  */
 public class Helper {
@@ -191,6 +191,9 @@ public class Helper {
 		} catch (IOException | ParseException e) {
 			Logging.logError(CLASSNAME, e);
 			return false;
+		}
+		if(!json.containsKey("failover")) {
+			Logging.logWarn(CLASSNAME, Bundle.getBundle("failoverNotEnabled"));
 		}
 		if(!json.containsKey("channels")) {
 			return false;

@@ -20,7 +20,7 @@ import org.apache.commons.cli.ParseException;
  * 
  * @author Jack Stockley
  *
- * @version 1.5
+ * @version 1.51
  *
  */
 public class BTTN {
@@ -59,8 +59,6 @@ public class BTTN {
 	public static void main(String[] args) {
 		// Read the arguments passed
 		argsHandler(args);
-		// Check for update
-		Updater.updateAvailable();
 		// Program not in setup mode
 		if(!setupMode) {
 			if(!Helper.validConfig()) {
@@ -68,6 +66,8 @@ public class BTTN {
 			}
 			// Get API Keys from config file
 			auth = new Auth(configFile);
+			// Check for update
+			Updater.updateAvailable();
 			// Get Old Twitch.tv Live status
 			List<Channel> allChannels = new ArrayList<Channel>();
 			HashMap <String, Boolean> channels = Helper.getOldStatus(configFile);
@@ -149,4 +149,11 @@ public class BTTN {
 			setupMode = true;
 		}
 	}
+	
+	/**
+	 * BUILD Jun-24-21
+	 * Fixed bug with logging that would incorrectly clear logs
+	 * Changes some warning messages to errors
+	 * Fixed update notification error not sending
+	 */
 }

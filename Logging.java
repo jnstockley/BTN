@@ -1,12 +1,15 @@
 package com.github.jnstockley;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -16,15 +19,20 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Jack Stockley
  * 
- * @version 1.5
+ * @version 1.51
  *
  */
 public class Logging {
 
 	/**
+	 * Name of the user directory to store the log file
+	 */
+	private static final String USERDIR = System.getProperty("user.dir");
+
+	/**
 	 *  Name of the file used to log data
 	 */
-	private static final File LOGFILE = new File("BTTN.log");
+	private static File LOGFILE = new File(USERDIR + System.getProperty("file.separator") + "BTTN.log");
 
 	/**
 	 * Logs information to the log file, used when successful operations are performed
@@ -92,7 +100,6 @@ public class Logging {
 		} else {
 			System.err.println(message);
 		}
-		System.exit(1);
 	}
 
 	/**
@@ -172,33 +179,43 @@ public class Logging {
 	}
 
 	/**
-	 * Clears the log file after being 7 days old
+	 * Clears the log after being 7 days old
 	 */
 	private static void clearLog() {
-		// Gets the current date
+		// Gets the current date and checks if the log file exists
 		Date curDate = new Date();
-		try {
-			// Gets the date the file was created
-			BasicFileAttributes attrs = Files.readAttributes(LOGFILE.toPath(), BasicFileAttributes.class);
-			long time = attrs.creationTime().toMillis();
-			// Checks if date if older then 7 days and deletes it
-			if((time + TimeUnit.DAYS.toMillis(7)) < curDate.getTime()) {
-				if(!LOGFILE.delete()) {
-					if(!LOGFILE.createNewFile()) {
+		if(LOGFILE.exists()) {
+			try {
+				// Reads the first line of the log file
+				BufferedReader reader = new BufferedReader(new FileReader(LOGFILE));
+				String firstLine = reader.readLine();
+				reader.close();
+				if(firstLine == null) {
+					return;
+				}
+				// Parses the date from the log file
+				DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy");
+				Date d = dateFormat.parse(firstLine);
+				// Checks if log file is older then 7 days and deletes it and creates a new file
+				if((d.getTime() + TimeUnit.DAYS.toMillis(7)) < curDate.getTime()) {
+					if(LOGFILE.delete()) {
+						if(!LOGFILE.createNewFile()) {
+							System.err.println(curDate.toString() + ": " + Logging.class.getName() + " " + Bundle.getBundle("error") + Bundle.getBundle("deleteLogError"));
+						}
+					} else {
 						System.err.println(curDate.toString() + ": " + Logging.class.getName() + " " + Bundle.getBundle("error") + Bundle.getBundle("deleteLogError"));
 					}
-					System.err.println(curDate.toString() + ": " + Logging.class.getName() + " " + Bundle.getBundle("error") + Bundle.getBundle("deleteLogError"));
 				}
-			}
-		} catch (IOException e) {
-			if(BTTN.debug) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				System.err.println(curDate.toString() + ": " + Logging.class.getName() + " " + Bundle.getBundle("error") + error.toString());
-			} else {
-				System.err.println(curDate.toString() + ": " + Logging.class.getName() + " " + Bundle.getBundle("error") + e.getLocalizedMessage());
+			} catch (IOException | ParseException e) {
+				// Prints more data if BTTN is in debug mode
+				if(BTTN.debug) {
+					StringWriter error = new StringWriter();
+					e.printStackTrace(new PrintWriter(error));
+					System.err.println(curDate.toString() + ": " + Logging.class.getName() + " " + Bundle.getBundle("error") + error.toString());
+				} else {
+					System.err.println(curDate.toString() + ": " + Logging.class.getName() + " " + Bundle.getBundle("error") + e.getLocalizedMessage());
+				}
 			}
 		}
 	}
-
 }

@@ -26,7 +26,7 @@ import okhttp3.Response;
  * 
  * @author Jack Stockley
  * 
- * @version 1.5
+ * @version 1.51
  *
  */
 public class Auth {
@@ -236,7 +236,7 @@ public class Auth {
 		}
 		// No API Keys were selected to be added
 		if(authJSON.isEmpty()) {
-			Logging.logWarn(CLASSNAME, Bundle.getBundle("noAPIKeysAdded"));
+			Logging.logError(CLASSNAME, Bundle.getBundle("noAPIKeysAdded"));
 		}
 		// Adds API Keys to current JSON and writes file out
 		json.put("auth", authJSON);
