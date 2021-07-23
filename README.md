@@ -3,9 +3,6 @@
 # Version 1.51
 Please update to version 1.51 to get bug fixes! This update fixes a bug where BTTN would not send update notifications.
 
-# Version 1.5
-BTTN Version 1.5 has been released! This version of BTTN has been written from the ground up and supports the new notification service Alertzy. This version is not compatible with the old version of BTTN and the config file from older versions should not be used! Also with the release of Version 1.5! I will stop supporting older versions after 1 month of Version 1.5 being released. Version 1.01 and older will be un-supported and removed from the WiKi on July 23rd, 2021.
-
 ## Description
 This is a Java program that uses [Twitch's API](https://dev.twitch.tv/docs/api/) to determine if a channel is live. The user can add any number of channels, using the program, to a JSON 'config' file. Whenever the program is run it will use the Twitch API to determine if the channel is live. If the status of the channel has changed from not live to live, using data stored in the JSON file, it will send the user a mobile push notification using [Alertzy](https://alertzy.app). I felt the need to build such a program since I started to get annoyed at how delayed the 1st party Twitch notifications could be, especially for channels with large followers. I would miss the beginning of streams and join late with a feeling that I missed a lot of important content. This program can send a notification within a minute of the stream going live, depending on how many channels are being checked, as compared to Twitch's notification which could be delayed as long as 10+ minutes.
 
@@ -19,7 +16,7 @@ In order to get the most out of BTTN you will want to have it run as often as po
 Yes, using the default Twitch.tv live notifications is a lot easier, but the notifications can be very delayed, if they are sent at all. BTTN reliably sends live notifications within a minute of the streamer going live.
 
 ## How does BTTN work?
-It uses the official Twitch.tv API to determine when a streamer goes live, saves the live status to a file, and sends a notification to your mobile device, using Spontit a free and open source application used to send notifications to peopole. BTTN also sends notifications through spontit if there are updates or if BTTN runs into issues checking the live status.
+It uses the official Twitch.tv API to determine when a streamer goes live, saves the live status to a file, and sends a notification to your mobile device, using Alertzy a free and open source application used to send notifications to peopole. BTTN also sends notifications through Alertzy if there are updates or if BTTN runs into issues checking the live status.
 
 ## Version 1.6 To-Do
 1. Handles exceptions better when not in debug mode.
