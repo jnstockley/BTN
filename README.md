@@ -19,12 +19,9 @@ Yes, using the default Twitch.tv live notifications is a lot easier, but the not
 It uses the official Twitch.tv API to determine when a streamer goes live, saves the live status to a file, and sends a notification to your mobile device, using Alertzy a free and open source application used to send notifications to peopole. BTTN also sends notifications through Alertzy if there are updates or if BTTN runs into issues checking the live status.
 
 ## Version 1.6 To-Do
-1. Handles exceptions better when not in debug mode.
-2. Check Alertzy Account key to ensure validity.
-3. German Language Support
+1. Check Alertzy Account key to ensure validity.
+2. German Language Support
 
 ## Features to add!
 1. Automatic updates
 2. More lanuage support
-3. Notifications to launch twitch stream on mobile devices
-4. Youtube notifications (possible no promise)
