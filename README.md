@@ -1,12 +1,5 @@
 # BTTN (Better Twitch.tv Notifications)
 
-# Random Error Messaged being Sent
-While using BTTN in my normal day, I have been getting error notifications being sent to my device a lot. I am aware of the issue and am trying to work on a way to fix this either through a different mean of getting the twitch status or by adding mitigation into BTTN. If you are experiencing a similar issue, please respond to the open issue.
-
-UPDATE!!! After looking into the issue, I am working on some mitigation techiques to avoid the buggy Twitch API. After testing the mitigation techniques, I will be adding them into the 1.6 update!
-
-UPDATE 2!!! It seems like Twitch has fixed their API and it is more reliable. I have reverted my version of BTTN to the public version, 1.51. Since downgrading I have not received any error messages. Since this version does not have the mitigation techniques added, I have no current plans to add them to a public release. If the Twitch API breaks in a similar way, then I will work on adding these changes. If you are still having these issues, please report them.
-
 # Version 1.51
 Please update to version 1.51 to get bug fixes! This update fixes a bug where BTTN would not send update notifications.
 
