@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+# Notifications Not Being Sent
+I have found a deteremined that their is a bug with all supported BTTN versions where they error out and don't send any notifications. I have just discovered this and am aware of it. I plan to work on a fix ASAP.
+
 # Version 1.51
 Please update to version 1.51 to get bug fixes! This update fixes a bug where BTTN would not send update notifications.
 
