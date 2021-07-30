@@ -3,6 +3,8 @@
 # Notifications Not Being Sent
 I have found a deteremined that their is a bug with all supported BTTN versions where they error out and don't send any notifications. I have just discovered this and am aware of it. I plan to work on a fix ASAP.
 
+Update!!! I have determined the bug. When a Twitch channel changes their name, BTTN returns null and the whole program crashes. A fix for this will be implemented in Version 1.6. If you exprience this problem, please update the Twitch name in the config by removing the channel and re-adding it.
+
 # Version 1.51
 Please update to version 1.51 to get bug fixes! This update fixes a bug where BTTN would not send update notifications.
 
