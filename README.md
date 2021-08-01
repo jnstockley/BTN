@@ -1,9 +1,7 @@
 # BTTN (Better Twitch.tv Notifications)
 
-# Notifications Not Being Sent
-I have deteremined that their is a bug with all supported BTTN versions where they error out and don't send any notifications. I have just discovered this and am aware of it. I plan to work on a fix ASAP.
-
-Update!!! I have determined the bug. When a Twitch channel changes their name, BTTN returns null and the whole program crashes. A fix for this will be implemented in Version 1.6. If you exprience this bug, please update the Twitch channel's name in the config by removing the channel and re-adding it.
+# Expiremtental 1.6 Testing
+I have noticed that very rarley BTTN will send an error notification with a timeout exception. This was one of the issues occuring a couple of days ago with the Twitch API. I have addded, what I belive is, a workaround to limit this issue. I will be testing this our and roll this update into Version 1.6.
 
 # Version 1.51
 Please update to version 1.51 to get bug fixes! This update fixes a bug where BTTN would not send update notifications.
