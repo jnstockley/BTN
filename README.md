@@ -1,8 +1,5 @@
 # BTTN (Better Twitch.tv Notifications)
 
-# Expiremtental 1.6 Testing
-I have noticed that very rarley BTTN will send an error notification with a timeout exception. This was one of the issues occuring a couple of days ago with the Twitch API. I have addded, what I belive is, a workaround to limit this issue. I will be testing this our and roll this update into Version 1.6.
-
 # Version 1.51
 Please update to version 1.51 to get bug fixes! This update fixes a bug where BTTN would not send update notifications.
 
