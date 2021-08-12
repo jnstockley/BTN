@@ -22,13 +22,13 @@ import org.simplejavamail.mailer.MailerBuilder;
 
 
 /**
- * 
+ *
  * Function that manages setting up the failover method and
  * building the failover message to be sent
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class Failover {
@@ -332,7 +332,7 @@ public class Failover {
 					Logging.logError(CLASSNAME, Bundle.getBundle("badSuffix"));
 				}
 			} else {
-				suffix = providers.get(providerNames.get(option));	
+				suffix = providers.get(providerNames.get(option));
 			}
 			failoverAddr = number + suffix;
 			// Failover is sent to a phone number as a text
@@ -468,7 +468,7 @@ public class Failover {
 		Matcher matcher = pattern.matcher(email);
 		return matcher.matches();
 	}
-	
+
 	/**
 	 * Helper function that uses regex to make sure a phone number is valid
 	 * @param phoneNumber The phone number to check if valid

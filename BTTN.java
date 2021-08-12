@@ -12,6 +12,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.json.simple.JSONObject;
 
 /**
  * 
@@ -20,7 +21,7 @@ import org.apache.commons.cli.ParseException;
  * 
  * @author Jack Stockley
  *
- * @version 1.51
+ * @version 1.6
  *
  */
 public class BTTN {
@@ -57,6 +58,13 @@ public class BTTN {
 	 * @param args The command line arguments used to run the program
 	 */
 	public static void main(String[] args) {
+		// Checks for test flag to test resource bundle
+		for(String arg: args) {
+			if(arg.equalsIgnoreCase("-test") || arg.equalsIgnoreCase("-t")) {
+				Bundle.bundleTest();
+				System.exit(0);
+			}
+		}
 		// Read the arguments passed
 		argsHandler(args);
 		// Program not in setup mode
@@ -74,8 +82,14 @@ public class BTTN {
 			// Gets current Twitch.tv Live Status
 			Set<String> channelNames = channels.keySet();
 			for(String name: channelNames) {
-				Channel channel = new Channel(Helper.curLiveStatus(auth, name), channels.get(name));
-				allChannels.add(channel);
+				JSONObject liveStatus = Helper.curLiveStatus(auth, name);
+				if(liveStatus == null) {
+					Logging.logWarn(CLASSNAME, Bundle.getBundle("chanNotFound", name));
+					Notifications.sendErrorNotification(Bundle.getBundle("chanNotFound", name), auth.getAlertzyAccountKey());
+				}else {
+					Channel channel = new Channel(liveStatus, channels.get(name));
+					allChannels.add(channel);
+				}
 			}
 			// Determine which channels have just gone live
 			List<Channel> nowLive = new ArrayList<Channel>();
@@ -84,6 +98,8 @@ public class BTTN {
 					nowLive.add(chan);
 				}
 			}
+			// Update config file with new live statuses
+			Helper.updateStatus(allChannels, configFile);
 			// Send live notification for channels that have just gone live
 			if(!nowLive.isEmpty()) {
 				Notifications.sendLiveNotification(nowLive, auth.getAlertzyAccountKey());
@@ -91,8 +107,6 @@ public class BTTN {
 			} else {
 				Logging.logInfo(CLASSNAME, 	Bundle.getBundle("statusUnchanged"));
 			}
-			// Update config file with new live statuses
-			Helper.updateStatus(allChannels, configFile);
 			// Program in setup mode
 		} else {
 			SetupManager.setup(configFile);
@@ -149,11 +163,9 @@ public class BTTN {
 			setupMode = true;
 		}
 	}
-	
+
 	/**
-	 * BUILD Jun-24-21
-	 * Fixed bug with logging that would incorrectly clear logs
-	 * Changes some warning messages to errors
-	 * Fixed update notification error not sending
+	 * TODO 
+	 * Function to check for expired or invalid OAuth token and alert user every 30 minutes
 	 */
 }

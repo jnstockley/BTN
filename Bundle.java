@@ -4,12 +4,12 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * 
+ *
  * Helps with getting the user's current language and deciding which resource bundle to use
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class Bundle {
@@ -59,5 +59,105 @@ public class Bundle {
 			message = message.replace("%f%", value);
 		}
 		return message;
+	}
+	
+	/**
+	 * Helper function used to verify resource bundles work in all supported languages
+	 */
+	protected static void bundleTest() {
+		int keys = 23;
+		String[] auth = {"missingAPIKey", "noAPIKeys", "addTwitchAPI", "twitchSecret", "twitchClient", "addAlertzy", "numAlertzyKeys", "noAlertzyKeys", "enterAlertzyKey",
+				"noAPIKeysAdded", "APIKeysAdded", "removeTwitchAPI", "removeAlertzyAPI", "APIKeysRemoved", "yes", "y", "no", "n", "isEmpty", "noAPIKeysSelRem",
+				"invalidTwitchKeys", "validAlertzyKeys", "invalidAlertzyKeys", "twitchReAuth"};
+		String[] BTTN = {"debugMode", "BTTNTesting", "BTTNRelease", "build", "statusUnchanged", "invalidArgs", "invalidConfig", "chanNotFound"};
+		String[] bundle = {"missingKey"};
+		String[] channel = {"numChanAdd", "invalidChanNum", "chanName", "addedChan", "channelsChecked", "chanRemove", "removedChan", "noChannels", "invalidChan"};
+		String[] failover = {"failoverSubject", "failoverSent", "failoverTextEmail", "enterPhoneNumber", "selectProvider", "provider", "enterEmailAddress", "toName",
+				"fromEmail", "smtpPassword", "smtpServer", "smtpPort", "failoverEnabled", "failoverRemoved", "failoverDisabled", "text", "email", "customProvider",
+				"cellProviderExtension", "badSuffix", "badEmail", "badPhoneNumber"};
+		String[] helper = {"errorCheckingStatus", "noChannels", "socketErrorRetry", "socketError", "expiredToken"};
+		String[] logging = {"info", "warn", "error", "deleteLogError"};
+		String[] notifications = {"encounteredError", "notSentEveryone", "notSent", "newVersion", "downloadUpdate", "updateTo", "isLive", "areLive", "notificationSent",
+				"errorNotificationSent", "testTitle", "testMessage"};
+		String[] setupManager = {"setupWelcome", "modifyKeys", "modifyChans", "modifyFailover", "wikiHelp", "option", "invalidOption", "howModifyKeys", "addKeys",
+				"removeKeys", "reauthKeys", "howModifyChan", "addChan", "removeChan", "howModifyFailover", "addFailover", "removeFailover"};
+		String[] updater = {"updateAvailable"};
+		String[] global = {"viewUpdate", "openStream", "failoverNotEnabled"};
+		String[] flags = {"setup", "setupDesc", "version", "versionDesc", "debug", "debugDesc", "config", "configDesc", "help", "helpDesc", "BTTNUsage"};
+		System.out.println(LOCALE.getDisplayLanguage());
+		System.out.println("-------------------------------------------");
+		System.out.println("AUTH.java");
+		for(String key: auth) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("BTTN.java");
+		for(String key: BTTN) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("BUNDLE.java");
+		for(String key: bundle) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("CHANNEL.java");
+		for(String key: channel) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("FAILOVER.java");
+		for(String key: failover) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("HELPER.java");
+		for(String key: helper) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("LOGGING.java");
+		for(String key: logging) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("NOTIFICIATIONS.java");
+		for(String key: notifications) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("SETUPMANAGER.java");
+		for(String key: setupManager) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("UPDATER.java");
+		for(String key: updater) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("GLOBAL");
+		for(String key: global) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("FLAGS");
+		for(String key: flags) {
+			System.out.println(key + " - \"" + getBundle(key) + "\"");
+			keys++;
+		}
+		System.out.println("-------------------------------------------");
+		System.out.println("Keys: " + keys);
 	}
 }

@@ -14,10 +14,10 @@ import okhttp3.Response;
 
 /**
  * Determines if an update is available and when to send a notification alerting of the update!
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class Updater {
@@ -30,12 +30,12 @@ public class Updater {
 	/**
 	 * The current version number of BTTN
 	 */
-	public static final double VERSION = 1.51;
+	public static final double VERSION = 1.6;
 
 	/**
 	 * The build version of BTTN
 	 */
-	public static final String BUILD = "JUN-24-21";
+	public static final String BUILD = "AUG-12-21";
 
 	/**
 	 * True if this build is part of the TESTING branch otherwise false
@@ -54,13 +54,24 @@ public class Updater {
 		// Sends the HTTP request
 		try(Response response = client.newCall(request).execute()){
 			double serverVersion = Double.parseDouble(response.body().string());
-			// Checks if the version on GitHub is newer then the current version and sends the notification
-			if(serverVersion > VERSION && sendNotification()) {
-				Auth auth = BTTN.auth;
-				Notifications.sendUpdateNotification(serverVersion, auth.getAlertzyAccountKey());
-				System.exit(0);
-			} else if(serverVersion > VERSION){
-				Logging.logError(CLASSNAME, Bundle.getBundle("updateAvailable"));
+			// Checks for a new stable release and send the notification
+			if(TESTING) {
+				if(serverVersion >= VERSION && sendNotification()) {
+					Auth auth = BTTN.auth;
+					Notifications.sendUpdateNotification(Bundle.getBundle("BTTNRelease", Double.toString(serverVersion)), auth.getAlertzyAccountKey());
+					System.exit(0);
+				} else if(serverVersion >= VERSION){
+					Logging.logError(CLASSNAME, Bundle.getBundle("updateAvailable"));
+				}
+				// Checks if the version on GitHub is newer then the current version and sends the notification
+			} else {
+				if(serverVersion > VERSION && sendNotification()) {
+					Auth auth = BTTN.auth;
+					Notifications.sendUpdateNotification(Double.toString(serverVersion), auth.getAlertzyAccountKey());
+					System.exit(0);
+				} else if(serverVersion > VERSION){
+					Logging.logError(CLASSNAME, Bundle.getBundle("updateAvailable"));
+				}
 			}
 		} catch (IOException e) {
 			Logging.logError(CLASSNAME, e);

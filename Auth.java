@@ -21,12 +21,12 @@ import okhttp3.Response;
 
 
 /**
- * 
+ *
  * Handles reading and writing the all of the users API Keys required for BTTN.
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class Auth {
@@ -133,7 +133,7 @@ public class Auth {
 			}
 		} else {
 			// No Auth section
-			Logging.logError(CLASSNAME, Bundle.getBundle("noAPIKeys", file.getName()));	
+			Logging.logError(CLASSNAME, Bundle.getBundle("noAPIKeys", file.getName()));
 		}
 	}
 
@@ -160,7 +160,7 @@ public class Auth {
 			} catch (IOException | ParseException e) {
 				Logging.logError(CLASSNAME, e);
 			}
-		}		
+		}
 		JSONObject authJSON = new JSONObject();
 		if(json.containsKey("auth")) {
 			authJSON = (JSONObject) json.get("auth");
@@ -231,6 +231,12 @@ public class Auth {
 					Logging.logError(CLASSNAME, e);
 				}
 				accountKeys.add(accountKey);
+			}
+			boolean success = Notifications.sendTestNotification(accountKeys);
+			if(success) {
+				Logging.logInfo(CLASSNAME, Bundle.getBundle("validAlertzyKeys"));
+			} else {
+				Logging.logError(CLASSNAME, Bundle.getBundle("invalidAlertzyKeys"));
 			}
 			authJSON.put("alertzyAccountKeys", accountKeys);
 		}
@@ -322,6 +328,57 @@ public class Auth {
 			Logging.logInfo(CLASSNAME, Bundle.getBundle("APIKeysRemoved"));
 		} catch (IOException e) {
 			Logging.logError(CLASSNAME, e);
+		}
+	}
+
+	/**
+	 * Asks the user for a new Twitch.TV Client Secret API Key and writes the authorization key to the config file
+	 * @param reader BufferedReader used to get user input from the console
+	 */
+	@SuppressWarnings("unchecked")
+	public static void reAuthTwitch(BufferedReader reader) {
+		JSONParser parser = new JSONParser();
+		JSONObject json = new JSONObject();
+		// Makes sure the file exists and isn't empty
+		if(!BTTN.configFile.exists() || BTTN.configFile.length() == 0) {
+			Logging.logError(CLASSNAME, Bundle.getBundle("isEmpty", BTTN.configFile.getName()));
+		}
+		// Reads the JSON from the config file
+		try {
+			json = (JSONObject) parser.parse(new FileReader(BTTN.configFile));
+		} catch (IOException | ParseException e) {
+			Logging.logError(CLASSNAME, e);
+		}
+		// Makes sure JSON file contains required keys
+		if(json.containsKey("auth")) {
+			JSONObject auth = (JSONObject)json.get("auth");
+			if(auth.containsKey("twitchAuthorization") && auth.containsKey("twitchClientID")) {
+				// Gets the current clientID and asks user for new client secret
+				String clientID = auth.get("twitchClientID").toString();
+				System.out.print(Bundle.getBundle("twitchSecret"));
+				String clientSecret = "";
+				try {
+					clientSecret = reader.readLine();
+				} catch (IOException e) {
+					Logging.logError(clientID, e);
+				}
+				// Sends API Keys to Twitch and get's Authorization key
+				String authorization = getAuthKey(clientID, clientSecret);
+				if(authorization != null) {
+					// Writes the new key to the JSON file
+					auth.put("twitchAuthorization", authorization);
+					json.put("auth", auth);
+					try {
+						FileWriter writer = new FileWriter(BTTN.configFile);
+						writer.write(json.toJSONString());
+						writer.flush();
+						writer.close();
+						Logging.logInfo(CLASSNAME, Bundle.getBundle("twitchReAuth"));
+					} catch (IOException e) {
+						Logging.logError(CLASSNAME, e);
+					}
+				}
+			}
 		}
 	}
 

@@ -14,13 +14,13 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * 
+ *
  * Class that holds the data for each channel and helps with
  * adding and removing channels
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class Channel {

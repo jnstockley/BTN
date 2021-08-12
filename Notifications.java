@@ -12,12 +12,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * 
+ *
  * Sends all the notification used throughout BTTN and handles sending failover notification if needed
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class Notifications {
@@ -64,7 +64,7 @@ public class Notifications {
 	 * @param keys List of Strings representing the Alertzy API Key(s)
 	 */
 	@SuppressWarnings("unchecked")
-	public static void sendUpdateNotification(double newVersion, List<String> keys) {
+	public static void sendUpdateNotification(String newVersion, List<String> keys) {
 		// Builds the key string used to send notifications to multiple people with Alertzy
 		String keysStr = "";
 		for(String key: keys) {
@@ -84,7 +84,7 @@ public class Notifications {
 		// True if the notification was sent otherwise false
 		boolean success = sendNotification(url);
 		if(success) {
-			Logging.logInfo(CLASSNAME, Bundle.getBundle("updateTo", Double.toString(newVersion)));
+			Logging.logInfo(CLASSNAME, Bundle.getBundle("updateTo", newVersion));
 		} else {
 			// Builds the failover message
 			Failover failover = new Failover(BTTN.configFile);
@@ -153,6 +153,25 @@ public class Notifications {
 				Logging.logError(CLASSNAME, Bundle.getBundle("notSent"));
 			}
 		}
+	}
+
+	/**
+	 * Sends a test notification to make sure Alertzy is valid and works
+	 * @param keys The user's Alertzy Key(s)
+	 * @return True if the notification was sent otherwise false
+	 */
+	public static boolean sendTestNotification(List<String> keys) {
+		// Builds the key string used to send notifications to multiple people with Alertzy
+		String keysStr = "";
+		for(String key: keys) {
+			keysStr += key + "_";
+		}
+		// Builds the title of the notification and the url to the send the live notification
+		keysStr = keysStr.substring(0, keysStr.length()-1);
+		String title = Bundle.getBundle("testTitle");
+		String message = Bundle.getBundle("testMessage");
+		String url = "https://alertzy.app/send?accountKey=" + keysStr + "&title=" + title + "&message=" + message;
+		return sendNotification(url);
 	}
 
 	/**

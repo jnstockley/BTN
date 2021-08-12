@@ -8,12 +8,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * 
+ *
  * Class that manages the program when in setup mode, and controls the flow of the program
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class SetupManager {
@@ -44,26 +44,26 @@ public class SetupManager {
 			Logging.logError(CLASSNAME, e);
 		}
 		switch(option) {
-		// Modify API Keys
-		case 1:
-			setupAPI(reader);
-			break;
+			// Modify API Keys
+			case 1:
+				setupAPI(reader);
+				break;
 			// Modify Channels
-		case 2:
-			setupChannels(reader);
-			break;
+			case 2:
+				setupChannels(reader);
+				break;
 			// Modify failover
-		case 3:
-			setupFailover(reader);
-			break;
+			case 3:
+				setupFailover(reader);
+				break;
 			// View WiKi
-		case 4:
-			accessWiki();
-			break;
+			case 4:
+				accessWiki();
+				break;
 			// Invalid option
-		default:
-			Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
-			break;
+			default:
+				Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
+				break;
 		}
 	}
 
@@ -76,6 +76,7 @@ public class SetupManager {
 		System.out.println(Bundle.getBundle("howModifyKeys"));
 		System.out.println(Bundle.getBundle("addKeys"));
 		System.out.println(Bundle.getBundle("removeKeys"));
+		System.out.println(Bundle.getBundle("reauthKeys"));
 		System.out.print(Bundle.getBundle("option"));
 		// Gets the users input
 		int option = -1;
@@ -85,18 +86,22 @@ public class SetupManager {
 			Logging.logError(CLASSNAME, e);
 		}
 		switch(option) {
-		// Add Keys
-		case 1:
-			Auth.addAPIKeys(reader);
-			break;
+			// Add Keys
+			case 1:
+				Auth.addAPIKeys(reader);
+				break;
 			// Remove Keys
-		case 2:
-			Auth.removeAPIKeys(reader);
-			break;
+			case 2:
+				Auth.removeAPIKeys(reader);
+				break;
+			// Reauth Twitch Key
+			case 3:
+				Auth.reAuthTwitch(reader);
+				break;
 			// Invalid option
-		default:
-			Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
-			break;
+			default:
+				Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
+				break;
 		}
 	}
 
@@ -118,18 +123,18 @@ public class SetupManager {
 			Logging.logError(CLASSNAME, e);
 		}
 		switch(option) {
-		// Add Channel(s)
-		case 1:
-			Channel.addChannels(reader);
-			break;
+			// Add Channel(s)
+			case 1:
+				Channel.addChannels(reader);
+				break;
 			// Remove Channel(s)
-		case 2:
-			Channel.removeChannels(reader);
-			break;
-		default:
-			// Invalid option
-			Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
-			break;
+			case 2:
+				Channel.removeChannels(reader);
+				break;
+			default:
+				// Invalid option
+				Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
+				break;
 		}
 	}
 
@@ -151,18 +156,18 @@ public class SetupManager {
 			Logging.logError(CLASSNAME, e);
 		}
 		switch(option) {
-		// Add failover
-		case 1:
-			Failover.addFailover(reader);
-			break;
+			// Add failover
+			case 1:
+				Failover.addFailover(reader);
+				break;
 			// Remove failover
-		case 2:
-			Failover.removeFailover(reader);
-			break;
-		default:
-			// Invalid option
-			Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
-			break;
+			case 2:
+				Failover.removeFailover(reader);
+				break;
+			default:
+				// Invalid option
+				Logging.logError(CLASSNAME, Bundle.getBundle("invalidOption", Integer.toString(option)));
+				break;
 		}
 	}
 

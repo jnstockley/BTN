@@ -14,12 +14,12 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 
+ *
  * Helps with logging all messages to the log file and clear the log when needed
- * 
+ *
  * @author Jack Stockley
- * 
- * @version 1.51
+ *
+ * @version 1.6
  *
  */
 public class Logging {
