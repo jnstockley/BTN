@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+# Version 1.62
+What's new! Updated dependencies, requires Java 17+. This version is recommended for all users
+
 # Version 1.6
 What's new! Updated dependencies, BTTN now checks if an Alertzy API key is valid and sends a test notification, fixes a crash when a Twitch channel name changes, German Support, mitigation techniques to fix Twitch API Timeout Errors, BTTN will send a notification when your Twitch OAuth token has expired..
 
