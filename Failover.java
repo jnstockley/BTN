@@ -28,7 +28,7 @@ import org.simplejavamail.mailer.MailerBuilder;
  *
  * @author Jack Stockley
  *
- * @version 1.6
+ * @version 1.62
  *
  */
 public class Failover {

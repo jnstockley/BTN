@@ -17,7 +17,7 @@ import okhttp3.Response;
  *
  * @author Jack Stockley
  *
- * @version 1.6
+ * @version 1.62
  *
  */
 public class Updater {
@@ -30,12 +30,12 @@ public class Updater {
 	/**
 	 * The current version number of BTTN
 	 */
-	public static final double VERSION = 1.6;
+	public static final double VERSION = 1.62;
 
 	/**
 	 * The build version of BTTN
 	 */
-	public static final String BUILD = "AUG-12-21";
+	public static final String BUILD = "DEC-10-21";
 
 	/**
 	 * True if this build is part of the TESTING branch otherwise false

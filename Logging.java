@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Jack Stockley
  *
- * @version 1.6
+ * @version 1.62
  *
  */
 public class Logging {
