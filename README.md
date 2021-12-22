@@ -7,6 +7,7 @@ Since I am happy with how BTTN works for Twitch.tv notification, I have started 
   - [ ] All current features in 1.62
   - [ ] Youtube Video Upload support
   - [ ] Youtube Live Stream support
+  - [ ] Possible New Name (Suggestions Welcome)
 
 # Version 1.62
 What's new! Updated dependencies, requires Java 17+. This version is recommended for all users
