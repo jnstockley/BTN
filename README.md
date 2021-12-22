@@ -1,5 +1,13 @@
 # BTTN (Better Twitch.tv Notifications)
 
+# What's next for BTTN
+Since I am happy with how BTTN works for Twitch.tv notification, I have started some testing to see if it's theoretically possible to do a simple thing for Youtube videos. In a perfect world, I would love to get this working with Youtube live streams as well. So with that said, I am starting work on Version 2.0. This version will most likely take a while to implement since I am planning on re-writing the whole program to better facilitate future versions and new services. Below is a checklist with the featutres I plan to add, as well if they are in-progress, done, or canceled. Please create an issue if there are any features that should be added.
+
+## Version 2.0 Progress
+  - [ ] All current features in 1.62
+  - [ ] Youtube Video Upload support
+  - [ ] Youtube Live Stream support
+
 # Version 1.62
 What's new! Updated dependencies, requires Java 17+. This version is recommended for all users
 
@@ -20,11 +28,3 @@ Yes, using the default Twitch.tv live notifications is a lot easier, but the not
 
 ## How does BTTN work?
 It uses the official Twitch.tv API to determine when a streamer goes live, saves the live status to a file, and sends a notification to your mobile device, using Alertzy a free and open source application used to send notifications to peopole. BTTN also sends notifications through Alertzy if there are updates or if BTTN runs into issues checking the live status.
-
-## Version 1.6 To-Do
-1. Check Alertzy Account key to ensure validity.
-2. German Language Support
-
-## Features to add!
-1. Automatic updates
-2. More lanuage support
