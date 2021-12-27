@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 1!!!
+I have deemed it possible to add Youtube Notifications to BTTN. With that said I have started work on Version 2.0 and such, the current beta of 1.7 has been canceled and the features added will be implemented in Version 2.0. I would also like to provide a progress update. I have started writting the backend for BTTN where it interacts with local files and reached out to the required APIs to detmerine if a streamer is live or new video posted. I am hoping to release a VERY early version, possibly with source code, at the start of 2022.
+
 # What's next for BTTN
 Since I am happy with how BTTN works for Twitch.tv notification, I have started some testing to see if it's theoretically possible to do a simple thing for Youtube videos. In a perfect world, I would love to get this working with Youtube live streams as well. So with that said, I am starting work on Version 2.0. This version will most likely take a while to implement since I am planning on re-writing the whole program to better facilitate future versions and new services. Below is a checklist with the featutres I plan to add, as well if they are in-progress, done, or canceled. Please create an issue if there are any features that should be added.
 
