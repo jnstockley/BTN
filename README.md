@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Versioin 2.0 Update 3!!!
+I have decided that I want to wait on pushing the first build of BTTN Version 2. I want to do some more testing with YouTube live streams and test how the program works with YouTube premieres and hopefully make a seperate notification for YouTube shorts (no promises). I also want to make the set up slightly more user friendly then how the current build is. In a perfect world, I would love to have the first build out by the end of next week but I am not promising anything since I am not sure how YouTube live streams and YouTube premiere testing will go. Stay tuned!
+
 ## Version 2.0 Update 2!!!
 After doing some internal testing with my first try at YouTube notification, I found the delay to be too long. I then decided to look into using the YouTube API. After trying to figure out a way to stay under the YouTube quota, I have began work on my second try at getting YouTube notifications. I am hoping to start more internal testing on this version tomorrow to make sure it is light on the YouTube quota, and the delay is on par, or better then YouTubes. If all goes well, I plan on releasing a very early version by the end of this week!
 
