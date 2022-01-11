@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 4!!!
+I believe if all goes well during my testing this week that I am ready to release the version version of version 2.0. Right now the program checks Twitch.tv live channels, YouTube video uploads (is able to determine if its a regular YouTube video or a short) and YouTube live streams. Right now the only major issues is that if a youtube is "premiered" I believe you won't be notified until the premier is over, (need to test this, I know for a fact it won't notify you when the permier is starting but need to make sure it still notifies you after the premier). The program also creates a folder in the user's home folder called "BTTN" where all the config and data files are stored. Ill make an update when I release on how to set these up. Upon full release this will all be automated.
+
 ## Versioin 2.0 Update 3!!!
 I have decided that I want to wait on pushing the first build of BTTN Version 2. I want to do some more testing with YouTube live streams and test how the program works with YouTube premieres and hopefully make a seperate notification for YouTube shorts (no promises). I also want to make the set up slightly more user friendly then how the current build is. In a perfect world, I would love to have the first build out by the end of next week but I am not promising anything since I am not sure how YouTube live streams and YouTube premiere testing will go. Stay tuned!
 
