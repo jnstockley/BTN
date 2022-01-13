@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0-Alpha1!!
+I have just published the first alpha version of BTTN V2. Please read the README in the root of the directory on how to setup BTTN and read the README in the config examples folder on how to configure the config and data files. Any issues, post an issue with the `version2` lable on the issue tracker.
+
 ## Version 2.0 Update 5!!!
 In the next day or so I plan on releasing source code as well as a compiled jar file for the first 2.0 release. From this point further all version 2.0 updates will be released here and not on the main branch. I will also make a section here for known bugs, what I am working on for the next version, how to setup the current version and any other updates. Stays tuned!
 
