@@ -33,6 +33,9 @@ Since I am happy with how BTTN works for Twitch.tv notification, I have started 
   - [ ] Adding CLI to work with the current state of BTTN
   - [ ] Swithiching from JSON config files to storing data in [redis database](https://en.wikipedia.org/wiki/Redis)
 
+## Current Limitations
+ - BTTN can only check for 300 YouTube channels. This is due to the YouTube quota. I don't anticipate anybody running into this issue, but I do have plans to possibly add a feature to get around this.
+
 ## Known bugs
 Here is a list of known bugs, a check marks means that they have been fixed, an empty check box mean they are affecting the most current version
   - [ ] Sometimes BTTN will send 2+ notification for YouTube video uploads after it has already been uploaded
