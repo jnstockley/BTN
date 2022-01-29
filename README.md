@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 6!!!
+Sorry for the long update gap. Updates to this project will start to become longer and with lesser changes. Since I am a college student I am going to focus on School and work over this project for the time being. I will try to post some updates here and there but progress will slow drastically. With that said, I am currently testing a verision of BTTN V2 with YouTube Premiere support. I found a way to determine if a video is a "Premiere" or not and want to make sure it's accurate. Not timieline of when I will make this version public. Stay tuned.
+
 ## Version 2.0-Alpha1!!
 I have just published the first alpha version of BTTN V2. Please read the README in the root of the directory on how to setup BTTN and read the README in the config examples folder on how to configure the config and data files. Any issues, post an issue with the `version2` lable on the issue tracker.
 
