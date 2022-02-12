@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 7!!!
+Updates to this project will be delayed since I am currently looking at using either WebSockets or WebHooks to have data sent to BTTN from YouTube and Twitch instead of getting the data every minute from them. Right now I am leaning toward WebSockets but that might change. Stay tuned.
+
 ## Version 2.0 Update 6!!!
 Sorry for the long update gap. Updates to this project will start to become longer and with lesser changes. Since I am a college student I am going to focus on School and work over this project for the time being. I will try to post some updates here and there but progress will slow drastically. With that said, I am currently testing a verision of BTTN V2 with YouTube Premiere support. I found a way to determine if a video is a "Premiere" or not and want to make sure it's accurate. Not timieline of when I will make this version public. Stay tuned.
 
