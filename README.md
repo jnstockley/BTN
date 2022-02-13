@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 8!!!
+After almost giving up on this new improvment to the program I am happy to report that I MIGHT have something working. I have just started some early testing to make sure that it works. I will update with more info if this works and how I am acomplishing this as well as any decreased delay.
+
 ## Version 2.0 Update 7!!!
 Updates to this project will be delayed since I am currently looking at using either WebSockets or WebHooks to have data sent to BTTN from YouTube and Twitch instead of getting the data every minute from them. Right now I am leaning toward WebSockets but that might change. Stay tuned.
 
