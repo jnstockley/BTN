@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 9!!!
+I am pleased to report I am testing a new version that, if all goes well, will be public. This version includes a bog fix to YouTube premieres, a lower latency way of getting Twitch.tv live stream statuses. This version will be tested throughout this week to make sure all features works since the way the program is being run has drastically changed. I'll post an update if this version works, or has any issues.
+
 ## Version 2.0 Update 8!!!
 After almost giving up on this new improvment to the program I am happy to report that I MIGHT have something working. I have just started some early testing to make sure that it works. I will update with more info if this works and how I am acomplishing this as well as any decreased delay.
 
