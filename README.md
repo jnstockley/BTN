@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 10!!!
+I am very excited to release the next version of BTTN. With that said, the next alpha version won't be released for at least a week, if there are no major issues. This new version is drastically different from the previous version. The main improvemnets are that it runs as a service, linux only for now, switches away from storing data in files and moves to storing data in a redis database, as well as a much improved way to setup BTTN. More infor on how to do all of this when the next version is released.
+
 ## Version 2.0 Update 9!!!
 I am pleased to report I am testing a new version that, if all goes well, will be public. This version includes a bog fix to YouTube premieres, a lower latency way of getting Twitch.tv live stream statuses. This version will be tested throughout this week to make sure all features works since the way the program is being run has drastically changed. I'll post an update if this version works, or has any issues.
 
