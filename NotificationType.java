@@ -1,12 +1,5 @@
 package com.github.jnstockley;
 
-
 public enum NotificationType {
-	Youtube,
-	YoutubeStream,
-	Twitch,
-	Error,
-	Update,
-	Failover
-
+	Youtube, YoutubeStream, YoutubeShort, YoutubePremiere, Twitch, Error, Update, Failover
 }

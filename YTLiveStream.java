@@ -3,15 +3,15 @@ package com.github.jnstockley;
 import org.json.simple.JSONObject;
 
 public class YTLiveStream {
-		
+
 	private boolean isLive;
-	
+
 	private String channelId;
-	
+
 	private String channelName;
-	
+
 	private String streamName;
-	
+
 	/**
 	 * @return the isLive
 	 */
@@ -67,7 +67,7 @@ public class YTLiveStream {
 	public void setStreamName(String streamName) {
 		this.streamName = streamName;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "YTLiveStream [isLive=" + isLive + ", channelId=" + channelId + ", channelName=" + channelName

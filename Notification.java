@@ -25,75 +25,63 @@ public class Notification<E> {
 	public NotificationType type;
 
 	public Notification(List<E> data) {
-		if (data.get(0).getClass().equals(YTVideo.class)) {
-			this.type = NotificationType.Youtube;
+		if (data.get(0).getClass().equals(YouTubeVideo.class)) {
 			if (data.size() == 1) {
-				YTVideo video = (YTVideo) data.get(0);
+				YouTubeVideo video = (YouTubeVideo) data.get(0);
 				try {
-					if (video.isShorts()) {
-						this.title = URLEncoder.encode(video.getChannelName() + " has posted a Short!", StandardCharsets.UTF_8.toString());
+					if (video.isPremiere()) {
+						this.type = NotificationType.YoutubePremiere;
+						this.title = URLEncoder.encode(
+								video.getChannelName() + " has scheduled a premiere for " + video.getPremiereDate(),
+								StandardCharsets.UTF_8.toString());
+					} else if (video.isShorts()) {
+						this.type = NotificationType.YoutubeShort;
+						this.title = URLEncoder.encode(video.getChannelName() + " has posted a Short!",
+								StandardCharsets.UTF_8.toString());
 					} else {
-						this.title =  URLEncoder.encode(video.getChannelName() + " has uploaded!", StandardCharsets.UTF_8.toString());
+						this.type = NotificationType.Youtube;
+						this.title = URLEncoder.encode(video.getChannelName() + " has uploaded!",
+								StandardCharsets.UTF_8.toString());
 					}
-					this.message = URLEncoder.encode(video.getVideoName(), StandardCharsets.UTF_8.toString());
-					this.url = URLEncoder.encode("https://youtube.com/watch?v=" + video.getVideoId(), StandardCharsets.UTF_8.toString());
+					this.message = URLEncoder.encode(video.getName(), StandardCharsets.UTF_8.toString());
+					this.url = URLEncoder.encode("https://youtube.com/watch?v=" + video.getId(),
+							StandardCharsets.UTF_8.toString());
 				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Logging.logger.severe(e.toString());
+					System.exit(1);
 				}
 
 			} else if (data.size() > 1) {
 				this.title = "";
 				for (int i = 0; i < data.size(); i++) {
-					YTVideo video = (YTVideo) data.get(i);
+					YouTubeVideo video = (YouTubeVideo) data.get(i);
 					this.title = this.title + video.getChannelName() + ", ";
 				}
 				try {
-					this.title = URLEncoder.encode(this.title.substring(0, this.title.length() - 2) + " have uploaded!", StandardCharsets.UTF_8.toString());
-					this.message = URLEncoder.encode("Check out their latest YoutTube videos!", StandardCharsets.UTF_8.toString());
-					this.url = URLEncoder.encode("https://youtube.com/feed/subscriptions/", StandardCharsets.UTF_8.toString());
+					this.title = URLEncoder.encode(this.title.substring(0, this.title.length() - 2) + " have uploaded!",
+							StandardCharsets.UTF_8.toString());
+					this.message = URLEncoder.encode("Check out their latest YoutTube videos!",
+							StandardCharsets.UTF_8.toString());
+					this.url = URLEncoder.encode("https://youtube.com/feed/subscriptions/",
+							StandardCharsets.UTF_8.toString());
 				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Logging.logger.severe(e.toString());
+					System.exit(1);
 				}
-			}
-		} else if (data.get(0).getClass().equals(TwitchLiveStream.class)) {
-			this.type = NotificationType.Twitch;
-			if (data.size() == 1) {
-				TwitchLiveStream channel = (TwitchLiveStream) data.get(0);
-				String channelName = channel.getChannelName();
-				try {
-					this.title = URLEncoder.encode(channelName + " is live on Twitch!", StandardCharsets.UTF_8.toString());
-					this.message = URLEncoder.encode(channel.getStreamName(), StandardCharsets.UTF_8.toString());
-					this.url = URLEncoder.encode("https://twitch.tv/" + channelName, StandardCharsets.UTF_8.toString());
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else if (data.size() > 1) {
-				for (int i = 0; i < data.size(); i++) {
-					TwitchLiveStream channel = (TwitchLiveStream) data.get(i);
-					this.title = this.title + channel.getChannelName() + ", ";
-				}
-				try {
-					this.title = URLEncoder.encode(this.title.substring(0, this.title.length() - 2) + " are live on Twitch!", StandardCharsets.UTF_8.toString());
-					this.message = URLEncoder.encode("Check them out on twitch.tv!", StandardCharsets.UTF_8.toString());
-					this.url = URLEncoder.encode("https://twitch.tv/", StandardCharsets.UTF_8.toString());
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	
 			}
 		} else if (data.get(0).getClass().equals(YTLiveStream.class)) {
 			this.type = NotificationType.YoutubeStream;
 			if (data.size() == 1) {
 				YTLiveStream ytLiveStream = (YTLiveStream) data.get(0);
 				try {
-					this.title = URLEncoder.encode(ytLiveStream.getChannelName() + " has gone live on YouTube!", StandardCharsets.UTF_8.toString());
+					this.title = URLEncoder.encode(ytLiveStream.getChannelName() + " has gone live on YouTube!",
+							StandardCharsets.UTF_8.toString());
 					this.message = URLEncoder.encode(ytLiveStream.getStreamName(), StandardCharsets.UTF_8.toString());
-					this.url = URLEncoder.encode("https://www.youtube.com/channel/" + ytLiveStream.getChannelId() + "/live/", StandardCharsets.UTF_8.toString());
+					this.url = URLEncoder.encode(
+							"https://www.youtube.com/channel/" + ytLiveStream.getChannelId() + "/live/",
+							StandardCharsets.UTF_8.toString());
 				} catch (UnsupportedEncodingException e) {
-					
+
 				}
 			} else if (data.size() > 1) {
 				for (int i = 0; i < data.size(); i++) {
@@ -101,15 +89,30 @@ public class Notification<E> {
 					this.title = this.title + channel.getChannelName() + ", ";
 				}
 				try {
-					this.title = URLEncoder.encode(this.title.substring(0, this.title.length() - 2) + " are live on YouTube!", StandardCharsets.UTF_8.toString());
+					this.title = URLEncoder.encode(
+							this.title.substring(0, this.title.length() - 2) + " are live on YouTube!",
+							StandardCharsets.UTF_8.toString());
 					this.message = URLEncoder.encode("Check them out on YouTube!", StandardCharsets.UTF_8.toString());
-					this.url = URLEncoder.encode("https://youtube.com/feed/subscriptions/", StandardCharsets.UTF_8.toString());
+					this.url = URLEncoder.encode("https://youtube.com/feed/subscriptions/",
+							StandardCharsets.UTF_8.toString());
 				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Logging.logger.severe(e.toString());
+					System.exit(1);
 				}
-				
 			}
+		}
+	}
+
+	public Notification(TwitchLiveStream stream) {
+		this.type = NotificationType.Twitch;
+		String channelName = stream.getChannelName();
+		try {
+			this.title = URLEncoder.encode(channelName + " is live on Twitch!", StandardCharsets.UTF_8.toString());
+			this.message = URLEncoder.encode(stream.getStreamName(), StandardCharsets.UTF_8.toString());
+			this.url = URLEncoder.encode("https://twitch.tv/" + channelName, StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException e) {
+			Logging.logger.severe(e.toString());
+			System.exit(1);
 		}
 	}
 
@@ -118,11 +121,12 @@ public class Notification<E> {
 		return "Notification [title=" + title + ", message=" + message + ", url=" + url + ", type=" + type + "]";
 	}
 
-	public boolean send(Auth auth) {
+	public boolean send(AlertzyAuth auth) {
 		String keysStr = "";
-		for (String key : auth.getAlertzyAccountKeys()) {
+		for (String key : auth.getAccountKeys()) {
 			keysStr += key + "_";
 		}
+		keysStr = keysStr.substring(0, keysStr.length() - 1);
 		String url = "https://alertzy.app/send?accountKey=" + keysStr + "&title=" + this.title + "&message="
 				+ this.message + "&link=" + this.url;
 		OkHttpClient client = new OkHttpClient();
@@ -133,12 +137,15 @@ public class Notification<E> {
 			JSONObject responseJSON = (JSONObject) parser.parse(response.body().string());
 			String success = responseJSON.get("response").toString();
 			if (success.equalsIgnoreCase("success")) {
+				Logging.logger.info("Sent Alertzy Notification: " + this.toString());
 				return true;
 			} else {
+				Logging.logger.severe("Error sending Alertzy Notification: Sent to: " + responseJSON.get("sentTo")
+						+ ", Error: " + responseJSON.get("error"));
 				return false;
 			}
 		} catch (IOException | ParseException e) {
-			// TODO Error logging
+			Logging.logger.severe(e.toString());
 			return false;
 		}
 	}

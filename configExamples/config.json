@@ -1,7 +1,0 @@
-{
-	"twitchAuthorizationKey": "follow steps here https://dev.twitch.tv/docs/api/",
-	"twitchClientId": "ENTER CLIENT_ID",
-	"twitchSecret": "ENTER CLIENT_SECRET",
-	"youtubeAPIKey":"ENTER YOUTUBE_API_KEY",
-	"alertzyAccountKeys": ["ENTER ALERTZY_API_KEY"]
-}
