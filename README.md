@@ -47,29 +47,23 @@ Since I am happy with how BTTN works for Twitch.tv notification, I have started 
   - [ ] Possible New Name (Suggestions Welcome)
 
 ## Currently Working on
-  - [ ] Bug testing and fixing
-  - [ ] Adding CLI to work with the current state of BTTN
-  - [ ] Swithiching from JSON config files to storing data in [redis database](https://en.wikipedia.org/wiki/Redis)
+  - [ ] Adding support for removing and updating YouTube and YouTube live channels
+  - [ ] Better argument handling
+  - [ ] Better error messages
+  - [ ] Improved speed, especially for YouTube Live Channels
 
 ## Current Limitations
- - BTTN can only check for 300 YouTube channels. This is due to the YouTube quota. I don't anticipate anybody running into this issue, but I do have plans to possibly add a feature to get around this.
+ - BTTN can only check for 300 YouTube channels. This is due to the YouTube quota. I don't anticipate anybody running into this issue, but I do have plans to possibly add a feature to get around this. (Might not be a thing with Alpha-2, need to look into it)
 
 ## Known bugs
 Here is a list of known bugs, a check marks means that they have been fixed, an empty check box mean they are affecting the most current version
-  - [ ] Sometimes BTTN will send 2+ notification for YouTube video uploads after it has already been uploaded
+  - [ ] BTTN will crash at random time intervals and restarts automatically
+  - [ ] Info/error messages are inconsitent or wrong
 
 ## What you need for BTTN to work
  1. Java 17+
  2. A [YouTube V3 Data API key](https://developers.google.com/youtube/v3/getting-started)
  3. A [Twitch.TV client ID and client secret](https://dev.twitch.tv/docs/v5)
  4. An [Alertzy API Key](https://alertzy.app)
- 5. A computer/server running 24/7
-
-# How to setup BTTN
- 1. Run BTTN using this command `java -jar /path/to/BTTN.jar`
- 2. This will create a folder in the current user's directory with 4 JSON files
- 3. All 4 of these JSON files need to valid in order for BTTN to run (I plan on changing this is newer versions)
- 4. First you'll need to edit the `config.json` file to contain these keys
- 5. Second you'll need to edit the `twitch.json`, `youtube.json`, and `youtubeLive.json` files to contain the respective channels, more info can be found in the example config files
- 6. Now I reccomend manually running BTTN with the previous command to make sure their aren't any errors.
- 7. After there are no errors, set up your computer/server to run BTTN every minute either with [cron](https://mkyong.com/java/java-cron-job-to-run-a-jar-file/) or [task scheduler](https://treehozz.com/how-do-i-run-a-java-program-in-task-scheduler)
+ 5. A redis server locally or cloud
+ 6. A computer/server running 24/7
