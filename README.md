@@ -1,7 +1,7 @@
 # BTTN (Better Twitch.tv Notifications)
 
 ## Version 2.0-Alpha2!!!
-The seconds alpha version of BTTN-2 has been released. This version still have plenty of bugs and needs lots of love. Only use this version if you are ok with hiccups while setting it up and running the program. This version is very different from the previous version and thus and new steps needed to setup the program. Please read over the setup.md file
+The seconds alpha version of BTTN-2 has been released. This version still have plenty of bugs and needs lots of love. Only use this version if you are ok with hiccups while setting it up and running the program. This version is very different from the previous version and thus and new steps needed to setup the program. Please read over the [setup.md](setup.md) file
 
 ## Version 2.0 Update 10!!!
 I am very excited to release the next version of BTTN. With that said, the next alpha version won't be released for at least a week, if there are no major issues. This new version is drastically different from the previous version. The main improvemnets are that it runs as a service, linux only for now, switches away from storing data in files and moves to storing data in a redis database, as well as a much improved way to setup BTTN. More infor on how to do all of this when the next version is released.
