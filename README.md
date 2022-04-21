@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 11!
+Sorry for the lack of updates! This project is not dead. I have been very busy latey and not super motivated to work on this project to be honest. The main reason is becuase I believe the current version has become unmanagable for me to work on. With that said, I am currently in the process of writing this from the ground up, AGAIN. This time I am using the Google API java client to hopefully keep the code more manageable and under control as well as improve reliability. No time frame on the next update sadly.
+
 ## Version 2.0-Alpha2!!!
 The seconds alpha version of BTTN-2 has been released. This version still have plenty of bugs and needs lots of love. Only use this version if you are ok with hiccups while setting it up and running the program. This version is very different from the previous version and thus and new steps needed to setup the program. Please read over the [setup.md](setup.md) file
 
