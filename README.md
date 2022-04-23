@@ -1,5 +1,8 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## Version 2.0 Update 12!!
+I am currently testing a new version of BTTN that strickly checks if a new YouTube video is uploaded and makes sure it's classifed correctly, i.e, YouTube Premiere, YouTube short or a regular video. I am going to test this for at least a week to make sure all parts of it work as expected and then Ill implement the remaing parts and test. FYI when this new version is released, it will not be compatible with ANY previous versions of BTTN, and sadly all data will need to be re-entered maually.
+
 ## Version 2.0 Update 11!
 Sorry for the lack of updates! This project is not dead. I have been very busy latey and not super motivated to work on this project to be honest. The main reason is becuase I believe the current version has become unmanagable for me to work on. With that said, I am currently in the process of writing this from the ground up, AGAIN. This time I am using the Google API java client to hopefully keep the code more manageable and under control as well as improve reliability. No time frame on the next update sadly.
 
