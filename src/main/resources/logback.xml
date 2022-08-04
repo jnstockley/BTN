@@ -1,0 +1,29 @@
+<configuration>
+    <property name="HOME_LOG" value="logs/BTTN.log"/>
+
+    <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${HOME_LOG}</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- each archived file, size max 10MB -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
+            <totalSizeCap>20GB</totalSizeCap>
+            <!-- 60 days to keep -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} MDC=%X{user} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.github.twitch4j" level="OFF"/>
+    <logger name="com.github.philippheuer" level="OFF"/>
+    <logger name="com.netflix" level="OFF"/>
+
+    <root level="debug">
+        <appender-ref ref="FILE-ROLLING" />
+    </root>
+</configuration>
