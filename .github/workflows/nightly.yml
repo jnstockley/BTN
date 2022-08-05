@@ -49,4 +49,4 @@ jobs:
         with:
             artifacts: "target/*.jar"
             prerelease: true
-            tag_name: ${{ github.ref }}
+            tag: ${{ github.ref }}
