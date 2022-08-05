@@ -43,3 +43,9 @@ jobs:
         run: |
           cd target
           ls -a
+          
+      - name: Step 6 - Create Release
+        uses: ncipollo/release-action@v1.10.0
+        with:
+         artifacts: "target/*.jar"
+         prerelease: true
