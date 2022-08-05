@@ -62,8 +62,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TIME: "${{ steps.current-time.outputs.readableTime }}"
         with:
-          tag_name: nightly-${{ env.TIME }}
-          release_name: nightly-${{ env.TIME }}
+          tag_name: echo "nightly-$TIME" #nightly-${{ env.TIME }}
+          release_name: echo "nightly-$TIME" #nightly-${{ env.TIME }}
           prerelease: true
           asset_files: BSN.jar
     
