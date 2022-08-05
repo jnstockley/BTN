@@ -50,3 +50,5 @@ jobs:
             artifacts: "target/*.jar"
             prerelease: true
             tag: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
