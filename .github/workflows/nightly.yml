@@ -45,8 +45,8 @@ jobs:
           ls -a
           
       - name: Step 6 - Create Release
-      -  uses: actions/setup-java@v3.4.1
-      -  uses: ncipollo/release-action@v1.10.0
-         with:
+        uses: ncipollo/release-action@v1.10.0
+        with:
             artifacts: "target/*.jar"
             prerelease: true
+            tag: ""
