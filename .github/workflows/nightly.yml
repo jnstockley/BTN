@@ -58,9 +58,8 @@ jobs:
     steps:
       - name: Step 1 - Download Jar
         uses: actions/download-artifact@v3.0.0
-        with:
-          name: BSN.jar
-          path: target/
+        
+          
       - name: Step 2 - Create Release
         uses: ncipollo/release-action@v1.10.0
         env:
@@ -69,6 +68,6 @@ jobs:
           tag: nightly-${{ github.run_number }}
           name: nightly-${{ github.run_number }}
           prerelease: true
-          artifacts: target/BSN.jar
+          artifacts: BSN.jar
     
     
