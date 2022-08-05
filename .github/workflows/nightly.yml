@@ -60,11 +60,12 @@ jobs:
         uses: Hs1r1us/Release-AIO@v1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          name: echo "nightly-${{ steps.current-time.outputs.readableTime }}"
+          NAME: echo "nightly-${{ steps.current-time.outputs.readableTime }}"
         with:
           tag_name: ${{ env.NAME }} #nightly-${{ env.TIME }}
           release_name: ${{ env.NAME }} #nightly-${{ env.TIME }}
           prerelease: true
           asset_files: BSN.jar
+      - run: echo $NAME
     
     
