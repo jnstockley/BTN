@@ -55,7 +55,7 @@ jobs:
         uses: josStorer/get-current-time@v2.0.0
         id: current-date
         with:
-          format: YYYYMMDD-HH:M:S
+          format: YYYYMMDD-HH
       - name: Step 3 - Create Release
         uses: Hs1r1us/Release-AIO@v1.0
         env:
