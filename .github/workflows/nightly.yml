@@ -54,13 +54,13 @@ jobs:
         
           
       - name: Step 2 - Create Release
-        uses: softprops/action-gh-release@v0.1.14
+        uses: Hs1r1us/Release-AIO@v1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
         with:
           tag_name: nightly-${{ github.run_number }}
-          name: nightly-${{ github.run_number }}
+          release_name: nightly-${{ github.run_number }}
           prerelease: true
-          files: BSN.jar
+          asset_files: BSN.jar
     
     
