@@ -58,7 +58,10 @@ jobs:
           format: YYYYMMDD-HH
         env:
           NAME: echo "nightly-${{ steps.current-time.outputs.readableTime }}"
-      - run: echo {{ steps.current-time.outputs.readableTime }}
+      - name: testDate
+        env:
+          R_TIME: "${{ steps.current-time.outputs.readableTime }}"
+        run: echo $R_TIME
       - name: Step 3 - Create Release
         uses: Hs1r1us/Release-AIO@v1.0
         env:
