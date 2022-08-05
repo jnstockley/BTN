@@ -48,4 +48,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: target/*.jar
+          files: target/BSN-2.0-alpha3.jar
