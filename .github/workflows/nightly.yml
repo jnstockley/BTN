@@ -51,14 +51,18 @@ jobs:
     steps:
       - name: Step 1 - Download Jar
         uses: actions/download-artifact@v3.0.0
-        
-          
-      - name: Step 2 - Create Release
+      - name: Step 2 - Get Current Date & Time
+        uses: josStorer/get-current-time@v2.0.0
+        id: current-date
+        with:
+          format: YYYYMMDD-HH:M:S
+      - name: Step 3 - Create Release
         uses: Hs1r1us/Release-AIO@v1.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TIME: "${{ steps.current-time.outputs.readableTime }}"
         with:
-          tag_name: nightly-${{ github.run_number }}
+          tag_name: nightly-$TIME
           release_name: nightly-${{ github.run_number }}
           prerelease: true
           asset_files: BSN.jar
