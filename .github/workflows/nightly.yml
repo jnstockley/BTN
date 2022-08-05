@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: BSN.jar
-          path: target/
+          path: target/*.jar
           
   release-jar:
     name: Release Jar
@@ -60,6 +60,7 @@ jobs:
         uses: actions/download-artifact@v3.0.0
         with:
           name: BSN.jar
+          path: target/
       - name: Step 2 - Create Release
         uses: ncipollo/release-action@v1.10.0
         env:
