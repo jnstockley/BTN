@@ -45,10 +45,6 @@ jobs:
           ls -a
           
       - name: Step 6 - Create Release
-        uses: ncipollo/release-action@v1.10.0
+        uses: softprops/action-gh-release@v1
         with:
-            artifacts: "target/*.jar"
-            prerelease: true
-            tag: ${{ github.ref }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+          files: target/*.txt
