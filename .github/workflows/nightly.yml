@@ -69,6 +69,6 @@ jobs:
           tag: nightly-${{ github.run_number }}
           name: nightly-${{ github.run_number }}
           prerelease: true
-          artifacts: BSN.jar
+          artifacts: target/BSN.jar
     
     
