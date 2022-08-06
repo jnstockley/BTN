@@ -46,7 +46,7 @@ jobs:
   release:
     name: Release Jar
     runs-on: ubuntu-latest
-  #  needs: build
+    needs: build
     
     steps:
       - name: Get current date
