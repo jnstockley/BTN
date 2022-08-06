@@ -64,7 +64,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: echo $TAG_NAME
-          release_name: echo $RELEASE_NAME
+          tag_name: nightly-${{ steps.date.outputs.date }}
+          release_name: nightly-${{ steps.date.outputs.date }}
           prerelease: true
           asset_files: BSN.jar
