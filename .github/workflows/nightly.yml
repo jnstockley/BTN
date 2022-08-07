@@ -53,6 +53,17 @@ jobs:
         run: mvn -B deploy --file pom.xml
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Step 7 - Create Doc
+        run: mvn dokka:dokka -f pom.xml
+      - name: Step 8 - Move Doc folder
+        run: mv -r target/dokka/* docs
+      - name: Step 9 - Push new Doc
+        uses: s0/git-publish-subdir-action@v2.5.1
+        env:
+          REPO: self
+          BRANCH: nightly
+          FOLDER: docs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
   release:
     name: Release Jar
