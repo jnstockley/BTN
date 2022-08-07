@@ -42,6 +42,10 @@ jobs:
         with:
           name: BSN.jar
           path: target/*.jar
+      - name: Step 5 - Create Package
+        run: mvn -B deploy --file pom.xml
+        env:
+            github-token: ${{ github.token }}
           
   release:
     name: Release Jar
