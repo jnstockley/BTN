@@ -36,6 +36,6 @@ target/*
 *.bak
 .idea/*
 *.iml
-META-INF/*
+# META-INF/*
 logs/*
 out/*
