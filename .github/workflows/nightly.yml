@@ -58,7 +58,8 @@ jobs:
     steps:
       - name: Step 1 - Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y/%m/%d %H:%M:%S')"
+        #run: echo "::set-output name=date::$(date +'%Y/%m/%d %H:%M:%S')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Step 2 - Download Jar
         uses: actions/download-artifact@v3.0.0
       - name: Step 3 - Create Release
