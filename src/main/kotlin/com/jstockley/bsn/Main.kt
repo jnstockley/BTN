@@ -43,6 +43,8 @@ fun main(args: Array<String>) {
         exitProcess(CommandLine(Setup()).setSubcommandsCaseInsensitive(true).execute(*args))
     }
 
+    print("Test")
+
     if (hasConnection()){
         startingMessage(accountKeys)
         logger.info { "Sent Starting Message!" }
