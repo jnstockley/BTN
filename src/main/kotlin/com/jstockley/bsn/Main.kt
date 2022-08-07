@@ -44,21 +44,21 @@ fun main(args: Array<String>) {
     }
 
     if (hasConnection()){
-        //startingMessage(accountKeys)
+        startingMessage(accountKeys)
         logger.info { "Sent Starting Message!" }
     }
 
     //addLiveStreamChannels("subscriptions.csv")
 
     val youtubeUpload = Thread(YouTubeUpload())
-    //youtubeUpload.start()
+    youtubeUpload.start()
 
 
     val youtubeLive = Thread(YouTubeLive())
     youtubeLive.start()
 
     val twitch = Thread(TwitchLive())
-    //twitch.start()
+    twitch.start()
 
 }
 
