@@ -39,13 +39,15 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Step 3 - Build Maven Project
         run: mvn -B package --file pom.xml
-          
-      - name: Step 4 - Upload Artifact
+      - name: Step 4 - Rename Jar
+        run: mv target/*-jar-with-dependencies.jar target/BSN.jar
+      - name: Step 5 - Upload Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
           name: BSN.jar
-          path: target/*-jar-with-dependencies.jar
-      - name: Step 5 - Create Package
+          #path: target/*-jar-with-dependencies.jar
+          path: target/BSN.jar
+      - name: Step 6 - Create Package
         run: mvn -B deploy --file pom.xml
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
