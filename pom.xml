@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>BSN</artifactId>
+    <artifactId>bsn</artifactId>
     <groupId>com.jstockley</groupId>
-    <version>2.0-alpha3</version>
+    <version>2.0-alpha3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Better Social Notifications</name>
