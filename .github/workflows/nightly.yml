@@ -19,6 +19,9 @@ jobs:
     name: Build Jar
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      packages: write 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -45,7 +48,8 @@ jobs:
       - name: Step 5 - Create Package
         run: mvn -B deploy --file pom.xml
         env:
-            github-token: ${{ secrets.MAVEN_TOKEN }}
+            # GITHUB_TOKEN: ${{ secrets.MAVEN_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
   release:
     name: Release Jar
