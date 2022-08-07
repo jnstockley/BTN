@@ -56,18 +56,12 @@ jobs:
     needs: build
     
     steps:
-      - name: Get current date
+      - name: Step 1 - Get current date
         id: date
-        # date "+%d/%m/%y %H:%M:%S"
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-      - name: Test with environment variables
-        run: echo $TAG_NAME - $RELEASE_NAME
-        env:
-          TAG_NAME: nightly-tag-${{ steps.date.outputs.date }}
-          RELEASE_NAME: nightly-release-${{ steps.date.outputs.date }}
-      - name: Step 1 - Download Jar
+      - name: Step 2 - Download Jar
         uses: actions/download-artifact@v3.0.0
-      - name: Step 2 - Create Release
+      - name: Step 3 - Create Release
         uses: Hs1r1us/Release-AIO@v1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
