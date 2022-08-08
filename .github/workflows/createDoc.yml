@@ -2,18 +2,30 @@ name: Create-Doc
 
 # Controls when the workflow will run
 on: workflow_dispatch
-      
+
+
 jobs:
   # This workflow contains a single job called "build"
   doc:
-    name: Build Doc
+    name: Create Doc
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     permissions: 
       contents: read
       packages: write 
-      
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: actions/checkout@v3
+        name: Step 1 - Checkout Nightly Branch
+  
+      # Runs a single command using the runners shell
+      - name: Step 2 - Setup JDK 17
+        uses: actions/setup-java@v3.4.1
+        with: 
+          java-version: 17
+          distribution: 'temurin'
+          
       - name: Step 7 - Create Doc
         run: mvn dokka:dokka -f pom.xml
       - name: Step 8 - Move Doc folder
