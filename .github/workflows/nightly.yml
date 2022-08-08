@@ -57,11 +57,12 @@ jobs:
       - name: Step 8 - Move Doc folder
         run: mv target/dokka/* docs
       - name: Step 9 - Push new Doc
-        uses: casperdcl/push-dir@v1.0.0
+        uses: peaceiris/actions-gh-pages@v3.7.3
         with:
-          message: update docs
-          branch: nightly
-          dir: docs
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: nightly
+          publish_dir: ./docs
+          destination_dir: docs
           
   release:
     name: Release Jar
