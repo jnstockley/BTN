@@ -1,8 +1,5 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Nightly-Build
 
-# Controls when the workflow will run
 on:  
 
   push:
@@ -10,51 +7,43 @@ on:
     paths:
       - 'src/**'
       - 'pom.xml'
-      - '.github/**'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
- # build:
- #   name: Build Jar
- #   # The type of runner that the job will run on
- #   runs-on: ubuntu-latest
- #   permissions: 
- #     contents: read
- #     packages: write 
+  build:
+    name: Build Jar
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      packages: write 
 
- #   # Steps represent a sequence of tasks that will be executed as part of the job
- #   steps:
- #     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
- #     - uses: actions/checkout@v3
- #       name: Step 1 - Checkout Nightly Branch
+    steps:
+      - uses: actions/checkout@v3
+        name: Step 1 - Checkout Nightly Branch
   
-      # Runs a single command using the runners shell
- #     - name: Step 2 - Setup JDK 17
- #       uses: actions/setup-java@v3.4.1
- #       with: 
- #         java-version: 17
- #         distribution: 'temurin'
+      - name: Step 2 - Setup JDK 17
+        uses: actions/setup-java@v3.4.1
+        with: 
+          java-version: 17
+          distribution: 'temurin'
 
-      # Runs a set of commands using the runners shell
- #     - name: Step 3 - Build Maven Project
- #       run: mvn -B package --file pom.xml
- #     - name: Step 4 - Rename Jar
- #       run: mv target/*-jar-with-dependencies.jar target/BSN.jar
- #     - name: Step 5 - Upload Artifact
- #       uses: actions/upload-artifact@v3.1.0
- #       with:
- #         name: BSN.jar
- #         path: target/BSN.jar
- #     - name: Step 6 - Create Package
- #       run: mvn -B deploy --file pom.xml
- #       env:
- #           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Step 3 - Build Maven Project
+        run: mvn -B package --file pom.xml
+      - name: Step 4 - Rename Jar
+        run: mv target/*-jar-with-dependencies.jar target/BSN.jar
+      - name: Step 5 - Upload Artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: BSN.jar
+          path: target/BSN.jar
+      - name: Step 6 - Create Package
+        run: mvn -B deploy --file pom.xml
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
   release:
     name: Release Jar
     runs-on: ubuntu-latest
-    needs: doc
+    needs: build
     
     steps:
       - name: Step 1 - Get current date
@@ -93,20 +82,7 @@ jobs:
         run: |
            mkdir -p docs
            mv target/dokka/* docs
-     # - name: Step 4 - Upload Docs
-     #   run: |
-     #     mkdir -p docs
-     #     mv target/dokka/* docs
-     #     git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-     #     git config --local user.name "github-actions[bot]"
-     #     git add docs/*
-     #     git commit -m "Update Docs" -a
-     # - name: Step 5 - Push changes
-     #   uses: ad-m/github-push-action@v0.6.0
-     #   with:
-     #     github_token: ${{ secrets.GITHUB_TOKEN }}
-     #     branch: ${{ github.ref }} #nightly
-      - name: Publish docs
+      - name: Step 5 - Publish docs
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
