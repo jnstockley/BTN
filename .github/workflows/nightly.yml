@@ -108,6 +108,7 @@ jobs:
      #     branch: ${{ github.ref }} #nightly
       - name: Publish docs
         run: |
+          git init
           git config user.email "jack@jstockley.com"
           git config --local user.name "Jack Stockley"
           git add docs
