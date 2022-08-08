@@ -7,9 +7,10 @@ on:
 
   push:
     branches: [ "nightly" ]
-    #paths:
-    #  - 'src/**'
-    #  - 'pom.xml'
+    paths:
+      - 'src/**'
+      - 'pom.xml'
+      - '.github/**'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -53,7 +54,7 @@ jobs:
       - name: Step 7 - Create Doc
         run: mvn dokka:dokka -f pom.xml
       - name: Step 8 - Move Doc folder
-        run: mv -r target/dokka/* docs
+        run: mv target/dokka/* docs
       - name: Step 9 - Push new Doc
         uses: s0/git-publish-subdir-action@v2.5.1
         env:
