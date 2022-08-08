@@ -37,22 +37,23 @@ jobs:
           distribution: 'temurin'
 
       # Runs a set of commands using the runners shell
-      - name: Step 3 - Build Maven Project
-        run: mvn -B package --file pom.xml
-      - name: Step 4 - Rename Jar
-        run: mv target/*-jar-with-dependencies.jar target/BSN.jar
-      - name: Step 5 - Upload Artifact
-        uses: actions/upload-artifact@v3.1.0
-        with:
-          name: BSN.jar
-          #path: target/*-jar-with-dependencies.jar
-          path: target/BSN.jar
-      - name: Step 6 - Create Package
-        run: mvn -B deploy --file pom.xml
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Step 3 - Build Maven Project
+      #  run: mvn -B package --file pom.xml
+      #- name: Step 4 - Rename Jar
+      #  run: mv target/*-jar-with-dependencies.jar target/BSN.jar
+      #- name: Step 5 - Upload Artifact
+      #  uses: actions/upload-artifact@v3.1.0
+      #  with:
+      #    name: BSN.jar
+      #    #path: target/*-jar-with-dependencies.jar
+      #    path: target/BSN.jar
+      #- name: Step 6 - Create Package
+      #  run: mvn -B deploy --file pom.xml
+      #  env:
+      #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Step 7 - Create Doc
         run: mvn dokka:dokka -f pom.xml
+      - run: mkdir -p docs
       - name: Step 8 - Move Doc folder
         run: mv target/dokka/* docs
       - name: Step 9 - Push new Doc
