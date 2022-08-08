@@ -108,7 +108,7 @@ jobs:
      #     branch: ${{ github.ref }} #nightly
       - name: Publish docs
         run: |
-          git remote set-url https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+          git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
           git config --local user.name "Jack Stockley"
           git add docs
