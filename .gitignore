@@ -39,5 +39,5 @@ target/*
 # META-INF/*
 logs/*
 out/*
-docs/*
+# docs/*
 
