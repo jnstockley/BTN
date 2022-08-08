@@ -38,8 +38,6 @@ fun main(args: Array<String>) {
      * Move list to GUI
       */
 
-    println("")
-
     if (args.isNotEmpty()) {
         exitProcess(CommandLine(Setup()).setSubcommandsCaseInsensitive(true).execute(*args))
     }
