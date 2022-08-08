@@ -1,0 +1,26 @@
+name: Create-Doc
+
+# Controls when the workflow will run
+on: workflow_dispatch
+      
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    name: Build Jar
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      packages: write 
+
+      - name: Step 7 - Create Doc
+        run: mvn dokka:dokka -f pom.xml
+      - name: Step 8 - Move Doc folder
+        run: mv -r target/dokka/* docs
+      - name: Step 9 - Push new Doc
+        uses: s0/git-publish-subdir-action@v2.5.1
+        env:
+          REPO: self
+          BRANCH: nightly
+          FOLDER: docs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
