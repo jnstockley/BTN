@@ -62,7 +62,6 @@ jobs:
           message: update docs
           branch: nightly
           dir: docs
-          history: false
           
   release:
     name: Release Jar
