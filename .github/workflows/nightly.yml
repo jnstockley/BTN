@@ -113,4 +113,4 @@ jobs:
           git config --local user.name "Jack Stockley"
           git add docs
           git commit -m "Updated Docs"
-          git push nightly
+          git push origin nightly
