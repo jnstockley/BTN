@@ -60,7 +60,7 @@ jobs:
           git add docs/*
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git commit -m "Update Docs"
+          git commit -m "Update Docs" -a
           git push origin nightly
       #- name: Step 9 - Push new Doc
       #  uses: peaceiris/actions-gh-pages@v3.7.3
