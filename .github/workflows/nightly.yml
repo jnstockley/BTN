@@ -55,7 +55,7 @@ jobs:
         run: mvn dokka:dokka -f pom.xml
       - run: mkdir -p docs
       - name: Step 8 - Upload Docs
-      - run:
+        run:
           mv target/dokka/* docs
           git add docs/*
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
