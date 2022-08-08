@@ -30,6 +30,7 @@ jobs:
         name: Step 1 - Checkout Nightly Branch
         with:
           persist-credentials: false
+          fetch-depth: 0
   
       # Runs a single command using the runners shell
       - name: Step 2 - Setup JDK 17
