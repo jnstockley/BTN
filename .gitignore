@@ -40,4 +40,7 @@ target/*
 logs/*
 out/*
 docs/*
+*.html
+*.js
+*.css
 
