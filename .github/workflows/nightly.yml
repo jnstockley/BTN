@@ -53,13 +53,13 @@ jobs:
       #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Step 7 - Create Doc
         run: mvn dokka:dokka -f pom.xml
-      - run: mkdir -p docs
       - name: Step 8 - Upload Docs
         run:
+          mkdir -p docs
           mv target/dokka/* docs
           git add docs/*
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
           git commit -m "Update Docs"
           git push origin nightly
       #- name: Step 9 - Push new Doc
