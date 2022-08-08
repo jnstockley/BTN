@@ -59,15 +59,15 @@ jobs:
         run: |
           mkdir -p docs
           mv target/dokka/* docs
-          git config --global user.email "jack@jstockley.com"
-          git config --global user.name "Jack Stockley"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add docs/*
           git commit -m "Update Docs" -a
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: nightly
+          branch: ${{ github.ref }} #nightly
       #- name: Step 9 - Push new Doc
       #  uses: peaceiris/actions-gh-pages@v3.7.3
       #  with:
