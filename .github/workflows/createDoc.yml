@@ -12,7 +12,8 @@ jobs:
     permissions: 
       contents: read
       packages: write 
-
+      
+    steps:
       - name: Step 7 - Create Doc
         run: mvn dokka:dokka -f pom.xml
       - name: Step 8 - Move Doc folder
