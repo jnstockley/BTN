@@ -107,8 +107,7 @@ jobs:
      #     github_token: ${{ secrets.GITHUB_TOKEN }}
      #     branch: ${{ github.ref }} #nightly
       - name: Publish docs
-        uses: docploy/docploy-action@v1.3.0
-        with:
-          baseUrl: 'https://jnstockley.github.io/docs/'
-          docsDir: 'docs'
-          pagesBranch: 'nightly'
+        run: |
+          git add docs
+          git commit -m "Updated Docs"
+          git push
