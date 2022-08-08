@@ -109,7 +109,7 @@ jobs:
       - name: Publish docs
         run: |
           git init
-          git remote add origin git@github.com:jnstockley/BTTN.git 
+          git remote set-url origin git@github.com:jnstockley/BTTN.git 
           git config user.email "jack@jstockley.com"
           git config --local user.name "Jack Stockley"
           git add docs
