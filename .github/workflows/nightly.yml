@@ -7,7 +7,7 @@ on:
     paths:
       - 'src/**'
       - 'pom.xml'
-      - 'nightly.yml'
+      - '.github/**'
 
 jobs:
   build:
