@@ -56,14 +56,17 @@ jobs:
       - run: mkdir -p docs
       - name: Step 8 - Move Doc folder
         run: mv target/dokka/* docs
-      - name: Step 9 - Push new Doc
-        uses: peaceiris/actions-gh-pages@v3.7.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: nightly
-          publish_dir: ./docs
-          destination_dir: docs
-          commit_message: update docs
+      - run: git add docs/*
+      - run: git commit -m "Update Docs"
+      - run: git push origin nightly
+      #- name: Step 9 - Push new Doc
+      #  uses: peaceiris/actions-gh-pages@v3.7.3
+      #  with:
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    publish_branch: nightly
+      #    publish_dir: ./docs
+      #    destination_dir: docs
+      #    commit_message: update docs
           
   release:
     name: Release Jar
