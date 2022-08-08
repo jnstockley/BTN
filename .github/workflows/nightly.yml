@@ -59,6 +59,8 @@ jobs:
         run: |
           mkdir -p docs
           mv target/dokka/* docs
+          git config --global user.email "jack@jstockley.com"
+          git config --global user.name "Jack Stockley"
           git add docs/*
           git commit -m "Update Docs" -a
           git push origin nightly
