@@ -1,4 +1,4 @@
-name: Build-Nightly-2
+name: Build-Nightly
 
 on:  
   push:
