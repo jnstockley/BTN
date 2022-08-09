@@ -3,6 +3,7 @@ name: Create-Doc-Nightly
 on:  
 
   push:
+    workflow_dispatch:
     branches: [ "nightly" ]
     paths:
       - 'src/**'
