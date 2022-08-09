@@ -1,13 +1,13 @@
 name: Build-Nightly
 
 on:  
-  workflow_dispatch:
+  workflow_dispatch
   
-  push:
-    branches: [ "nightly" ]
-    paths:
-      - 'src/**'
-      - 'pom.xml'
+  #push:
+  #  branches: [ "nightly" ]
+  #  paths:
+  #    - 'src/**'
+  #    - 'pom.xml'
 
 jobs:
   build:
