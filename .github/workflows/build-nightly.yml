@@ -1,9 +1,9 @@
 name: Build-Nightly
 
 on:  
-
+  workflow_dispatch:
+  
   push:
-    workflow_dispatch:
     branches: [ "nightly" ]
     paths:
       - 'src/**'
