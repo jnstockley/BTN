@@ -1,13 +1,12 @@
 name: Create-Doc-Nightly
 
 on:  
-  workflow_dispatch:
-
   push:
     branches: [ "nightly" ]
     paths:
       - 'src/**'
       - 'pom.xml'
+  workflow_dispatch:
 
 jobs:
   doc:
