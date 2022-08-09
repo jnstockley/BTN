@@ -1,13 +1,12 @@
 name: Deploy-Nightly
 
-on:  
-  workflow_dispatch:
-
+on:
   push:
     branches: [ "nightly" ]
     paths:
       - 'src/**'
       - 'pom.xml'
+  workflow_dispatch:
 
 jobs:
   build:

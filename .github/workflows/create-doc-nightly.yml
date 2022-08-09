@@ -1,13 +1,12 @@
 name: Create-Doc-Nightly
 
 on:  
-  workflow_dispatch:
-
   push:
     branches: [ "nightly" ]
     paths:
       - 'src/**'
       - 'pom.xml'
+  workflow_dispatch:
 
 jobs:
   doc:
@@ -38,6 +37,7 @@ jobs:
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
           git config --local user.name "Jack Stockley"
+          git rm -r docs
           git add docs
           git commit -m "Updated Docs"
           git push origin nightly
