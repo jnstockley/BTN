@@ -32,6 +32,7 @@ jobs:
            rm -rf docs
            mkdir -p docs
            mv target/dokka/* docs
+           
      # git rm -r --cached docs
      # git rm -r docs
       - name: Step 5 - Publish docs
