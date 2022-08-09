@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'pom.xml'
+ 
   workflow_dispatch:
 
 jobs:
@@ -24,20 +25,26 @@ jobs:
         with: 
           java-version: 17
           distribution: 'temurin'
-      - name: Step 3 - Create Doc
-        run: mvn dokka:dokka -f pom.xml
-      - name: Step 4 - Move Docs
-        run: |
-           rm -rf docs
-           mkdir -p docs
-           mv target/dokka/* docs
-     # git rm -r --cached docs
-      - name: Step 5 - Publish docs
+      - name: Step 3 - Remove Doc
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
           git config --local user.name "Jack Stockley"
           git rm -r docs
-          git add docs
+          git commit -m "Removed Docs"
+          git push origin nightly
+      - name: Step 4 - Create Doc
+        run: mvn dokka:dokka -f pom.xml
+      - name: Step 5 - Move Docs
+        run: |
+           rm -rf docs
+           mkdir -p docs
+           mv target/dokka/* docs
+      - name: Step 6 - Publish docs
+        run: |
+          git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+          git config user.email "jack@jstockley.com"
+          git config --local user.name "Jack Stockley"
+          git add -f docs
           git commit -m "Updated Docs"
           git push origin nightly
