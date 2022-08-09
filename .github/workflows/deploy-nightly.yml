@@ -1,6 +1,6 @@
 name: Deploy-Nightly
 
- on:
+on:
    push:
      branches: [ "nightly" ]
      paths:
@@ -8,7 +8,7 @@ name: Deploy-Nightly
        - 'pom.xml'
    workflow_dispatch:
 
- jobs:
+jobs:
    build:
      name: Deploy Jar
      runs-on: ubuntu-latest
