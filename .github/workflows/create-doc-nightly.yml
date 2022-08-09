@@ -1,9 +1,9 @@
 name: Create-Doc-Nightly
 
 on:  
+  workflow_dispatch:
 
   push:
-    workflow_dispatch:
     branches: [ "nightly" ]
     paths:
       - 'src/**'
@@ -29,6 +29,7 @@ jobs:
         run: mvn dokka:dokka -f pom.xml
       - name: Step 4 - Move Docs
         run: |
+           rm -rf docs
            mkdir -p docs
            mv target/dokka/* docs
      # git rm -r --cached docs

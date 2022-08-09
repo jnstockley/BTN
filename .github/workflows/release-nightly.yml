@@ -1,19 +1,17 @@
 name: Release-Nightly
 
 on:  
-
-  push:
-    workflow_dispatch:
-    branches: [ "nightly" ]
-    paths:
-      - 'src/**'
-      - 'pom.xml'
+  workflow_dispatch:
+  
+  workflow_run:
+    workflows: ["Build-Nightly"]
+    types:
+      - completed
 
 jobs:
   release:
     name: Release Jar
     runs-on: ubuntu-latest
-    # needs: build
     
     steps:
       - name: Step 1 - Get current date
