@@ -1,0 +1,50 @@
+name: Create-Doc-Nightly
+
+ on:  
+   push:
+     branches: [ "nightly" ]
+     paths:
+       - 'src/**'
+       - 'pom.xml'
+
+   workflow_dispatch:
+
+ jobs:
+   doc:
+     name: Create Doc
+     runs-on: ubuntu-latest
+
+     steps:
+       - uses: actions/checkout@v3
+         name: Step 1 - Checkout Nightly Branch
+         with:
+           persist-credentials: false
+           fetch-depth: 0
+       - name: Step 2 - Setup JDK 17
+         uses: actions/setup-java@v3.4.1
+         with: 
+           java-version: 17
+           distribution: 'temurin'
+       - name: Step 3 - Remove Doc
+         run: |
+           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+           git config user.email "jack@jstockley.com"
+           git config --local user.name "Jack Stockley"
+           git rm -r docs
+           git commit -m "Removed Docs"
+           git push origin nightly
+       - name: Step 4 - Create Doc
+         run: mvn dokka:dokka -f pom.xml
+       - name: Step 5 - Move Docs
+         run: |
+            rm -rf docs
+            mkdir -p docs
+            mv target/dokka/* docs
+       - name: Step 6 - Publish docs
+         run: |
+           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+           git config user.email "jack@jstockley.com"
+           git config --local user.name "Jack Stockley"
+           git add -f docs
+           git commit -m "Updated Docs"
+           git push origin nightly
