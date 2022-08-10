@@ -31,7 +31,9 @@ jobs:
       - name: Step 3 - Build Maven Project
         run: mvn -B package --file pom.xml
       - name: Step 4 - Clean Old Jars
-        run: rm -rf target/
+        run: |
+          rm -rf target/
+          mkdir -p target/
       - name: Step 5 - Rename Jar
         run: mv target/*.jar target/
       - name: Step 6 - Upload Artifact
