@@ -31,12 +31,13 @@ jobs:
       - name: Step 3 - Build Maven Project
         run: mvn -B package --file pom.xml
       - name: Step 4 - Rename Jar
-        run: mv target/*-jar-with-dependencies.jar target/BSN.jar
+        # run: mv target/*-jar-with-dependencies.jar target/BSN.jar
+        run: mv target/*.jar target/
       - name: Step 5 - Upload Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
           name: BSN.jar
-          path: target/BSN.jar
+          path: target/*.jar
           
   release:
     name: Release Jar
@@ -58,3 +59,32 @@ jobs:
           release_name: nightly-${{ steps.date.outputs.date }}
           prerelease: true
           asset_files: BSN.jar
+          
+  upload:
+    name: Upload Jar
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - uses: actions/checkout@v3
+        name: Step 1 - Checkout Nightly Branch
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Step 2 - Download Jar
+        uses: actions/download-artifact@v3.0.0
+      - name: Step 3 - Remove Jar
+        run: |
+          git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+          git config user.email "jack@jstockley.com"
+          git config --local user.name "Jack Stockley"
+          git rm -r out
+          git commit -m "Removed Jar"
+          git push origin nightly
+      - name: Step 4 - Upload Jar
+        run: |
+          git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+          git config user.email "jack@jstockley.com"
+          git config --local user.name "Jack Stockley"
+          git add -f out
+          git commit -m "Updated Jar"
+          git push origin nightly
