@@ -72,7 +72,7 @@ jobs:
       - name: Step 2 - Download Jar
         uses: actions/download-artifact@v3.0.0
         with:
-          path: out
+          path: ~/out/
       - name: Step 3 - Remove Jar
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
