@@ -73,8 +73,12 @@ jobs:
         uses: actions/download-artifact@v3.0.0
         with:
           path: out/
-      - run: ls out/
-      - name: Step 3 - Remove Jar
+      - name: Step 3 - Clean Artifact
+        run: |
+          mv out/BSN/* out/
+          rm BSN.jar
+          rm -r BSN/
+      - name: Step 4 - Remove Jar
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
@@ -82,7 +86,7 @@ jobs:
           git rm -r out
           git commit -m "Removed Jar"
           git push origin nightly
-      - name: Step 4 - Upload Jar
+      - name: Step 5 - Upload Jar
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
