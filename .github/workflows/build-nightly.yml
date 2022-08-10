@@ -77,7 +77,7 @@ jobs:
         run: |
           mv out/BSN/* out/
           rm out/BSN.jar
-          rm -r BSN/
+          rm -r out/BSN/
       - name: Step 4 - Remove Jar
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
