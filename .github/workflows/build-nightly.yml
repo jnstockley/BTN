@@ -76,7 +76,7 @@ jobs:
       - name: Step 3 - Clean Artifact
         run: |
           mv out/BSN/* out/
-          rm out/BSN/BSN.jar
+          rm out/BSN.jar
           rm -r BSN/
       - name: Step 4 - Remove Jar
         run: |
