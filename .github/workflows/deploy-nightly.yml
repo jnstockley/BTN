@@ -19,6 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: Step 1 - Checkout Nightly Branch
+        with:
+          ref: nightly
   
       - name: Step 2 - Setup JDK 17
         uses: actions/setup-java@v3.4.1
