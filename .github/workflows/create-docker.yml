@@ -1,16 +1,16 @@
-name: Create Docker
+name: Create-Docker
 
 on:
-  push:
-    branches: [ "nightly" ]
-    paths:
-      - 'src/**'
-      - 'pom.xml'
+  workflow_run:
+    workflows: [Build-Nightly]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
 
   build:
+    name: Creat Docker Nightly Image
 
     runs-on: ubuntu-latest
 
