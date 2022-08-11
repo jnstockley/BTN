@@ -2,7 +2,10 @@ name: Create Docker
 
 on:
   push:
-    branches: [ nightly ]
+    branches: [ "nightly" ]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
   workflow_dispatch:
 
 jobs:
