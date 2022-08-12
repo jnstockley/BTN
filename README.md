@@ -29,6 +29,6 @@ java -jar target/bsn-2.0-alpha3-SNAPSHOT-jar-with-dependencies.jar <CLI Command>
 
 ## Download Jar (Not Recommended)
 ```
-wget -O BSN.jar https://github.com/jnstockley/BTTN/raw/nightly/out/bsn-2.0-alpha3-SNAPSHOT-jar-with-dependencies.jar \
+wget -O BSN.jar https://github.com/jnstockley/BTTN/raw/nightly/out/BSN.jar \
 java -jar BSN.jar <CLI Command>
 ```
