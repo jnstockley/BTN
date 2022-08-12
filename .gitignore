@@ -39,3 +39,6 @@ target/*
 # META-INF/*
 logs/*
 out/*
+
+.github
+.local_gitignore
