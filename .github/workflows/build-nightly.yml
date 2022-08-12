@@ -86,8 +86,7 @@ jobs:
           source_folder: out
           # target_folder: out
           commit_message: Updated Jar
-        if: success() && github.event == 'push'
-
+        
       #- name: Step 4 - Remove Jar
       #  run: |
       #    git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
