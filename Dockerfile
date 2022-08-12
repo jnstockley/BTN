@@ -4,7 +4,7 @@ RUN echo 'deb http://ftp.debian.org/debian stretch-backports main' | tee /etc/ap
 
 RUN apt update && apt upgrade -y && apt install openjdk-17-jre -y
 
-ADD out/bsn-2.0-alpha3-SNAPSHOT-jar-with-dependencies.jar BSN.jar
+ADD out/BSN.jar BSN.jar
 
 RUN echo 'alias BSN="java -jar BSN.jar"' >> ~/.bashrc
 
