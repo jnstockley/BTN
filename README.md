@@ -6,3 +6,5 @@ This Java program mimicks the Twitch live notifications, but with drastically lo
 [![Create-Doc-Nightly](https://github.com/jnstockley/BTTN/actions/workflows/create-doc-nightly.yml/badge.svg?branch=nightly)](https://github.com/jnstockley/BTTN/actions/workflows/create-doc-nightly.yml)
 
 [![Deploy-Nightly](https://github.com/jnstockley/BTTN/actions/workflows/deploy-nightly.yml/badge.svg?branch=nightly)](https://github.com/jnstockley/BTTN/actions/workflows/deploy-nightly.yml)
+
+[![Create-Docker](https://github.com/jnstockley/BTTN/actions/workflows/create-docker.yml/badge.svg?branch=nightly)](https://github.com/jnstockley/BTTN/actions/workflows/create-docker.yml)
