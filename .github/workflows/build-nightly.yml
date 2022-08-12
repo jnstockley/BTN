@@ -84,7 +84,7 @@ jobs:
       - name: Step 5 - Move Jars
         run: |
           mv out/BSN/* out/
-          rm out/BSN.jar
+          rm out/*-jar-with-dependencies.jar
           rm -r out/BSN/
       - name: Step 6 - Upload Jars
         run: |
