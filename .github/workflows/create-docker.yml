@@ -24,5 +24,5 @@ jobs:
     - name: Step 3 - Build the Docker image
       run: |
         echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin docker.io
-        docker buildx build . --file Dockerfile --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 --tag docker.io/${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:nightly
+        docker buildx build . --file Dockerfile --push --platform linux/amd64,linux/arm64,linux/arm --tag docker.io/${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:nightly
         
