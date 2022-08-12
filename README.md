@@ -24,7 +24,8 @@ git clone --branch nightly https://github.com/jnstockley/ \
 cd BTTN \
 mvn install \
 mvn package \
-java -jar target/bsn-2.0-alpha3-SNAPSHOT-jar-with-dependencies.jar <CLI Command>
+mv target/*-jar-with-dependencies.jar BSN.jar
+java -jar BSN.jar <CLI Command>
 ```
 
 ## Download Jar (Not Recommended)
