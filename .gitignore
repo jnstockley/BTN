@@ -40,5 +40,5 @@ target/*
 logs/*
 out/*
 
-.github
+.github/*
 .local_gitignore
