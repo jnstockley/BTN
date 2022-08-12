@@ -73,7 +73,7 @@ jobs:
         uses: actions/download-artifact@v3.0.0
         with:
           path: out/
-      - name: Step 3 - Remove Doc
+      - name: Step 3 - Remove Jars
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
@@ -86,7 +86,7 @@ jobs:
           mv out/BSN/* out/
           rm out/BSN.jar
           rm -r out/BSN/
-      - name: Step 6 - Publish docs
+      - name: Step 6 - Upload Jars
         run: |
           git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
           git config user.email "jack@jstockley.com"
