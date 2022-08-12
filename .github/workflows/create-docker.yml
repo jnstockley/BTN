@@ -10,13 +10,17 @@ on:
 jobs:
 
   build:
-    name: Creat Docker Nightly Image
+    name: Create Docker Nightly Image
 
     runs-on: ubuntu-latest
 # docker push docker.io/${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:nightly
     steps:
     - name: Step 1 - Setup Docker Buildx
+      id: buildx
       uses: crazy-max/ghaction-docker-buildx@v3.3.1
+      
+    - name: Available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
 
     - uses: actions/checkout@v2
       name: Step 2 - Checkout Git Repo
