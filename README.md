@@ -19,15 +19,15 @@ docker exec BSN BSN <CLI Command>
 
 ## Mvn Install
 ```
-git clone --branch nightly https://github.com/jnstockley/
-cd BTTN
-mvn install
-mvn package
+git clone --branch nightly https://github.com/jnstockley/ \
+cd BTTN \
+mvn install \
+mvn package \
 java -jar target/bsn-2.0-alpha3-SNAPSHOT-jar-with-dependencies.jar <CLI Command>
 ```
 
 ## Download Jar (Not Recommended)
 ```
-wget -O BSN.jar https://github.com/jnstockley/BTTN/raw/nightly/out/bsn-2.0-alpha3-SNAPSHOT-jar-with-dependencies.jar
+wget -O BSN.jar https://github.com/jnstockley/BTTN/raw/nightly/out/bsn-2.0-alpha3-SNAPSHOT-jar-with-dependencies.jar \
 java -jar BSN.jar <CLI Command>
 ```
