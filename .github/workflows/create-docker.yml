@@ -13,7 +13,6 @@ jobs:
     name: Create Docker Nightly Image
 
     runs-on: ubuntu-latest
-# docker push docker.io/${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:nightly
     steps:
     - name: Step 1 - Setup Docker Buildx
       id: buildx
