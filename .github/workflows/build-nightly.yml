@@ -78,19 +78,28 @@ jobs:
           mv out/BSN/* out/
           rm out/BSN.jar
           rm -r out/BSN/
-      - name: Step 4 - Remove Jar
-        run: |
-          git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
-          git config user.email "jack@jstockley.com"
-          git config --local user.name "Jack Stockley"
-          git rm -rf out
-          git commit -m "Removed Jar"
-          git push origin nightly
-      - name: Step 5 - Upload Jar
-        run: |
-          git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
-          git config user.email "jack@jstockley.com"
-          git config --local user.name "Jack Stockley"
-          git add -f out/
-          git commit -m "Updated Jar"
-          git push origin nightly
+      - name: Step 4 - Update Jar
+        uses: seanmiddleditch/gha-publish-to-git@v2
+        with:
+          branch: nightly
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_folder: out
+          target_folder: out
+          commit_message: Updated Jar
+
+      #- name: Step 4 - Remove Jar
+      #  run: |
+      #    git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+      #    git config user.email "jack@jstockley.com"
+      #    git config --local user.name "Jack Stockley"
+      #    git rm -rf out
+      #    git commit -m "Removed Jar"
+      #    git push origin nightly
+      #- name: Step 5 - Upload Jar
+      #  run: |
+      #    git remote set-url origin https://jnstockley:${{ secrets.TOKEN }}@github.com/jnstockley/BTTN.git
+      #    git config user.email "jack@jstockley.com"
+      #    git config --local user.name "Jack Stockley"
+      #    git add -f out/
+      #    git commit -m "Updated Jar"
+      #    git push origin nightly
