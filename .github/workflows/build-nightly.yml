@@ -78,6 +78,7 @@ jobs:
           mv out/BSN/* out/
           rm out/BSN.jar
           rm -r out/BSN/
+      - run: git config --global --add safe.directory /github/home/gitrepo.ENIPMd
       - name: Step 4 - Update Jar
         uses: seanmiddleditch/gha-publish-to-git@v2
         with:
