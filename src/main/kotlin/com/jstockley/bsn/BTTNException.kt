@@ -39,6 +39,10 @@ open class CredException(override var message: String): Exception() {
         val logger = KotlinLogging.logger{}
         logger.error { message }
     }
+
+    override fun toString(): String {
+        return message
+    }
 }
 
 open class MissingChannelsException(override var message: String): Exception() {
@@ -71,6 +75,12 @@ class YouTubePlaylistDataException(message: String):
 
 class YouTubeLiveDataException(message: String):
         BTTNException("Error getting YouTube Live Stream data!", message)
+
+class AlertzyCredException(message: String):
+        CredException(message)
+
+class YouTubeCredException(message: String):
+        CredException(message)
 
 class AlertzyMixedException(message: String, email: String):
         BTTNFailoverException("Mixed error sending Alertzy Notification!", message, email)

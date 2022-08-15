@@ -9,15 +9,15 @@ class YouTubeUpload: Runnable {
 
         val logger = KotlinLogging.logger{}
 
-        val apiKeys: List<String> = getYouTubeCred()
+        val apiKeys: List<String> = getDataAsList(YOUTUBE_KEYS)
 
         var index = 0
 
         while (true) {
 
-            val previousVideoIds: MutableMap<String, String> = getPreviousVideoId()
+            val previousVideoIds: MutableMap<String, String> = getDataAsStringMap(YOUTUBE_IDS) as MutableMap<String, String>
 
-            var previousVideoAmounts: Map<String, Int> = getPlaylists()
+            var previousVideoAmounts: Map<String, Int> = getDataAsIntMap(YOUTUBE_PLAYLISTS)
 
             if(hasConnection()){
 
@@ -40,7 +40,6 @@ class YouTubeUpload: Runnable {
                         }
                         previousVideoIds[playlist] = video.getVideoId()
                     }
-                    //previousVideoAmounts[playlist] = ytPlaylist.getCurrentVideoAmounts()[playlist]!!
                 }
                 if (recentlyUploadedVideos.isNotEmpty()) {
                     val notif = Notification(recentlyUploadedVideos)
@@ -50,8 +49,8 @@ class YouTubeUpload: Runnable {
 
                 if (previousVideoAmounts != ytPlaylist.getCurrentVideoAmounts()){
                     previousVideoAmounts = ytPlaylist.getCurrentVideoAmounts()
-                    writePlaylists(previousVideoAmounts)
-                    writePreviousVideoId(previousVideoIds)
+                    writeData(YOUTUBE_PLAYLISTS, previousVideoAmounts)
+                    writeData(YOUTUBE_PLAYLISTS, previousVideoIds)
                 }
 
             } else {

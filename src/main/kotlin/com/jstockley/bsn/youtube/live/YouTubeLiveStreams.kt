@@ -2,7 +2,6 @@ package com.jstockley.bsn.youtube.live
 
 import com.jstockley.bsn.YouTubeLiveDataException
 import mu.KotlinLogging
-import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URI
 import java.net.http.HttpClient
@@ -29,10 +28,6 @@ class YouTubeLiveStreams(private val previousLiveStreamStatus: MutableMap<String
 
     fun getCurrentLiveStreams(): List<YouTubeLiveStream> {
         return this.currentLiveStreams
-    }
-
-    fun getChannels(): Set<String> {
-        return this.channels
     }
 
     private fun getYouTubeData(channelIds: Set<String>): MutableMap<String, Boolean> {

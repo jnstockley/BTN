@@ -11,7 +11,7 @@ class YouTubeLive: Runnable {
 
 
         while (true) {
-            val previousLiveStatus: MutableMap<String, Boolean> = getYouTubeLive()
+            val previousLiveStatus: MutableMap<String, Boolean> = getDataAsBooleanMap("youtubeLive.json") as MutableMap<String, Boolean>
 
             if (hasConnection()) {
 
@@ -29,7 +29,7 @@ class YouTubeLive: Runnable {
                 }
 
                 if(previousLiveStatus != youtubeLive.getCurrentLiveStreamStatus()){
-                    writeYouTubeLive(youtubeLive.getCurrentLiveStreamStatus())
+                    writeData(YOUTUBE_LIVE_CHANNELS, youtubeLive.getCurrentLiveStreams())
                 }
 
             } else {

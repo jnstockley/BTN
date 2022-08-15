@@ -10,6 +10,6 @@ class CredSetup: Callable<Int> {
     lateinit var spec: CommandLine.Model.CommandSpec
 
     override fun call(): Int {
-        throw CommandLine.ParameterException(spec.commandLine(), "Missing required subcommand for twitch")
+        throw CommandLine.ParameterException(spec.commandLine(), "Missing required subcommand for credentials")
     }
 }

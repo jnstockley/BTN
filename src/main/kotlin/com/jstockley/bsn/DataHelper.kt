@@ -1,129 +1,61 @@
 package com.jstockley.bsn
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.gson.Gson
 import mu.KotlinLogging
-import org.json.JSONObject
+import org.json.JSONException
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileWriter
 import java.io.PrintWriter
+import java.nio.charset.Charset
 
 val logger = KotlinLogging.logger{}
 
-
-fun getPlaylists(): MutableMap<String, Int> {
-    val file = File("playlists.json")
-    if (file.exists()){
-        val jsonString: String = file.readText(Charsets.UTF_8)
-        return ObjectMapper().readValue(jsonString)
+private fun getData(path: String): String {
+    val file = File(path)
+    if (!file.exists()) {
+        logger.error { "$path is not found!" }
+        throw FileNotFoundException("$path is not found!")
     }
-    logger.error { "Failed to Retrieved YouTube Playlists!" }
-    return mutableMapOf()
+    return file.readText(Charset.defaultCharset())
 }
 
-fun writePlaylists(json: Map<String, Int>){
-    val jsonString: String = JSONObject(json).toString()
-    PrintWriter(FileWriter("playlists.json")).use{
-        it.write(jsonString)
-    }
-    logger.info { "Wrote YouTube Playlists changes!" }
+fun getDataAsList(path: String): List<String> {
+    return ObjectMapper().readValue(getData(path))
 }
 
-fun getPreviousVideoId():MutableMap<String, String> {
-    val file = File("previousIds.json")
-    if(file.exists()) {
-        val jsonString: String = file.readText(Charsets.UTF_8)
-        return ObjectMapper().readValue(jsonString)
-    }
-    logger.error { "Failed to Retrieved YouTube Channel Previous Ids!" }
-    return mutableMapOf()
+fun getDataAsIntMap(path: String): Map<String, Int> {
+    return ObjectMapper().readValue(getData(path))
 }
 
-fun writePreviousVideoId(json: Map<String, String>){
-    val jsonString: String = JSONObject(json).toString()
-    PrintWriter(FileWriter("previousIds.json")).use {
-        it.write(jsonString)
-    }
-    logger.info { "Wrote YouTube Playlists Channel Previous Ids!" }
+fun getDataAsStringMap(path: String): Map<String, String> {
+    return ObjectMapper().readValue(getData(path))
 }
 
-fun getYouTubeLive(): MutableMap<String, Boolean>{
-    val file = File("youtubeLive.json")
-    if (file.exists()){
-        val jsonString: String = file.readText(Charsets.UTF_8)
-        return ObjectMapper().readValue(jsonString)
-    }
-    logger.error { "Failed to Retrieved YouTube Live Channels!" }
-    return mutableMapOf()
+fun getDataAsBooleanMap(path: String): Map<String, Boolean> {
+    return ObjectMapper().readValue(getData(path))
 }
 
-fun getTwitch(): List<String> {
-    val file = File("twitch.csv")
-    if (file.exists()){
-        val jsonString: String = file.readText(Charsets.UTF_8)
-        return jsonString.split(",").map { it.trim() }
-    }
-    logger.error { "Failed to Retrieved Twitch Channels!" }
-    return mutableListOf()
-}
 
-fun writeTwitch(channels: List<String>) {
-    val file = File("twitch.csv")
+fun writeData(path: String, data: Any) {
+    val json: String
+    val file = File(path)
+    if (!file.exists()) {
+        val pattern = Regex("(/[a-zA-Z]*.json)")
+        val fileName = pattern.find(path)!!.value
+        val dirs = File(path.substring(0, path.indexOf(fileName)))
+        dirs.mkdirs()
+        file.createNewFile()
+    }
+    try {
+        json = Gson().toJson(data)
+    } catch (e: JSONException) {
+        logger.error { "$data is not valid JSON!" }
+        throw JSONException("$data is not valid JSON!")
+    }
     PrintWriter(FileWriter(file)).use {
-        it.write(channels.joinToString( separator = ","){ it })
+        it.write(json)
     }
-}
-
-fun writeYouTubeLive(json: Map<String, Boolean>) {
-    val jsonString: String = JSONObject(json).toString()
-    PrintWriter(FileWriter("youtubeLive.json")).use {
-        it.write((jsonString))
-    }
-    logger.info { "Wrote YouTube Live Channels!" }
-}
-
-fun getYouTubeCred(): List<String> {
-    val file = File("creds.csv")
-    if (file.exists()){
-        val jsonString: String = file.readText(Charsets.UTF_8)
-        logger.info { "Retrieved YouTube Creds!" }
-        return jsonString.split(",").map { it.trim() }
-    }
-    logger.error { "Failed to Retrieved YouTube Creds!" }
-    return mutableListOf()
-}
-
-fun writeYouTubeCred(creds: List<String>) {
-    val file = File("creds.csv")
-    PrintWriter(FileWriter(file)).use {
-        it.write(creds.joinToString( separator = ","){ it })
-    }
-}
-
-fun getTwitchCred(): Map<String, String> {
-    val file = File("twitchCreds.json")
-    if (file.exists()){
-        val jsonString: String = file.readText(Charsets.UTF_8)
-        logger.info { "Retrieved Twitch Creds!" }
-        return ObjectMapper().readValue(jsonString)
-    }
-    logger.error { "Failed to Retrieved Twitch Creds!" }
-    return mutableMapOf()
-}
-
-fun writeAlertzyKeys(keys: List<String>) {
-    val file = File("alertzyKeys.csv")
-    PrintWriter(FileWriter(file)).use {
-        it.write(keys.joinToString( separator = ","){ it })
-    }
-}
-
-fun getAlertzyKey(): List<String> {
-    val file = File("alertzyKeys.csv")
-    if (file.exists()) {
-        val string: String = file.readText(Charsets.UTF_8)
-        logger.info { "Retrieved Alertzy Keys(s)" }
-        return ObjectMapper().readValue(string)
-    }
-    logger.error { "Failed to retrieve Alertzy Key(s)" }
-    return mutableListOf()
+    logger.debug { "$json wrote JSON to $file" }
 }

@@ -42,3 +42,4 @@ out/*
 
 .github/*
 .local_gitignore
+config/*

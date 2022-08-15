@@ -8,6 +8,7 @@ import com.jstockley.bsn.youtube.live.YouTubeLive
 import com.jstockley.bsn.youtube.video.YouTubeUpload
 import mu.KotlinLogging
 import picocli.CommandLine
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -17,8 +18,9 @@ var accountKeys: List<String> = mutableListOf()
 
 const val version = "2.0-alpha3"
 
-fun main(args: Array<String>) {
 
+
+fun main(args: Array<String>) {
 
     /**
      * TODO
@@ -28,9 +30,6 @@ fun main(args: Array<String>) {
      *  2. Log videoId in new file is is upcoming live stream, send notif when becomes live
      */
 
-    val logger = KotlinLogging.logger{}
-
-    accountKeys = listOf("787xmvo9n0roff6")
 
     /**
      * TODO
@@ -38,16 +37,23 @@ fun main(args: Array<String>) {
      * Move list to GUI
       */
 
+    val logger = KotlinLogging.logger{}
+
     if (args.isNotEmpty()) {
         exitProcess(CommandLine(Setup()).setSubcommandsCaseInsensitive(true).execute(*args))
     }
 
+    if (!checkSetup()) {
+        logger.error { "BSN not fully setup, stopping BSN!" }
+        System.err.println("BSN not fully setup, stopping BSN!")
+        exitProcess(1)
+    }
+
     if (hasConnection()){
+        accountKeys = getDataAsList(ALERTZY_KEYS)
         startingMessage(accountKeys)
         logger.info { "Sent Starting Message!" }
     }
-
-    //addLiveStreamChannels("subscriptions.csv")
 
     val youtubeUpload = Thread(YouTubeUpload())
     youtubeUpload.start()
@@ -64,6 +70,21 @@ fun main(args: Array<String>) {
 private fun startingMessage(accountKeys: List<String>){
     val notif = Notification("BTTN Started!","BTTN listening for updates!", NotificationType.StartingMessage)
     notif.send(accountKeys)
+}
+
+private fun checkSetup(): Boolean {
+    try {
+        getDataAsList(ALERTZY_KEYS)
+        getDataAsStringMap(TWITCH_KEYS)
+        getDataAsList(YOUTUBE_KEYS)
+        getDataAsIntMap(YOUTUBE_PLAYLISTS)
+        getDataAsStringMap(YOUTUBE_IDS)
+        getDataAsBooleanMap(YOUTUBE_LIVE_CHANNELS)
+        getDataAsList(TWITCH_CHANNELS)
+    } catch (e: FileNotFoundException) {
+        return false
+    }
+    return true
 }
 
 fun hasConnection(): Boolean {

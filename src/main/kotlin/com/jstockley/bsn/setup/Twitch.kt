@@ -3,7 +3,7 @@ package com.jstockley.bsn.setup
 import com.github.twitch4j.TwitchClient
 import com.github.twitch4j.TwitchClientBuilder
 import com.jstockley.bsn.*
-import getSelectedItemsList
+import com.jstockley.bsn.getSelectedItemsList
 import picocli.CommandLine.ParameterException
 import picocli.CommandLine.Command
 import picocli.CommandLine.Model.CommandSpec
@@ -32,7 +32,7 @@ class TwitchAdd : Callable<Int> {
 
     override fun call(): Int {
         try{
-            val twitchCred = getTwitchCred()
+            val twitchCred = getDataAsStringMap(TWITCH_KEYS)
             if (twitchCred.isNotEmpty()) {
                 val channels = mutableMapOf<String, String>()
                 val twitchClient: TwitchClient = TwitchClientBuilder.builder().withEnableHelix(true)
@@ -46,7 +46,7 @@ class TwitchAdd : Callable<Int> {
                     channels[result.toName] = result.toLogin
                 }
                 val selectedChannels = getSelectedItemsList(channels, "Select Twitch Channel(s) to Import")
-                writeTwitch(selectedChannels)
+                writeData(TWITCH_CHANNELS, selectedChannels)
                 return 0
             } else {
                 throw TwitchCredException("Twitch Credentials not setup, unable to list channels!")
@@ -54,6 +54,7 @@ class TwitchAdd : Callable<Int> {
         } catch (e: TwitchCredException) {
             System.err.println(e.message)
             return 1
+            //throw TwitchCredException(e.message)
         }
     }
 }
@@ -81,11 +82,11 @@ class TwitchList : Callable<Int> {
 
     fun getChannels(): Map<String, String> {
         try {
-            val file = File("twitch.csv")
+            val file = File(TWITCH_CHANNELS)
             if (file.exists()) {
                 val channels = mutableMapOf<String, String>()
-                val chanNames = getTwitch()
-                val twitchCreds = getTwitchCred()
+                val chanNames = getDataAsList(TWITCH_CHANNELS)
+                val twitchCreds = getDataAsStringMap(TWITCH_KEYS)
                 if (twitchCreds.isNotEmpty()) {
                     val twitchClient: TwitchClient = TwitchClientBuilder.builder().withEnableHelix(true)
                         .withClientId(twitchCreds["clientId"])
@@ -124,7 +125,7 @@ class TwitchUpdate : Callable<Int> {
             if (checkedChannels.isNotEmpty()) {
                 val channelMap = mutableMapOf<String, String>()
                 if (name == "") {
-                    val twitchCred = getTwitchCred()
+                    val twitchCred = getDataAsStringMap(TWITCH_KEYS)
                     if (twitchCred.isNotEmpty()) {
                         val channels = mutableMapOf<String, String>()
                         val twitchClient: TwitchClient = TwitchClientBuilder.builder().withEnableHelix(true)
@@ -145,8 +146,7 @@ class TwitchUpdate : Callable<Int> {
                 channelMap.putAll(checkedChannels)
 
                 val updatedChannels = getSelectedItemsList(channelMap, "Select Twitch Channel(s) to Add/Remove", checkedItems = checkedChannels)
-
-                writeTwitch(updatedChannels)
+                writeData(TWITCH_CHANNELS, updatedChannels)
                 return 0
             } else {
                 throw MissingChannelsException("No Twitch channels added. Please add channels first.")
@@ -170,8 +170,7 @@ class TwitchRemove : Callable<Int> {
 
             if (channels.isNotEmpty()) {
                 val removedChannels = getSelectedItemsList(channels, "Select Twitch Channel(s) to Remove", checkedItems = channels)
-
-                writeTwitch(removedChannels)
+                writeData(TWITCH_KEYS, removedChannels)
                 return 0
             } else {
                 throw MissingChannelsException("No Twitch channels added. Please add channels first.")

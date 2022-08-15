@@ -1,8 +1,11 @@
+package com.jstockley.bsn
+
 import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.*
+import com.googlecode.lanterna.gui2.TextBox.TextBoxRenderer
 import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory
-import okhttp3.internal.toImmutableList
+
 
 fun getSelectedItemsMap(items: Map<String, String>, title: String, checkedItems: Map<String, String> = mutableMapOf()): MutableMap<String, Boolean> {
     val sortedItems = items.toSortedMap(java.lang.String.CASE_INSENSITIVE_ORDER)
@@ -49,6 +52,27 @@ fun getSelectedItemsList(items: List<String>, title: String, checkedItems: List<
     return itemList
 }
 
+fun getMultiTextBox(titles: List<String>, mainWindow: String, enteredItems: List<String> = mutableListOf()): Map<String, String> {
+    val mainPanel = Panel()
+    mainPanel.layoutManager = LinearLayout(Direction.VERTICAL)
+
+    val size = TerminalSize(50, 2)
+    for (i in titles.indices) {
+        val textBox = TextBox(size)
+        if (enteredItems.isNotEmpty()) {
+            textBox.text = enteredItems[i]
+        }
+        mainPanel.addComponent(textBox.withBorder(Borders.singleLine(titles[i])))
+    }
+
+    setupWindow(mainWindow, mainPanel)
+
+    val clientIdBox = (mainPanel.childrenList[0] as Border).childrenList[0] as TextBox
+    val clientSecretBox = (mainPanel.childrenList[1] as Border).childrenList[0] as TextBox
+
+    return mapOf("clientId" to clientIdBox.text, "clientSecret" to clientSecretBox.text)
+}
+
 fun getSelectedItemsList(title: String, items: List<String> = mutableListOf()): List<String> {
     val panel = setupTextBoxPanel(title, items)
 
@@ -56,6 +80,8 @@ fun getSelectedItemsList(title: String, items: List<String> = mutableListOf()): 
 
     return textBox.text.split('\n')
 }
+
+
 
 private fun setupTextBoxPanel(title: String, currentText: List<String>): Panel{
     val contentPanel = Panel(GridLayout(1))
@@ -70,6 +96,8 @@ private fun setupTextBoxPanel(title: String, currentText: List<String>): Panel{
     setupWindow(title, contentPanel)
     return contentPanel
 }
+
+
 
 private fun setupCheckBoxPanel(title: String, items: Set<String>, checkedItems: Set<String>): Panel {
     val controlPanel = Panel(GridLayout(1))
@@ -102,5 +130,3 @@ private fun setupWindow(title: String, panel: Panel): Window {
     textGUI.addWindowAndWait(window)
     return window
 }
-
-

@@ -1,9 +1,6 @@
 package com.jstockley.bsn.setup.creds
 
-import com.jstockley.bsn.getYouTubeCred
-import com.jstockley.bsn.version
-import com.jstockley.bsn.writeYouTubeCred
-import getSelectedItemsList
+import com.jstockley.bsn.*
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Spec
@@ -30,12 +27,13 @@ class YouTubeAdd: Callable<Int> {
         try {
             val keys = getSelectedItemsList("Add YouTube API Key(s)")
             if (checkKeys(keys)) {
-                writeYouTubeCred(keys)
+                writeData(YOUTUBE_KEYS, keys)
                 return 0
             } else {
-                throw Exception("Not Implemented yet")
+                throw YouTubeCredException("At least one you the entered YouTube API Keys is invalid")
             }
-        } catch (e: Exception) {
+        } catch (e: YouTubeCredException) {
+            System.err.println(e.message)
             return 1
         }
     }
@@ -46,7 +44,7 @@ class YouTubeAdd: Callable<Int> {
 class YouTubeList: Callable<Int> {
     override fun call(): Int {
         try {
-            val keys = getYouTubeCred()
+            val keys = getDataAsList(YOUTUBE_KEYS)
             if (keys.isNotEmpty()) {
                 println("YouTube API Key(s) currently being used:")
                 for (key in keys) {
@@ -54,10 +52,10 @@ class YouTubeList: Callable<Int> {
                 }
                 return 0
             } else {
-                throw Exception("")
+                throw YouTubeCredException("YouTube Credentials not setup, unable to API Key(s)")
             }
-        } catch (e: Exception) {
-            // TODO
+        } catch (e: YouTubeCredException) {
+            System.err.println(e.message)
             return 1
         }
     }
@@ -67,16 +65,16 @@ class YouTubeList: Callable<Int> {
 class YouTubeUpdate: Callable<Int> {
     override fun call(): Int {
         try {
-            val currentKeys = getYouTubeCred()
+            val currentKeys = getDataAsList(YOUTUBE_KEYS)
             val updatedKeys = getSelectedItemsList("Add/Remove YouTube API Keys", items = currentKeys)
             if (checkKeys(updatedKeys)) {
-                writeYouTubeCred(updatedKeys)
+                writeData(YOUTUBE_KEYS, updatedKeys)
                 return 0
             } else {
-                throw Exception("Not Implemented yet")
+                throw YouTubeCredException("At least one you the entered YouTube API Keys is invalid")
             }
-        } catch (e: Exception) {
-            // TODO
+        } catch (e: YouTubeCredException) {
+            System.err.println(e.message)
             return 1
         }
     }
@@ -85,9 +83,21 @@ class YouTubeUpdate: Callable<Int> {
 @Command(name = "Remove", mixinStandardHelpOptions = true, description = ["Remove YouTube API Keys(s)"], version = [version])
 class YouTubeRemove: Callable<Int> {
     override fun call(): Int {
-        TODO("Not yet implemented")
-    }
+        try {
+            val keys = getDataAsList(YOUTUBE_KEYS)
 
+            if (keys.isNotEmpty()) {
+                val removedKeys = getSelectedItemsList(keys, "Select YouTube API Key(s) to remove", checkedItems = keys)
+                writeData(YOUTUBE_KEYS, removedKeys)
+                return 0
+            } else {
+                throw YouTubeCredException("Alertzy Credentials not setup, unable remove to API key(s)!")
+            }
+        } catch (e: YouTubeCredException) {
+            System.err.println(e.message)
+            return 1
+        }
+    }
 }
 
 private fun checkKeys(keys: List<String>): Boolean {

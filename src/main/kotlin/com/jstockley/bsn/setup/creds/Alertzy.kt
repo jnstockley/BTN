@@ -1,15 +1,8 @@
 package com.jstockley.bsn.setup.creds
 
-import com.googlecode.lanterna.TerminalSize
-import com.googlecode.lanterna.gui2.*
-import com.googlecode.lanterna.screen.Screen
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory
-import com.jstockley.bsn.getAlertzyKey
+import com.jstockley.bsn.*
 import com.jstockley.bsn.notification.Notification
 import com.jstockley.bsn.notification.NotificationType
-import com.jstockley.bsn.version
-import com.jstockley.bsn.writeAlertzyKeys
-import getSelectedItemsList
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import java.util.concurrent.Callable
@@ -30,16 +23,15 @@ class AlertzyAdd: Callable<Int> {
     override fun call(): Int {
         try {
             val keys = getSelectedItemsList("Add Alertzy Account Key(s)")
-            val notif = Notification("Test Notification", "This is a test BSN Notification", NotificationType.Test)
-            val sent = notif.send(keys)
-            if (sent) {
-                writeAlertzyKeys(keys)
+            val success = sendTestNotif(keys)
+            if (success) {
+                writeData(ALERTZY_KEYS, keys)
                 return 0
             } else {
-                throw Exception("")
-                // TODO Throw exception, don't write keys
+                throw AlertzyCredException("Failed sending Alertzy test notification to at least one account key!")
             }
-        } catch (e: Exception) {
+        } catch (e: AlertzyCredException) {
+            System.err.println(e.message)
             return 1
         }
     }
@@ -49,7 +41,8 @@ class AlertzyAdd: Callable<Int> {
 class AlertzyList: Callable<Int> {
     override fun call(): Int {
         try {
-            val keys = getAlertzyKey()
+            val keys = getDataAsList(ALERTZY_KEYS)
+
             if (keys.isNotEmpty()) {
                 println("Alertzy Key(s) currently being used:")
                 for (key in keys){
@@ -57,11 +50,10 @@ class AlertzyList: Callable<Int> {
                 }
                 return 0
             } else {
-                // TODO Throw Exception
-                throw Exception("")
+                throw AlertzyCredException("Alertzy Credentials not setup, unable to account keys!")
             }
-        } catch (e: Exception) {
-            // TODO
+        } catch (e: AlertzyCredException) {
+            System.err.println(e.message)
             return 1
         }
     }
@@ -71,19 +63,18 @@ class AlertzyList: Callable<Int> {
 class AlertzyUpdate: Callable<Int> {
     override fun call(): Int {
         try {
-            val currentKeys = getAlertzyKey()
+            val currentKeys = getDataAsList(ALERTZY_KEYS)
+
             val updatedKeys = getSelectedItemsList("Add/Remove Alertzy Account Keys", items = currentKeys)
-            val notif = Notification("Test Notification", "This is a test BSN Notification", NotificationType.Test)
-            val sent = notif.send(updatedKeys)
-            if (sent) {
-                writeAlertzyKeys(updatedKeys)
+            val success = sendTestNotif(updatedKeys)
+            if (success) {
+                writeData(ALERTZY_KEYS, updatedKeys)
                 return 0
             } else {
-                throw Exception("")
-                // TODO Throw exception, don't write keys
+                throw AlertzyCredException("Failed sending Alertzy test notification to at least one account key!")
             }
-
-        } catch (e: Exception) {
+        } catch (e: AlertzyCredException) {
+            System.err.println(e.message)
             return 1
         }
     }
@@ -93,16 +84,23 @@ class AlertzyUpdate: Callable<Int> {
 class AlertzyRemove: Callable<Int> {
     override fun call(): Int {
         try {
-            val keys = getAlertzyKey()
+            val keys = getDataAsList(ALERTZY_KEYS)
 
             if(keys.isNotEmpty()) {
-                val removedKeys = getSelectedItemsList(keys, "Selected Alertzy Acccount Key(s) to remove", checkedItems = keys)
+                val removedKeys = getSelectedItemsList(keys, "Selected Alertzy Account Key(s) to remove", checkedItems = keys)
+                writeData(ALERTZY_KEYS, removedKeys)
                 return 0
             } else {
-                TODO("Throw exception")
+                throw AlertzyCredException("Alertzy Credentials not setup, unable to account keys!")
             }
-        } catch (e: Exception) {
+        } catch (e: AlertzyCredException) {
+            System.err.println(e.message)
             return 1
         }
     }
+}
+
+private fun sendTestNotif(keys: List<String>): Boolean {
+    val notif = Notification("Test Notification", "This is a test BSN Notification", NotificationType.Test)
+    return notif.send(keys)
 }

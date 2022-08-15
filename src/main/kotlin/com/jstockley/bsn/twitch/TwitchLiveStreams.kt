@@ -16,6 +16,8 @@ class TwitchLiveStreams(channels: List<String>, clientId: String, clientSecret: 
             .withClientSecret(clientSecret)
             .build()
 
+
+
         twitchClient.clientHelper.enableStreamEventListener(channels)
         twitchClient.eventManager.onEvent(ChannelGoLiveEvent::class.java) {event ->
             val stream = TwitchLiveStream(event.stream.userName, event.stream.title, event.stream.gameName)

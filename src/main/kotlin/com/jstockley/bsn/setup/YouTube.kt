@@ -3,7 +3,7 @@ package com.jstockley.bsn.setup
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.jstockley.bsn.*
 import com.jstockley.bsn.youtube.video.YouTubePlaylists
-import getSelectedItemsList
+import com.jstockley.bsn.getSelectedItemsList
 import picocli.CommandLine.ParameterException
 import picocli.CommandLine.Command
 import picocli.CommandLine.Model.CommandSpec
@@ -43,11 +43,11 @@ class YouTubeAdd: Callable<Int> {
                     }
                 }
 
-                val ytCred = getYouTubeCred()
+                val ytCred = getDataAsList(YOUTUBE_KEYS)
 
                 if (ytCred.isNotEmpty()){
                     val selectedChannels = getSelectedItemsList(channels, "Select YouTube Channel(s) to Import")
-                    writePlaylists(YouTubePlaylists(selectedChannels, ytCred[0]).getCurrentVideoAmounts())
+                    writeData(YOUTUBE_PLAYLISTS, YouTubePlaylists(selectedChannels, ytCred[0]).getCurrentVideoAmounts())
                     return 0
                 } else {
                     throw YTCredException("YouTube Credentials not setup, unable to add channels!")
@@ -88,11 +88,11 @@ class YouTubeList: Callable<Int> {
 
     fun getChannels(): Map<String, String> {
         try{
-            val file = File("playlists.json")
+            val file = File(YOUTUBE_PLAYLISTS)
             if (file.exists()) {
                 val channels = mutableMapOf<String, String>()
-                val playlists = getPlaylists().keys
-                val ytCred = getYouTubeCred()
+                val playlists = getDataAsIntMap(YOUTUBE_PLAYLISTS).keys
+                val ytCred = getDataAsList(YOUTUBE_KEYS)
                 if (ytCred.isNotEmpty()) {
                     val channelNames = YouTubePlaylists(playlists.toMutableList(), ytCred[0]).getChannels()
                     for (i in channelNames.indices) {
@@ -146,9 +146,9 @@ class YouTubeUpdate: Callable<Int> {
 
                 val updatedChannels = getSelectedItemsList(channelMap, "Select YouTube Channel(s) to Add/Remove", checkedItems = checkedChannels)
 
-                val ytCred = getYouTubeCred()
+                val ytCred = getDataAsList(YOUTUBE_KEYS)
 
-                writePlaylists(YouTubePlaylists(updatedChannels, ytCred[0]).getCurrentVideoAmounts())
+                writeData(YOUTUBE_PLAYLISTS, YouTubePlaylists(updatedChannels, ytCred[0]).getCurrentVideoAmounts())
                 return 0
             } else {
                 throw MissingChannelsException("No YouTube channels added. Please add channels first.")
@@ -174,10 +174,9 @@ class YouTubeRemove: Callable<Int> {
             if (channels.isNotEmpty()) {
                 val removedChannels = getSelectedItemsList(channels, "Select YouTube Channel(s) to Remove", checkedItems = channels)
 
-                val ytCred = getYouTubeCred()
+                val ytCred = getDataAsList(YOUTUBE_KEYS)
 
-                writePlaylists(YouTubePlaylists(removedChannels, ytCred[0]).getCurrentVideoAmounts())
-
+                writeData(YOUTUBE_PLAYLISTS, YouTubePlaylists(removedChannels, ytCred[0]).getCurrentVideoAmounts())
                 return 0
             } else {
                 throw MissingChannelsException("No YouTube channels added. Please add channels first.")

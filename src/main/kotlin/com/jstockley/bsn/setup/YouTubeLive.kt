@@ -4,7 +4,7 @@ import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.jstockley.bsn.*
 import com.jstockley.bsn.youtube.live.YouTubeLiveStreams
 import com.jstockley.bsn.youtube.live.getNames
-import getSelectedItemsMap
+import com.jstockley.bsn.getSelectedItemsMap
 import picocli.CommandLine.Command
 import picocli.CommandLine.Model.CommandSpec
 import picocli.CommandLine.Option
@@ -45,11 +45,11 @@ class YouTubeLiveAdd: Callable<Int> {
 
                 // TODO Not needed currently
 
-                val ytCred = getYouTubeCred()
+                val ytCred = getDataAsList(YOUTUBE_KEYS)
 
                 if (ytCred.isNotEmpty()) {
                     val selectedChannels = getSelectedItemsMap(channels, "Select YouTube Live Channel(s) to Import")
-                    writeYouTubeLive(YouTubeLiveStreams(selectedChannels).getCurrentLiveStreamStatus())
+                    writeData(YOUTUBE_LIVE_CHANNELS, YouTubeLiveStreams(selectedChannels).getCurrentLiveStreams())
                     return 0
                 } else {
                     throw YTCredException("YouTube Credentials not setup, unable to add channels!")
@@ -90,10 +90,10 @@ class YouTubeLiveList: Callable<Int> {
 
     fun getChannels(): Map<String, String> {
         try {
-            val file = File("youtubeLive.json")
+            val file = File(YOUTUBE_LIVE_CHANNELS)
             if (file.exists()) {
-                val liveStreams = getYouTubeLive().keys
-                val ytCred = getYouTubeCred()
+                val liveStreams = getDataAsBooleanMap(YOUTUBE_LIVE_CHANNELS).keys
+                val ytCred = getDataAsList(YOUTUBE_KEYS)
                 if (ytCred.isNotEmpty()) {
                     return getNames(liveStreams, ytCred[0])
                 } else {
@@ -141,7 +141,7 @@ class YouTubeLiveUpdate: Callable<Int> {
 
                 val updatedChannels = getSelectedItemsMap(channelMap, "Select YouTube Live Channel(s) to Add/Remove", checkedItems = checkedChannels)
 
-                writeYouTubeLive(YouTubeLiveStreams(updatedChannels).getCurrentLiveStreamStatus())
+                writeData(YOUTUBE_LIVE_CHANNELS, YouTubeLiveStreams(updatedChannels).getCurrentLiveStreamStatus())
                 return 0
             } else {
                 throw MissingChannelsException("No YouTube channels added. Please add channels first.")
@@ -167,8 +167,7 @@ class YouTubeLiveRemove: Callable<Int> {
                 val removedChannels = getSelectedItemsMap(channels, "Select YouTube Live Channel(s) to Remove", checkedItems = channels
                 )
 
-                writeYouTubeLive(YouTubeLiveStreams(removedChannels).getCurrentLiveStreamStatus())
-
+                writeData(YOUTUBE_LIVE_CHANNELS, YouTubeLiveStreams(removedChannels).getCurrentLiveStreamStatus())
                 return 0
             } else {
                 throw MissingChannelsException("No YouTube channels added. Please add channels first.")
