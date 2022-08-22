@@ -20,6 +20,7 @@ docker exec BSN BSN <CLI Command>
 
 ## Mvn Install (Reccomend for the time being)
 Make sure maven is installed on your system!
+Make sure Java 17+ is installed on your system!
 ```
 git clone --branch nightly https://github.com/jnstockley/BTTN \
 cd BTTN \
