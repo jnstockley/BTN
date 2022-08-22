@@ -11,14 +11,14 @@ This Java program mimicks the Twitch live notifications, but with drastically lo
 </div>
 
 # How to Install
-## Docker (Recommended)
+## Docker (Currently Not Working)
 ```
 docker pull jnstockley/bsn:nightly \
 docker run --name BSN jnstockley/bsn:nightly \
 docker exec BSN BSN <CLI Command>
 ```
 
-## Mvn Install
+## Mvn Install (Reccomend for the time being)
 ```
 git clone --branch nightly https://github.com/jnstockley/ \
 cd BTTN \
