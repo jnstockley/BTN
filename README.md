@@ -20,7 +20,7 @@ docker exec BSN BSN <CLI Command>
 
 ## Mvn Install (Reccomend for the time being)
 ```
-git clone --branch nightly https://github.com/jnstockley/ \
+git clone --branch nightly https://github.com/jnstockley/BTTN \
 cd BTTN \
 mvn install \
 mvn package \
