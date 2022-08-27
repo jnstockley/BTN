@@ -83,7 +83,6 @@ private fun checkSetup(): Boolean {
         getDataAsStringMap(TWITCH_KEYS)
         getDataAsList(YOUTUBE_KEYS)
         getDataAsIntMap(YOUTUBE_PLAYLISTS)
-        //getDataAsStringMap(YOUTUBE_IDS)
         getDataAsBooleanMap(YOUTUBE_LIVE_CHANNELS)
         getDataAsList(TWITCH_CHANNELS)
     } catch (e: FileNotFoundException) {

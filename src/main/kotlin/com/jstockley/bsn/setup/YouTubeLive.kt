@@ -49,7 +49,7 @@ class YouTubeLiveAdd: Callable<Int> {
 
                 if (ytCred.isNotEmpty()) {
                     val selectedChannels = getSelectedItemsMap(channels, "Select YouTube Live Channel(s) to Import")
-                    writeData(YOUTUBE_LIVE_CHANNELS, YouTubeLiveStreams(selectedChannels).getCurrentLiveStreams())
+                    writeData(YOUTUBE_LIVE_CHANNELS, selectedChannels)
                     return 0
                 } else {
                     throw YTCredException("YouTube Credentials not setup, unable to add channels!")
@@ -141,7 +141,7 @@ class YouTubeLiveUpdate: Callable<Int> {
 
                 val updatedChannels = getSelectedItemsMap(channelMap, "Select YouTube Live Channel(s) to Add/Remove", checkedItems = checkedChannels)
 
-                writeData(YOUTUBE_LIVE_CHANNELS, YouTubeLiveStreams(updatedChannels).getCurrentLiveStreamStatus())
+                writeData(YOUTUBE_LIVE_CHANNELS, updatedChannels)
                 return 0
             } else {
                 throw MissingChannelsException("No YouTube channels added. Please add channels first.")
@@ -167,7 +167,7 @@ class YouTubeLiveRemove: Callable<Int> {
                 val removedChannels = getSelectedItemsMap(channels, "Select YouTube Live Channel(s) to Remove", checkedItems = channels
                 )
 
-                writeData(YOUTUBE_LIVE_CHANNELS, YouTubeLiveStreams(removedChannels).getCurrentLiveStreamStatus())
+                writeData(YOUTUBE_LIVE_CHANNELS, removedChannels)
                 return 0
             } else {
                 throw MissingChannelsException("No YouTube channels added. Please add channels first.")
