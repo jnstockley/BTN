@@ -22,6 +22,11 @@ const val version = "2.0-alpha3"
 
 fun main(args: Array<String>) {
 
+//    val cli = CLIHelper("Test", 50, 5)
+//    cli.addTextBox(listOf("Box 1", "Box 2"))
+//
+//    exitProcess(0)
+
     /**
      * TODO
      * 1. Improve exceptions

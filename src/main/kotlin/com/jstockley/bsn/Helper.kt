@@ -2,10 +2,11 @@ package com.jstockley.bsn
 
 import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.gui2.*
-import com.googlecode.lanterna.gui2.TextBox.TextBoxRenderer
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialog
 import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 
+private var gui: MultiWindowTextGUI? = null
 
 fun getSelectedItemsMap(items: Map<String, String>, title: String, checkedItems: Map<String, String> = mutableMapOf()): MutableMap<String, Boolean> {
     val sortedItems = items.toSortedMap(java.lang.String.CASE_INSENSITIVE_ORDER)
@@ -82,6 +83,7 @@ fun getSelectedItemsList(title: String, items: List<String> = mutableListOf()): 
 }
 
 
+//@Deprecated("Use CLIHelper")
 
 private fun setupTextBoxPanel(title: String, currentText: List<String>): Panel{
     val contentPanel = Panel(GridLayout(1))
@@ -93,11 +95,21 @@ private fun setupTextBoxPanel(title: String, currentText: List<String>): Panel{
         textBox.text = currentText.joinToString(separator = "\n") { it }
     }
     contentPanel.addComponent(textBox)
-    setupWindow(title, contentPanel)
+    val button = Button("Enter")
+    //contentPanel.addComponent(button)
+    val window = setupWindow(title, contentPanel)
+    //val textGUI = MultiWindowTextGUI(window)
+    contentPanel.addComponent(Button("Enter") { window.close() })
+
+    //setupWindow(title, contentPanel)
+    gui!!.addWindowAndWait(window)
+    gui!!.screen.stopScreen()
+
     return contentPanel
 }
 
 
+//@Deprecated("Use CLIHelper")
 
 private fun setupCheckBoxPanel(title: String, items: Set<String>, checkedItems: Set<String>): Panel {
     val controlPanel = Panel(GridLayout(1))
@@ -114,9 +126,16 @@ private fun setupCheckBoxPanel(title: String, items: Set<String>, checkedItems: 
         }
     }
     controlPanel.addComponent(checkBoxList)
-    setupWindow(title, controlPanel)
+    val button = Button("Enter")
+    //controlPanel.addComponent(button)
+    val window = setupWindow(title, controlPanel)
+
+    controlPanel.addComponent(Button("Enter") { window.close() })
+    gui!!.addWindowAndWait(window)
+    gui!!.screen.stopScreen()
     return controlPanel
 }
+//@Deprecated("Use CLIHelper")
 
 private fun setupWindow(title: String, panel: Panel): Window {
     val terminalFactory = DefaultTerminalFactory()
@@ -127,6 +146,7 @@ private fun setupWindow(title: String, panel: Panel): Window {
     val hints = listOf(Window.Hint.CENTERED)
     window.setHints(hints)
     window.component = panel
-    textGUI.addWindowAndWait(window)
+    //textGUI.addWindowAndWait(window)
+    gui = textGUI
     return window
 }

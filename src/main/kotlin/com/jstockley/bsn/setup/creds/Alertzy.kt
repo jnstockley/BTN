@@ -20,12 +20,19 @@ class Alertzy: Callable<Int> {
 
 @Command(name = "Add", mixinStandardHelpOptions = true, description = ["Add Alertzy Account Key(s)"], version = [version])
 class AlertzyAdd: Callable<Int> {
+
+    var fileName = ALERTZY_KEYS
+
+    var keys = listOf<String>()
+
     override fun call(): Int {
         try {
-            val keys = getSelectedItemsList("Add Alertzy Account Key(s)")
+            if (keys == listOf<String>()) {
+                keys = getSelectedItemsList("Add Alertzy Account Key(s)")
+            }
             val success = sendTestNotif(keys)
             if (success) {
-                writeData(ALERTZY_KEYS, keys)
+                writeData(fileName, keys)
                 return 0
             } else {
                 throw AlertzyCredException("Failed sending Alertzy test notification to at least one account key!")
@@ -39,9 +46,12 @@ class AlertzyAdd: Callable<Int> {
 
 @Command(name = "List", mixinStandardHelpOptions = true, description = ["List Alertzy Account Key(s)"], version = [version])
 class AlertzyList: Callable<Int> {
+
+    var fileName = ALERTZY_KEYS
+
     override fun call(): Int {
         try {
-            val keys = getDataAsList(ALERTZY_KEYS)
+            val keys = getDataAsList(fileName)
 
             if (keys.isNotEmpty()) {
                 println("Alertzy Key(s) currently being used:")
@@ -64,8 +74,8 @@ class AlertzyUpdate: Callable<Int> {
     override fun call(): Int {
         try {
             val currentKeys = getDataAsList(ALERTZY_KEYS)
-
             val updatedKeys = getSelectedItemsList("Add/Remove Alertzy Account Keys", items = currentKeys)
+            println(updatedKeys)
             val success = sendTestNotif(updatedKeys)
             if (success) {
                 writeData(ALERTZY_KEYS, updatedKeys)
@@ -82,13 +92,20 @@ class AlertzyUpdate: Callable<Int> {
 
 @Command(name = "Remove", mixinStandardHelpOptions = true, description = ["Remove Alertzy Account Key(s)"], version = [version])
 class AlertzyRemove: Callable<Int> {
+
+    var removedKeys = listOf<String>()
+
+    var fileName = ALERTZY_KEYS
+
     override fun call(): Int {
         try {
-            val keys = getDataAsList(ALERTZY_KEYS)
-
+            val keys = getDataAsList(fileName)
             if(keys.isNotEmpty()) {
-                val removedKeys = getSelectedItemsList(keys, "Selected Alertzy Account Key(s) to remove", checkedItems = keys)
-                writeData(ALERTZY_KEYS, removedKeys)
+                if (removedKeys == listOf<String>()) {
+                    removedKeys =
+                        getSelectedItemsList(keys, "Selected Alertzy Account Key(s) to remove", checkedItems = keys)
+                }
+                writeData(fileName, removedKeys)
                 return 0
             } else {
                 throw AlertzyCredException("Alertzy Credentials not setup, unable to account keys!")
@@ -102,5 +119,9 @@ class AlertzyRemove: Callable<Int> {
 
 private fun sendTestNotif(keys: List<String>): Boolean {
     val notif = Notification("Test Notification", "This is a test BSN Notification", NotificationType.Test)
-    return notif.send(keys)
+    try {
+        return notif.send(keys)
+    } catch (e: AlertzyException) {
+        return false
+    }
 }

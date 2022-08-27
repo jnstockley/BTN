@@ -110,6 +110,12 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-lambda</artifactId>
+            <version>1.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.9.1</version>
@@ -142,7 +148,7 @@
         <dependency>
             <groupId>com.github.doyaaaaaken</groupId>
             <artifactId>kotlin-csv-jvm</artifactId>
-            <version>1.5.1</version>
+            <version>1.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

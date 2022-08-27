@@ -42,7 +42,7 @@ fun writeData(path: String, data: Any) {
     val json: String
     val file = File(path)
     if (!file.exists()) {
-        val pattern = Regex("(/[a-zA-Z]*.json)")
+        val pattern = Regex("(/[a-zA-Z-]*.json)")
         val fileName = pattern.find(path)!!.value
         val dirs = File(path.substring(0, path.indexOf(fileName)))
         dirs.mkdirs()
