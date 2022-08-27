@@ -3,6 +3,7 @@ package com.jstockley.bsn.youtube.video
 import com.jstockley.bsn.*
 import com.jstockley.bsn.notification.Notification
 import mu.KotlinLogging
+import java.io.File
 
 class YouTubeUpload: Runnable {
     override fun run() {
@@ -15,7 +16,11 @@ class YouTubeUpload: Runnable {
 
         while (true) {
 
-            val previousVideoIds: MutableMap<String, String> = getDataAsStringMap(YOUTUBE_IDS) as MutableMap<String, String>
+            var previousVideoIds: MutableMap<String, String> = mutableMapOf()
+
+            if (File(YOUTUBE_IDS).exists()) {
+                previousVideoIds = getDataAsStringMap(YOUTUBE_IDS) as MutableMap<String, String>
+            }
 
             var previousVideoAmounts: Map<String, Int> = getDataAsIntMap(YOUTUBE_PLAYLISTS)
 
