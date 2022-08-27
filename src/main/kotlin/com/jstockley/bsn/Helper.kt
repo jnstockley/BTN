@@ -66,7 +66,11 @@ fun getMultiTextBox(titles: List<String>, mainWindow: String, enteredItems: List
         mainPanel.addComponent(textBox.withBorder(Borders.singleLine(titles[i])))
     }
 
-    setupWindow(mainWindow, mainPanel)
+    val window = setupWindow(mainWindow, mainPanel)
+
+    mainPanel.addComponent(Button("Enter") { window.close() })
+    gui!!.addWindowAndWait(window)
+    gui!!.screen.stopScreen()
 
     val clientIdBox = (mainPanel.childrenList[0] as Border).childrenList[0] as TextBox
     val clientSecretBox = (mainPanel.childrenList[1] as Border).childrenList[0] as TextBox
