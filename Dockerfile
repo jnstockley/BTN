@@ -24,18 +24,16 @@ CMD echo "Enter Twitch Username: "
 
 CMD read twitchUsername
 
-CMD if [ ! -e $ALERTZY_KEY ]; then java -jar BSN.jar cred alertzy add; fi
+#CMD if [ ! -e $ALERTZY_KEY ]; then java -jar BSN.jar cred alertzy add; fi
 
-CMD if [ ! -e $TWITCH_KEY ]; then java -jar BSN.jar cred twitch add; fi
+#CMD if [ ! -e $TWITCH_KEY ]; then java -jar BSN.jar cred twitch add; fi
 
-CMD if [ ! -e $YOUTUBE_KEY ]; then java -jar BSN.jar cred youtube add; fi
+#CMD if [ ! -e $YOUTUBE_KEY ]; then java -jar BSN.jar cred youtube add; fi
 
-CMD if [ ! -e $TWITCH_CHANNELS ]; then java -jar BSN.jar twitch add -n $twitchName; fi
+#CMD if [ ! -e $TWITCH_CHANNELS ]; then java -jar BSN.jar twitch add -n $twitchName; fi
 
-CMD if [ ! -e $YOUTUBE_CHANNELS ]; then java -jar BSN.jar youtubelive add -f /config/subscriptions.csv; fi
+#CMD if [ ! -e $YOUTUBE_CHANNELS ]; then java -jar BSN.jar youtubelive add -f /config/subscriptions.csv; fi
 
-CMD if [ ! -e $YOUTUBE_PLAYLISTS ]; then \
-    java -jar BSN.jar YouTube add -f /config/subscriptions.csv; \
-fi
+CMD if [ ! -e $YOUTUBE_PLAYLISTS ]; then "java -jar BSN.jar YouTube add -f /config/subscriptions.csv"; fi
 
 ENTRYPOINT ["java", "-jar", "BSN.jar"]
