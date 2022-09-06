@@ -20,9 +20,15 @@ ENV YOUTUBE_CHANNELS = /config/youtube/channels.json
 
 ENV YOUTUBE_PLAYLISTS = /config/youtube/playlists.json
 
-CMD echo "Enter Twitch Username: "
+#CMD echo "Enter Twitch Username: "
 
-CMD read twitchUsername
+#CMD read twitchUsername
+
+COPY setup.sh .
+
+RUN chmod +x setup.sh
+
+RUN ./setup.sh
 
 #CMD if [ ! -e $ALERTZY_KEY ]; then java -jar BSN.jar cred alertzy add; fi
 
@@ -34,6 +40,9 @@ CMD read twitchUsername
 
 #CMD if [ ! -e $YOUTUBE_CHANNELS ]; then java -jar BSN.jar youtubelive add -f /config/subscriptions.csv; fi
 
-CMD if [ ! -e $YOUTUBE_PLAYLISTS ]; then "java -jar BSN.jar YouTube add -f /config/subscriptions.csv"; fi
+#CMD if [ ! -e $YOUTUBE_PLAYLISTS ]; then java -jar BSN.jar youtube add -f /config/subscriptions.csv; fi
+
+# CMD if [ ! -e $YOUTUBE_PLAYLISTS ]; then java -jar BSN.jar -V; fi
+
 
 ENTRYPOINT ["java", "-jar", "BSN.jar"]
