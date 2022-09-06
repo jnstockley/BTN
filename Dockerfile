@@ -35,7 +35,7 @@ CMD if [ ! -e $TWITCH_CHANNELS ]; then java -jar BSN.jar twitch add -n $twitchNa
 CMD if [ ! -e $YOUTUBE_CHANNELS ]; then java -jar BSN.jar youtubelive add -f /config/subscriptions.csv; fi
 
 CMD if [ ! -e $YOUTUBE_PLAYLISTS ]; then \
-    java -jar BSN.jar youtube add -f /config/subscriptions.csv; \
+    java -jar BSN.jar YouTube add -f /config/subscriptions.csv; \
 fi
 
 ENTRYPOINT ["java", "-jar", "BSN.jar"]
