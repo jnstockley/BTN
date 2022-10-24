@@ -33,7 +33,7 @@ jobs:
       - name: Step 4 - Rename Jar
         run: mv target/*-jar-with-dependencies.jar target/BSN.jar
       - name: Step 5 - Upload Artifact
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: BSN.jar
           path: target/BSN.jar
