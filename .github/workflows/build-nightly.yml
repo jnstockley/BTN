@@ -48,7 +48,7 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Step 2 - Download Jar
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v3.0.2
       - name: Step 3 - Create Release
         uses: Hs1r1us/Release-AIO@v1.0
         env:
