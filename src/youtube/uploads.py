@@ -146,6 +146,8 @@ class YouTubeUpload:
             self.thumbnail_url = upload_data['snippet']['thumbnails']['standard']['url']
         if self.length < 61:
             self.short = True
+        self.livestream = "liveStreamingDetails" in upload_data
+
 
 
 def write_data(channels: list[YouTubeChannel]):
@@ -161,5 +163,5 @@ TODO
 1. Get YT Channel Name DONE
 2. Parse YouTube Upload Data DONE
 3. Check if Short DONE
-4. Determine if YouTube Upload contains live streams or not?
+4. Determine if YouTube Upload contains live streams or not? It does, use `liveStreamingDetails` and check if it exists
 '''
