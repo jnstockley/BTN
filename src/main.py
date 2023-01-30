@@ -1,24 +1,41 @@
+import time
+
 from helper.data import read
 from notification.email import new_upload
+from youtube import uploads
 from youtube.uploads import YouTubeChannels, YouTubeChannel, write_data
 
-channel_ids = list(read('data/youtube/uploads.json').keys())
+while True:
+    uploads.previous_uploads = read('data/youtube/uploads.json')
 
-data = YouTubeChannels.get_data(channel_ids)
+    channel_ids = list(uploads.previous_uploads.keys())
 
-channels: list[YouTubeChannel] = []
+    data = YouTubeChannels.get_data(channel_ids)
 
-for channel_data in data:
-    channel = YouTubeChannel(channel_data)
+    channels: list[YouTubeChannel] = []
 
-    channels.append(channel)
+    for channel_data in data:
+        channel = YouTubeChannel(channel_data)
 
-write_data(channels)
+        channels.append(channel)
 
-new_uploads = [channel for channel in channels if channel.latest_upload is not None]
+    write_data(channels)
 
-if new_uploads:
-    new_upload(new_uploads)
-    # print("Not empty")
+    new_uploads = [channel for channel in channels if channel.latest_upload is not None]
 
-print(new_uploads)
+    if new_uploads:
+        new_upload(new_uploads)
+
+    print(new_uploads)
+
+    print("Sleeping...")
+    time.sleep(45)
+
+    '''
+    TODO
+    1. Ensure API Keys are used equally
+    2. Determine checking for livestreams
+    3. Ensure shorts checking works
+    4. Refactor code to work better
+    5. Add comments for 
+    '''
