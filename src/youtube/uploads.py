@@ -144,10 +144,8 @@ class YouTubeUpload:
             self.thumbnail_url = upload_data['snippet']['thumbnails']['maxres']['url']
         else:
             self.thumbnail_url = upload_data['snippet']['thumbnails']['standard']['url']
-        if self.length < 61:
-            self.short = True
+        self.short = 61 > self.length > 0
         self.livestream = "liveStreamingDetails" in upload_data
-
 
 
 def write_data(channels: list[YouTubeChannel]):
