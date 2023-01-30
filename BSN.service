@@ -5,6 +5,6 @@ After=multi-user.target
 Type=simple
 Restart=always
 WorkingDirectory=/home/<username>/BTTN
-ExecStart=/usr/bin/python3 /home/<username>/BTTN
+ExecStart=/usr/bin/python3 /home/<username>/BTTN/src/main.py
 [Install]
 WantedBy=multi-user.target
