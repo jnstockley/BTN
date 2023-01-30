@@ -1,0 +1,10 @@
+[Unit]
+Description=BSN - Python3
+After=multi-user.target
+[Service]
+Type=simple
+Restart=always
+WorkingDirectory=/home/<username>/BTTN
+ExecStart=/usr/bin/python3 /home/<username>/BTTN
+[Install]
+WantedBy=multi-user.target
