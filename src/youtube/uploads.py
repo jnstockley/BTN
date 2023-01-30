@@ -55,7 +55,7 @@ class YouTubeChannel:
 
         self.current_uploads: int = -1
 
-        self.latest_upload = None
+        self.latest_upload: YouTubeUpload = None
 
         self.parse_data(channel_data)
 
