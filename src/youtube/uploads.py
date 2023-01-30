@@ -9,7 +9,7 @@ from youtube.auth import APIKeys, create_youtube_service
 
 keys = APIKeys(secrets.yt_api_keys)
 
-previous_uploads = read('data/youtube/uploads.json')
+previous_uploads = read('/home/jackstockley/BTTN/data/youtube/uploads.json')
 
 
 class YouTubeChannels:
@@ -153,7 +153,7 @@ def write_data(channels: list[YouTubeChannel]):
     for channel in channels:
         data[channel.channel_id] = channel.current_uploads
     if data:
-        write('data/youtube/uploads.json', data)
+        write('/home/jackstockley/BTTN/data/youtube/uploads.json', data)
 
 
 '''
