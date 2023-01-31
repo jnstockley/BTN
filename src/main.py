@@ -1,12 +1,12 @@
 import time
 
 from helper.data import read
-from notification.email import new_upload
+from notification.notify import new_upload
 from youtube import uploads
 from youtube.uploads import YouTubeChannels, YouTubeChannel, write_data
 
 while True:
-    uploads.previous_uploads = read('/home/jackstockley/BTTN/data/youtube/uploads.json')
+    uploads.previous_uploads = read('data/youtube/uploads.json')  # /home/jackstockley/BTTN/
 
     channel_ids = list(uploads.previous_uploads.keys())
 
