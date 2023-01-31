@@ -1,6 +1,7 @@
 import apprise
 
-from secrets import notifications
+
+import secrets
 from youtube.uploads import YouTubeChannel
 
 
@@ -16,7 +17,7 @@ def new_upload(channels: list[YouTubeChannel]):
 
     notification = apprise.Apprise()
 
-    notification.add(notifications)
+    notification.add(secrets.notifications)
 
     notification.notify(
         body=msg,

@@ -4,7 +4,8 @@ After=multi-user.target
 [Service]
 Type=simple
 Restart=always
-WorkingDirectory=/home/<username>/BTTN
+User=<username>
+Group=<username>
 ExecStart=/usr/bin/python3 /home/<username>/BTTN/src/main.py
 [Install]
 WantedBy=multi-user.target
