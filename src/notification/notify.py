@@ -5,6 +5,17 @@ import secrets
 from youtube.uploads import YouTubeChannel
 
 
+def starting_msg():
+    starting = apprise.Apprise()
+
+    starting.add(secrets.notifications)
+
+    starting.notify(
+        body="BSN Starting up, and checking for YouTube channel uploads!",
+        title="BSN Starting Message!"
+    )
+
+
 def new_upload(channels: list[YouTubeChannel]):
     msg = f"""\
         {channels[0].channel_name} has uploaded a new YouTube Video!</br>

@@ -1,7 +1,7 @@
 import time
 
 from helper.data import read, write
-from notification.notify import new_upload
+from notification.notify import new_upload, starting_msg
 from youtube.uploads import YouTubeChannels
 
 file = 'data/youtube/uploads.json'
@@ -17,6 +17,9 @@ file = 'data/youtube/uploads.json'
 
 
 def main():
+
+    starting_msg()
+
     while True:
 
         channels = YouTubeChannels(read(file))
