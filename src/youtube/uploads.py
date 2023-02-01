@@ -29,7 +29,7 @@ class YouTubeChannels:
                 self.channels.append(channel)
                 self.channel_file_repr[channel.channel_id] = {'uploads': channel.current_upload_amount,
                                                               'upload_id': channel.current_upload_id}
-                if channel.latest_upload is not None:
+                if channel.latest_upload is not None and channel.latest_upload.livestream is False:
                     self.recently_uploaded.append(channel)
 
     def __repr__(self):
