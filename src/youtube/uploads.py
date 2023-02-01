@@ -54,14 +54,15 @@ class YouTubeChannel:
         self.channel_id = channel_data['id']
         self.playlist_id = channel_data['contentDetails']['relatedPlaylists']['uploads']
         self.previous_upload_id = previous_uploads[self.channel_id]['upload_id']
-        self.current_upload_id = self.get_upload_id()
+        self.current_upload_id = self.previous_upload_id
         self.previous_upload_amount = previous_uploads[self.channel_id]['uploads']
         self.current_upload_amount = int(channel_data['statistics']['videoCount'])
         self.channel_name = channel_data['snippet']['title']
         self.latest_upload = None
-        if self.current_upload_amount > self.previous_upload_amount and \
-                self.current_upload_id != self.previous_upload_id:
-            self.latest_upload = YouTubeUpload(self.current_upload_id)
+        if self.current_upload_amount > self.previous_upload_amount:
+            self.current_upload_id = self.get_upload_id()
+            if self.current_upload_id != self.previous_upload_id:
+                self.latest_upload = YouTubeUpload(self.current_upload_id)
 
     def __repr__(self):
         return f"Channel ID: {self.channel_id}, Playlist ID: {self.playlist_id}, Previous Upload ID: " \
@@ -77,6 +78,8 @@ class YouTubeChannel:
             playlistId=self.playlist_id,
             maxResults=1
         )
+
+        print("get upload id")
 
         response: dict = request.execute()
 
