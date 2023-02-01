@@ -21,11 +21,12 @@ def main():
 
         channels = YouTubeChannels(read(file))
 
-        if not channels.recently_uploaded:
+        if len(channels.recently_uploaded) > 0:
             new_upload(channels.recently_uploaded)
 
         write(file, channels.channel_file_repr)
 
+        print("Sleeping...")
         time.sleep(45)
 
 
