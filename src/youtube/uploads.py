@@ -28,7 +28,7 @@ class YouTubeChannels:
                 channel = YouTubeChannel(channel_data, channels)
                 self.channels.append(channel)
                 self.channel_file_repr[channel.channel_id] = {'uploads': channel.current_upload_amount,
-                                                              'upload_id': channel.current_upload_amount}
+                                                              'upload_id': channel.current_upload_id}
                 if channel.latest_upload is not None:
                     self.recently_uploaded.append(channel)
 
