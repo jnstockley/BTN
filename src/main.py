@@ -1,41 +1,33 @@
 import time
 
-from helper.data import read
+from helper.data import read, write
 from notification.notify import new_upload
-from youtube import uploads
-from youtube.uploads import YouTubeChannels, YouTubeChannel, write_data
+from youtube.uploads import YouTubeChannels
 
-while True:
-    uploads.previous_uploads = read('data/youtube/uploads.json')  # /home/jackstockley/BTTN/
+file = 'data/youtube/uploads.json'
 
-    channel_ids = list(uploads.previous_uploads.keys())
-
-    data = YouTubeChannels.get_data(channel_ids)
-
-    channels: list[YouTubeChannel] = []
-
-    for channel_data in data:
-        channel = YouTubeChannel(channel_data)
-
-        channels.append(channel)
-
-    write_data(channels)
-
-    new_uploads = [channel for channel in channels if channel.latest_upload is not None]
-
-    if new_uploads:
-        new_upload(new_uploads)
-
-    print(new_uploads)
-
-    print("Sleeping...")
-    time.sleep(45)
-
-    '''
+'''
     TODO
     1. Ensure API Keys are used equally
-    2. Determine checking for livestreams
-    3. Ensure shorts checking works
-    4. Refactor code to work better
+    2. Determine checking for livestreams WORKS
+    3. Ensure shorts checking works WORKS
+    4. Refactor code to work better DONE
     5. Add comments for 
     '''
+
+
+def main():
+    while True:
+
+        channels = YouTubeChannels(read(file))
+
+        if not channels.recently_uploaded:
+            new_upload(channels.recently_uploaded)
+
+        write(file, channels.channel_file_repr)
+
+        time.sleep(45)
+
+
+if __name__ == '__main__':
+    main()
