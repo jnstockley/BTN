@@ -88,8 +88,6 @@ class YouTubeChannel:
             maxResults=1
         )
 
-        print("get upload id")
-
         response: dict = request.execute()
 
         return response['items'][0]['contentDetails']['videoId']
