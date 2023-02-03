@@ -1,36 +1,39 @@
 import time
 
+import secrets
 from helper.data import read, write
-from notification.notify import new_upload, starting_msg
+from notification.notify import Notification
 from youtube.uploads import YouTubeChannels
 
 file = 'data/youtube/uploads.json'
 
 '''
     TODO
-    1. Ensure API Keys are used equally
-    2. Determine checking for livestreams WORKS
-    3. Ensure shorts checking works WORKS
-    4. Refactor code to work better DONE
-    5. Add comments for 
+    1. Add comments for 
     '''
 
 
 def main():
 
-    starting_msg()
+    notification = Notification(secrets.notifications)
+
+    notification.create(starting_message=True).send()
 
     while True:
 
         channels = YouTubeChannels(read(file))
 
-        if len(channels.recently_uploaded) > 0:
-            new_upload(channels.recently_uploaded)
+        if len(channels.uploads) > 0:
+            notification.create(youtube_upload=channels.uploads).send()
+        if len(channels.livestreams) > 0:
+            notification.create(youtube_livestream=channels.livestreams).send()
+        if len(channels.shorts) > 0:
+            notification.create(youtube_short=channels.shorts).send()
 
         write(file, channels.channel_file_repr)
 
         print("Sleeping...")
-        time.sleep(45)
+        time.sleep(10)
 
 
 if __name__ == '__main__':

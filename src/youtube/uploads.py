@@ -14,7 +14,11 @@ class YouTubeChannels:
     def __init__(self, channels: dict):
         self.channels: list[YouTubeChannel] = []
 
-        self.recently_uploaded: list[YouTubeChannel] = []
+        self.uploads: list[YouTubeChannel] = []
+
+        self.livestreams: list[YouTubeChannel] = []
+
+        self.shorts: list[YouTubeChannel] = []
 
         self.channel_file_repr: dict = {}
 
@@ -29,8 +33,13 @@ class YouTubeChannels:
                 self.channels.append(channel)
                 self.channel_file_repr[channel.channel_id] = {'uploads': channel.current_upload_amount,
                                                               'upload_id': channel.current_upload_id}
-                if channel.latest_upload is not None and channel.latest_upload.livestream is False:
-                    self.recently_uploaded.append(channel)
+                if channel.latest_upload is not None:
+                    if channel.latest_upload.livestream is True:
+                        self.livestreams.append(channel)
+                    elif channel.latest_upload.short is True:
+                        self.shorts.append(channel)
+                    else:
+                        self.uploads.append(channel)
 
     def __repr__(self):
         return f"YouTube Channels: {self.channels}"
