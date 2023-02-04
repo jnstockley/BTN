@@ -1,7 +1,9 @@
 import os
+import sys
 import time
 import logging
 import datetime
+import traceback
 
 import secrets
 from helper.data import read, write
@@ -15,16 +17,22 @@ from youtube.uploads import YouTubeChannels
 
 logger = logging.getLogger("BSN")
 
+# logger.addHandler(logging.StreamHandler())
+
 
 def main():
 
     os.makedirs('logs/', exist_ok=True)
 
     logging.basicConfig(
-        filename=f'logs/BSN-{datetime.datetime.now()}.log',
+        # filename=f'logs/BSN-{datetime.datetime.now()}.log',
         level=logging.DEBUG,
         format="[%(asctime)s] %(levelname)s %(name)s:%(funcName)s:%(lineno)s - %(message)s",
-        datefmt='%Y-%m-%d %I:%M:%S %p'
+        datefmt='%Y-%m-%d %I:%M:%S %p',
+        handlers=[
+            logging.FileHandler(f'logs/BSN-{datetime.datetime.now()}.log'),
+            logging.StreamHandler()
+        ]
     )
 
     file = 'data/youtube/uploads.json'
@@ -50,5 +58,11 @@ def main():
         time.sleep(10)
 
 
+def exception_handler(type, value, tb):
+    logging.error("Uncaught exception: {0}".format(str(value)))
+    logging.error("".join(traceback.format_exception(type, value, tb)))
+
+
 if __name__ == '__main__':
+    sys.excepthook = exception_handler
     main()
