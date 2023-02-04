@@ -17,15 +17,12 @@ from youtube.uploads import YouTubeChannels
 
 logger = logging.getLogger("BSN")
 
-# logger.addHandler(logging.StreamHandler())
-
 
 def main():
 
     os.makedirs('logs/', exist_ok=True)
 
     logging.basicConfig(
-        # filename=f'logs/BSN-{datetime.datetime.now()}.log',
         level=logging.DEBUG,
         format="[%(asctime)s] %(levelname)s %(name)s:%(funcName)s:%(lineno)s - %(message)s",
         datefmt='%Y-%m-%d %I:%M:%S %p',
