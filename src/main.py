@@ -1,19 +1,33 @@
+import os
 import time
+import logging
+import datetime
 
 import secrets
 from helper.data import read, write
 from notification.notify import Notification
 from youtube.uploads import YouTubeChannels
 
-file = 'data/youtube/uploads.json'
-
 '''
     TODO
     1. Add comments for 
     '''
 
+logger = logging.getLogger("BSN")
+
 
 def main():
+
+    os.makedirs('logs/', exist_ok=True)
+
+    logging.basicConfig(
+        filename=f'logs/BSN-{datetime.datetime.now()}.log',
+        level=logging.DEBUG,
+        format="[%(asctime)s] %(levelname)s %(name)s:%(funcName)s:%(lineno)s - %(message)s",
+        datefmt='%Y-%m-%d %I:%M:%S %p'
+    )
+
+    file = 'data/youtube/uploads.json'
 
     notification = Notification(secrets.notifications)
 
@@ -32,7 +46,7 @@ def main():
 
         write(file, channels.channel_file_repr)
 
-        print("Sleeping...")
+        logger.info("Sleeping for 10 seconds...")
         time.sleep(10)
 
 

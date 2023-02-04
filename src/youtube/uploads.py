@@ -1,17 +1,20 @@
+import secrets
+import logging
 import isodate
 from dateutil import parser
 from dateutil.tz import tz
 from googleapiclient.http import HttpRequest
 
-import secrets
 from youtube.auth import create_youtube_service, APIKeys
 
-keys = APIKeys(secrets.yt_api_keys)
+logger = logging.getLogger(f"BSN:{__name__}")
 
 
 class YouTubeChannels:
+    keys = APIKeys(secrets.yt_api_keys)
 
     def __init__(self, channels: dict):
+
         self.channels: list[YouTubeChannel] = []
 
         self.uploads: list[YouTubeChannel] = []
@@ -44,15 +47,16 @@ class YouTubeChannels:
     def __repr__(self):
         return f"YouTube Channels: {self.channels}"
 
-    @staticmethod
-    def get_data(channel_ids: list[str]) -> list[dict]:
-        youtube = create_youtube_service(keys.next_key())
+    def get_data(self, channel_ids: list[str]) -> list[dict]:
+        youtube = create_youtube_service(YouTubeChannels.keys.next_key())
 
         request: HttpRequest = youtube.channels().list(
             part="contentDetails,statistics,snippet",
             id=channel_ids,
             maxResults=50
         )
+
+        logger.debug(f"Getting Data from YouTube API for channels: {channel_ids}")
 
         return request.execute()['items']
 
@@ -69,8 +73,12 @@ class YouTubeChannel:
         self.channel_name = channel_data['snippet']['title']
         self.latest_upload = None
         if self.current_upload_amount > self.previous_upload_amount:
+            logger.info(f"Upload amount changed for {self.channel_name} from {self.previous_upload_amount} to "
+                        f"{self.current_upload_amount}")
             self.current_upload_id = self.get_upload_id()
             if self.current_upload_id != self.previous_upload_id:
+                logger.info(f"Upload ID changed for {self.channel_name} from {self.previous_upload_id} to "
+                            f"{self.current_upload_id}")
                 self.latest_upload = YouTubeUpload(self.current_upload_id)
 
     def __repr__(self):
@@ -80,7 +88,7 @@ class YouTubeChannel:
                f"{self.channel_name}, Latest Upload: {self.latest_upload}"
 
     def get_upload_id(self) -> str:
-        youtube = create_youtube_service(keys.next_key())
+        youtube = create_youtube_service(YouTubeChannels.keys.next_key())
 
         request: HttpRequest = youtube.playlistItems().list(
             part="contentDetails",
@@ -89,6 +97,8 @@ class YouTubeChannel:
         )
 
         response: dict = request.execute()
+
+        logger.debug(f"Getting Upload ID for {self.channel_name}")
 
         return response['items'][0]['contentDetails']['videoId']
 
@@ -110,13 +120,14 @@ class YouTubeUpload:
             self.thumbnail_url = upload_data['snippet']['thumbnails']['standard']['url']
         self.short = 61 > self.length > 0
         self.livestream = "liveStreamingDetails" in upload_data
+        logger.info(f"New YouTube Upload: {self}")
 
     def __repr__(self):
         return f"Upload ID: {self.upload_id}, Uploaded At: {self.uploaded_at}, Title: {self.title}, Length: " \
                f"{self.length}, Thumbnail URL: {self.thumbnail_url}, Short: {self.short}, Livestream: {self.livestream}"
 
     def get_data(self) -> dict:
-        youtube = create_youtube_service(keys.next_key())
+        youtube = create_youtube_service(YouTubeChannels.keys.next_key())
 
         request: HttpRequest = youtube.videos().list(
             part="contentDetails,snippet,liveStreamingDetails",

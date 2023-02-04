@@ -1,8 +1,11 @@
 from collections import deque
+import logging
 
 import googleapiclient.discovery
 from googleapiclient.errors import HttpError
 from googleapiclient.http import HttpRequest
+
+logger = logging.getLogger(f"BSN:{__name__}")
 
 
 class APIKey:
@@ -12,8 +15,10 @@ class APIKey:
 
         self.valid: bool = self.valid_key()
 
+        logger.info(f"{self} if a valid YouTube Data V3 API Key")
+
     def __repr__(self):
-        return f"""[key={self.key}, valid={self.valid}]"""
+        return f"""[key={self.key[:10] + "*"*29}, valid={self.valid}]"""
 
     def valid_key(self):
         """
@@ -32,6 +37,8 @@ class APIKey:
             response: dict = request.execute()
             return response['items'][0]['id'] == "UC_x5XG1OV2P6uZZ5FSM9Ttw"
         except HttpError as e:
+            logger.warning(f"{self} is not a valid YouTube Data V3 API Key")
+            logger.warning(e)
             if e.reason == "API key not valid. Please pass a valid API key.":
                 return False
         return False
@@ -47,7 +54,7 @@ class APIKeys:
         :param keys: List of YouTube Data V3 API Keys
         """
         if len(keys) < 1:
-            print("No YouTube Data V3 API Keys were supplied!")
+            logger.error("No YouTube Data V3 API Keys were supplied!")
             exit(1)
 
         self.keys: deque[APIKey] = deque()
@@ -56,9 +63,10 @@ class APIKeys:
             api_key = APIKey(key)
             if api_key.valid:
                 self.keys.append(api_key)
+                logger.debug(f"Added {self} API Key to valid keys list")
 
         if len(self.keys) < 1:
-            print("No Valid YouTube Data V3 API Keys were supplied!")
+            logger.error("No valid YouTube Data V3 API Keys were supplied!")
             exit(1)
 
     def __repr__(self):
@@ -72,8 +80,10 @@ class APIKeys:
         """
         key: APIKey = self.keys.popleft()
         self.keys.append(key)
+        logger.info(f"Swapped YouTube Data API Key(s): {self}")
         return key.key
 
 
 def create_youtube_service(key: str):
+    logger.debug("Creating YouTube API Service Object")
     return googleapiclient.discovery.build("youtube", "v3", developerKey=key)
