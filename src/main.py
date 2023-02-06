@@ -57,7 +57,7 @@ def main():
 
     notification = Notification(secrets.notifications)
 
-    # notification.create(starting_message=True).send()
+    notification.create(starting_message=True).send()
 
     while True:
 
