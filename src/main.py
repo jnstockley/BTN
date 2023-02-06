@@ -4,6 +4,9 @@ import time
 import logging
 import datetime
 import traceback
+import tzlocal
+from dateutil import parser
+from dateutil.tz import tz
 
 import secrets
 from helper.data import read, write
@@ -19,6 +22,24 @@ logger = logging.getLogger("BSN")
 
 
 def main():
+
+    # 2023-02-05T18:00:25Z
+
+    '''upload_date = parser.parse("2023-02-05T18:00:25Z").astimezone(tz.tzlocal())
+
+    now = datetime.datetime.now(tzlocal.get_localzone())
+
+    previous = now - datetime.timedelta(days=1)
+
+    print(now)
+
+    print(upload_date)
+
+    print(previous)
+
+    print(previous < upload_date < now)
+
+    exit(0)'''
 
     os.makedirs('logs/', exist_ok=True)
 
@@ -36,7 +57,7 @@ def main():
 
     notification = Notification(secrets.notifications)
 
-    notification.create(starting_message=True).send()
+    # notification.create(starting_message=True).send()
 
     while True:
 

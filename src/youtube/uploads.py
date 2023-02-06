@@ -1,8 +1,14 @@
+import time
+from datetime import datetime, timedelta, timezone
+
+import pytz
+
 import secrets
 import logging
 import isodate
 from dateutil import parser
 from dateutil.tz import tz
+import tzlocal
 from googleapiclient.http import HttpRequest
 
 from youtube.auth import create_youtube_service, APIKeys
@@ -79,7 +85,14 @@ class YouTubeChannel:
             if self.current_upload_id != self.previous_upload_id:
                 logger.info(f"Upload ID changed for {self.channel_name} from {self.previous_upload_id} to "
                             f"{self.current_upload_id}")
-                self.latest_upload = YouTubeUpload(self.current_upload_id)
+                upload = YouTubeUpload(self.current_upload_id)
+                if upload.tries == 3:
+                    self.latest_upload = None
+                    # Determine if this will be useful??
+                    # self.current_upload_id = self.previous_upload_id
+                    # self.current_upload_amount -= 1
+                else:
+                    self.latest_upload = upload
 
     def __repr__(self):
         return f"Channel ID: {self.channel_id}, Playlist ID: {self.playlist_id}, Previous Upload ID: " \
@@ -106,21 +119,40 @@ class YouTubeChannel:
 class YouTubeUpload:
 
     def __init__(self, upload_id: str):
+        self.tries: int = 0
+
         self.upload_id = upload_id
 
-        upload_data = self.get_data()
+        utc = pytz.utc
 
-        self.uploaded_at = parser.parse(upload_data['snippet']['publishedAt']).astimezone(tz.tzlocal()) \
-            .strftime("%b %d, %Y - %I:%M %p")
-        self.title = upload_data['snippet']['localized']['title']
-        self.length = isodate.parse_duration(upload_data['contentDetails']['duration']).total_seconds()
-        if 'maxres' in upload_data['snippet']['thumbnails']:
-            self.thumbnail_url = upload_data['snippet']['thumbnails']['maxres']['url']
-        else:
-            self.thumbnail_url = upload_data['snippet']['thumbnails']['standard']['url']
-        self.short = 61 > self.length > 0
-        self.livestream = "liveStreamingDetails" in upload_data
-        logger.info(f"New YouTube Upload: {self}")
+        upload_data = {}
+
+        while self.tries < 3:
+            upload_data = self.get_data()
+
+            self.uploaded_at = parser.parse(upload_data['snippet']['publishedAt']).astimezone(utc).replace(
+                tzinfo=utc)
+            now = datetime.utcnow().replace(tzinfo=utc)
+            previous = now - timedelta(minutes=10)
+
+            if not (previous.replace(tzinfo=None) < self.uploaded_at.replace(tzinfo=None) < now.replace(tzinfo=None)):
+                logger.warning(f"{self.upload_id} not uploaded within 10 minutes, trying again")
+                self.tries += 1
+                time.sleep(2)
+            else:
+                self.tries = 0
+                break
+        if self.tries != 3:
+            self.uploaded_at = self.uploaded_at.strftime("%b %d, %Y - %I:%M %p")
+            self.title = upload_data['snippet']['localized']['title']
+            self.length = isodate.parse_duration(upload_data['contentDetails']['duration']).total_seconds()
+            if 'maxres' in upload_data['snippet']['thumbnails']:
+                self.thumbnail_url = upload_data['snippet']['thumbnails']['maxres']['url']
+            else:
+                self.thumbnail_url = upload_data['snippet']['thumbnails']['standard']['url']
+            self.short = 61 > self.length > 0
+            self.livestream = "liveStreamingDetails" in upload_data
+            logger.info(f"New YouTube Upload: {self}")
 
     def __repr__(self):
         return f"Upload ID: {self.upload_id}, Uploaded At: {self.uploaded_at}, Title: {self.title}, Length: " \
