@@ -90,7 +90,7 @@ class YouTubeChannel:
                     self.latest_upload = None
                     # Determine if this will be useful??
                     # self.current_upload_id = self.previous_upload_id
-                    # self.current_upload_amount -= 1
+                    self.current_upload_amount -= 1
                 else:
                     self.latest_upload = upload
 
