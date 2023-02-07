@@ -1,5 +1,7 @@
 # BTTN (Better Twitch.tv Notifications)
 
+## The future of this project has been move to a new repo [BSN](https://github.com/jnstockley/BSN)
+
 ## BTTN Version 2.0 Update!!!
 There is a new branch called testing where all the information for BTTN V2 is being posted. Please check this branch for new versions, updates, and progress reports.
 
