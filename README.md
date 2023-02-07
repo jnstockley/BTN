@@ -1,4 +1,7 @@
 # BTTN
+
+## The future of this project has been move to a new repo [BSN](https://github.com/jnstockley/BSN)
+
 This Java program mimicks the Twitch live notifications, but with drastically lower delay.
 
 This is a contiuation of the nightly version of BSN but written in Python3.
