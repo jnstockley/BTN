@@ -1,3 +1,5 @@
+## The future of this project has been move to a new repo [BSN](https://github.com/jnstockley/BSN)
+
 ## Version 2.0 Update 14!!
 Wow I can't believe it has been almost 6 months since the last alpha version has been released, sorry about that. Testing has gone really well and I am extremely close to releasing alpha 3. I will release alpha-3 when I have the CLI side of the program completed. I have also implemented YouTube Live Checking and Twitch checking. Before releasing the first beta version I want to improve the time it checks for YouTube Live streams. I am hoping alpha-3 will be out within a couple of weeks. Keep your eyes peeled here.
 
