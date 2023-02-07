@@ -1,4 +1,7 @@
 # BTTN
+
+## The future of this project has been move to a new repo [BSN](https://github.com/jnstockley/BSN)
+
 This Java program mimicks the Twitch live notifications, but with drastically lower delay.
 
 <div align="center">
